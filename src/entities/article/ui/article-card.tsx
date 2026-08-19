@@ -1,42 +1,65 @@
 import Image from "next/image";
-import { Link } from "@/i18n/navigation";
-import type { Article } from "@/types/news"; // Assume ye FSD type humne banaya hai
+import { Link } from "@/i18n/routing";
+import { Article } from "@/types/news";
 
-export function ArticleCard({ article }: { article: Article }) {
+interface ArticleCardProps {
+  article: Article;
+}
+
+export function ArticleCard({ article }: ArticleCardProps) {
+  // Using explicit dimensions for the image or the fill approach per Next.js 15 best practices.
+  // We'll use the 'fill' approach with a relative container for responsive design.
+  const imageUrl = article.image;
+
   return (
-    <article className="group relative flex flex-col space-y-3">
-      {/* AAA Focus Management & Semantic HTML */}
-      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-soft">
-        <Image
-          src={article.image}
-          // MUST: Descriptive alt text for screen readers (Rules compliance)
-          alt={article.imageAlt || `Image for article: ${article.title}`}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="image-zoom object-cover transition-transform duration-700 ease-out"
-          priority={false} // Lazy load by default
-        />
+    <Link 
+      href={`/news/${article.slug}`}
+      className="group flex h-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
+    >
+      <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
+        {imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt={article.title}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-400">
+            <span className="text-sm">No image available</span>
+          </div>
+        )}
       </div>
-      
-      <div className="flex flex-col">
-        <span className="kicker mb-2 text-signal">{article.category}</span>
-        <h3 className="editorial text-xl font-bold leading-tight text-ink">
-          {/* Link that covers the whole card semantically */}
-          <Link 
-            href={`/news/${article.slug}`} 
-            className="focus:outline-none focus:ring-2 focus:ring-signal focus:ring-offset-2 rounded-sm outline-none"
-          >
-            <span className="absolute inset-0" aria-hidden="true"></span>
-            {article.title}
-          </Link>
+
+      <div className="flex flex-1 flex-col p-4">
+        {article.category && (
+          <span className="mb-2 text-xs font-semibold uppercase tracking-wider text-blue-600">
+            {article.category}
+          </span>
+        )}
+        
+        <h3 className="mb-2 text-lg font-bold leading-tight text-gray-900 group-hover:text-blue-600 line-clamp-2">
+          {article.title}
         </h3>
         
-        <div className="mt-2 flex items-center gap-2 text-xs font-medium text-muted">
-          <span>{article.author}</span>
-          <span aria-hidden="true">&middot;</span>
-          <time dateTime={article.publishedAtIso}>{article.publishedAt}</time>
+        <p className="mb-4 flex-1 text-sm text-gray-600 line-clamp-3">
+          {article.excerpt || article.summary || ""}
+        </p>
+
+        <div className="mt-auto flex items-center justify-between text-xs font-medium text-gray-500">
+          <span className="truncate pr-2">
+            {article.author || "Editorial Desk"}
+          </span>
+          <time dateTime={article.publishedAt} className="shrink-0">
+            {new Intl.DateTimeFormat("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric"
+            }).format(new Date(article.publishedAt))}
+          </time>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }

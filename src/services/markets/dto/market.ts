@@ -1,13 +1,39 @@
+export interface Market {
+  id: string;
+  symbol: string;
+  name: string;
+  price: number;
+  change: number;
+  changePercent: number;
+  marketCap?: number;
+  volume?: number;
+  updatedAt: string;
+}
+
+export type MarketDto = {
+  id: string;
+  symbol: string;
+  name: string;
+  value: number;
+  change: number;
+  changePercent: number;
+  updatedAt: string;
+};
+
 import { z } from "zod";
 
 export const marketDtoSchema = z.object({
-  symbol: z.string().min(1),
-  name: z.string().min(1),
+  id: z.string(),
+  symbol: z.string(),
+  name: z.string(),
   value: z.number(),
   change: z.number(),
   changePercent: z.number(),
-  currency: z.string().min(1),
-  observedAt: z.string().datetime({ offset: true }),
+  updatedAt: z.string(),
 });
 
-export type MarketDto = z.infer<typeof marketDtoSchema>;
+export interface MarketResponse {
+  data: Market[];
+  status: "success" | "error";
+  timestamp: string;
+}

@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { searchArticles } from "@/services/search";
 import { ArticleCard } from "@/entities/article/ui/article-card";
-import { Article } from "@/types/news";
 
 interface SearchPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -13,17 +12,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   return (
     <main className="container mx-auto px-4 py-8">
-      <div className="mb-8 border-b border-gray-200 pb-4">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
-          Search Results {query ? `for "${query}"` : ""}
-        </h1>
-      </div>
-      
-      <Suspense fallback={
-        <div className="flex items-center justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" aria-label="Loading results..." />
-        </div>
-      }>
+      <h1 className="mb-6 text-3xl font-bold tracking-tight">
+        Search Results {query ? `for "${query}"` : ""}
+      </h1>
+      <Suspense fallback={<div className="animate-pulse">Loading results...</div>}>
         <SearchResults query={query} />
       </Suspense>
     </main>
@@ -32,27 +24,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
 async function SearchResults({ query }: { query: string }) {
   if (!query) {
-    return (
-      <div className="py-12 text-center text-lg text-gray-500">
-        Please enter a search term to begin.
-      </div>
-    );
+    return <div className="text-gray-500">Please enter a search term to begin.</div>;
   }
 
   const results = await searchArticles(query);
 
   if (!results || results.length === 0) {
-    return (
-      <div className="py-12 text-center text-lg text-gray-500">
-        No articles found matching your query.
-      </div>
-    );
+    return <div className="text-gray-500">No articles found matching your query.</div>;
   }
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {/* The Article type is explicitly defined here to fix the implicit 'any' error */}
-      {results.map((article: Article) => (
+      {results.map((article) => (
         <ArticleCard key={article.id} article={article} />
       ))}
     </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { createMarketRepository } from "@/services/markets";
+import { createMarketRepository, mapMarket } from "@/services/markets";
 import { MarketDashboard } from "@/features/markets/ui/market-dashboard";
 import { Container, Section } from "@/components/layout/layout";
 
@@ -20,7 +20,8 @@ export default async function MarketsPage() {
   const common = await getTranslations("common");
   let markets;
   try {
-    markets = await createMarketRepository().listQuotes();
+    const quotes = await createMarketRepository().listQuotes();
+    markets = quotes.map(mapMarket);
   } catch {
     markets = undefined;
   }

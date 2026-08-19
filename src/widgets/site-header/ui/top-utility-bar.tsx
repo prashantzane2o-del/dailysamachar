@@ -1,8 +1,9 @@
+"use client";
+
 import { useLocale } from "next-intl";
 import { LiveClock } from "@/features/clock/ui/live-clock";
-import { MarketTicker } from "@/widgets/market-ticker/ui/market-ticker";
-import { WeatherUtilityBar } from "@/widgets/weather/weather-utility-bar";
-import type { Locale } from "@/i18n/routing";
+import { MetalsTicker } from "@/widgets/market-ticker/ui/metals-ticker";
+import { WeatherWidget } from "@/widgets/weather/ui/weather-widget";
 
 // Hydration-safe client component
 import { CurrentDate } from "./current-date"; 
@@ -25,12 +26,12 @@ export function TopUtilityBar() {
           
           <span aria-hidden="true" className="hidden text-line md:inline">|</span>
                     
-          <WeatherUtilityBar locale={locale as Locale} />
+          <WeatherWidget city="New Delhi" />
         </div>
 
         {/* Right: Financial Market Ticker */}
         <div className="flex-1 overflow-hidden py-2 pl-0 md:pl-4" role="region" aria-label="Market Overview">
-          <MarketTicker />
+          <MetalsTicker />
         </div>
 
       </div>

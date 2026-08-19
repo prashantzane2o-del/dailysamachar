@@ -1,3 +1,5 @@
+"use client";
+
 import DOMPurify from "isomorphic-dompurify"; // npm install isomorphic-dompurify
 
 interface SanitizedHtmlProps {

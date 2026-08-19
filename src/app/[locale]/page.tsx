@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 
@@ -125,7 +126,7 @@ export default async function Home({
                           {article.excerpt}
                         </p>
                         <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-muted">
-                          <span>{article.author?.name || t("brand")}</span>
+                          <span>{article.author || t("brand")}</span>
                           <span>&bull;</span>
                           <time dateTime={article.publishedAt}>
                             {new Intl.DateTimeFormat(locale, {
@@ -135,13 +136,15 @@ export default async function Home({
                         </div>
                       </div>
                       
-                      {/* Image Placeholder (Can be replaced with next/image if imageUrl exists) */}
-                      <div className="hidden h-28 w-full rounded-lg bg-soft md:col-span-4 md:block overflow-hidden border border-line">
-                        {article.imageUrl && (
-                          <img 
-                            src={article.imageUrl} 
+                      {/* Image Placeholder with next/image */}
+                      <div className="relative hidden h-28 w-full rounded-lg bg-soft md:col-span-4 md:block overflow-hidden border border-line">
+                        {article.image && (
+                          <Image 
+                            src={article.image} 
                             alt={article.title}
-                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            fill
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
                           />
                         )}
                       </div>

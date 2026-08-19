@@ -1,5 +1,3 @@
-import "@/app/globals.css"; // <-- THIS FIXES THE STYLING ISSUE
-
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -10,6 +8,7 @@ import { QueryProvider } from "@/providers/query-provider";
 import { SiteHeader } from "@/widgets/site-header";
 import { SiteFooter } from "@/widgets/site-footer";
 import { BreakingTicker } from "@/widgets/breaking-news";
+import { MainLayout } from "@/components/layout/main-layout";
 
 export async function generateMetadata({
   params,
@@ -46,28 +45,18 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body className="flex min-h-screen flex-col font-sans antialiased bg-paper text-ink">
-        <NextIntlClientProvider messages={messages}>
-          <ThemeProvider defaultTheme="system">
-            <QueryProvider>
-              {/* Global Breaking News Ticker */}
-              <BreakingTicker />
-              
-              {/* Site Header with Navigation & Utility Bar */}
-              <SiteHeader />
-
-              {/* Main Content Area */}
-              <div className="flex-1">
-                {children}
-              </div>
-
-              {/* Global Site Footer */}
-              <SiteFooter />
-            </QueryProvider>
-          </ThemeProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider messages={messages}>
+      <ThemeProvider defaultTheme="system">
+        <QueryProvider>
+          <MainLayout
+            utility={<BreakingTicker />}
+            header={<SiteHeader />}
+            footer={<SiteFooter />}
+          >
+            {children}
+          </MainLayout>
+        </QueryProvider>
+      </ThemeProvider>
+    </NextIntlClientProvider>
   );
 }

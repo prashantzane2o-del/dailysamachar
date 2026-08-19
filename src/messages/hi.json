@@ -24,6 +24,7 @@
     "closeMenu": "मेनू बंद करें",
     "searchStories": "खबरें खोजें",
     "closeSearch": "खोज बंद करें"
+    ,"sections": "सेक्शन"
   },
   "footer": {
     "footerHeading": "साइट फुटर",
@@ -56,7 +57,8 @@
   "markets": {
     "tickerLabel": "सोने और चांदी के बाज़ार भाव",
     "trendUp": "भाव ऊपर",
-    "trendDown": "भाव नीचे"
+    "trendDown": "भाव नीचे",
+    "empty": "कमोडिटी भाव उपलब्ध नहीं हैं"
   },
   "breakingNews": {
     "regionLabel": "ब्रेकिंग न्यूज़ टिकर",
@@ -65,6 +67,7 @@
   "weather": {
     "title": "मौसम",
     "empty": "डेटा उपलब्ध नहीं है",
+    "error": "मौसम सेवा अस्थायी रूप से उपलब्ध नहीं है",
     "current": "वर्तमान"
   },
   "seo": {

@@ -1,12 +1,12 @@
 import Image from "next/image";
-import { Article, ArticleSummary } from "@/entities/article/model";
+import type { Article } from "@/types/news";
 import { Container, Section } from "@/components/layout/layout";
 import { SanitizedHtml } from "@/shared/ui/sanitized-html";
 import { Link } from "@/i18n/routing";
 
 interface ArticlePageProps {
   article: Article;
-  related: ArticleSummary[];
+  related: Article[];
 }
 
 export function ArticlePage({ article, related }: ArticlePageProps) {
@@ -34,7 +34,7 @@ export function ArticlePage({ article, related }: ArticlePageProps) {
             <div className="mt-6 flex items-center justify-between border-b border-t border-line py-4">
               <div className="flex items-center gap-3 text-sm">
                 <div className="font-bold text-ink">
-                  By {article.author?.name || "DailySamachar Desk"}
+                  By {article.author || "DailySamachar Desk"}
                 </div>
                 <span className="text-line">|</span>
                 <time dateTime={article.publishedAt} className="text-muted font-medium">
@@ -45,10 +45,10 @@ export function ArticlePage({ article, related }: ArticlePageProps) {
           </header>
 
           {/* Featured Image */}
-          {article.imageUrl && (
+          {article.image && (
             <figure className="mb-10 overflow-hidden rounded-xl bg-soft">
               <Image
-                src={article.imageUrl}
+                src={article.image}
                 alt={article.title}
                 width={800}
                 height={450}
@@ -60,7 +60,7 @@ export function ArticlePage({ article, related }: ArticlePageProps) {
 
           {/* Article Content */}
           <div className="prose prose-lg prose-slate dark:prose-invert max-w-none text-ink">
-            <SanitizedHtml html={article.content} />
+            <SanitizedHtml html={article.content?.map((block) => block.value).join("\n\n") ?? ""} />
           </div>
         </article>
 

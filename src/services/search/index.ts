@@ -9,17 +9,19 @@ export async function searchArticles(query: string): Promise<Article[]> {
       cache: "no-store",
       headers: {
         "Content-Type": "application/json",
+        "Accept": "application/json"
       },
     });
 
     if (!res.ok) {
-      throw new Error(`Search API returned status: ${res.status}`);
+      console.warn(`[Search Service] Search API returned status: ${res.status}`);
+      return [];
     }
 
     const data = await res.json();
-    return data.results || [];
+    return data.results || data.data || [];
   } catch (error) {
-    console.error("Search API Error:", error);
+    console.error("[Search Service] Error during search fetch:", error);
     return [];
   }
 }
