@@ -1,0 +1,1 @@
+export function SectionHeading({ title, link = "View all" }: { title: string; link?: string }) { return <div className="mb-6 flex items-baseline justify-between border-t-2 border-ink pt-3"><h2 className="editorial text-2xl font-bold tracking-tight">{title}</h2><a href="#all" className="text-xs font-bold text-signal hover:underline">{link} →</a></div>; }

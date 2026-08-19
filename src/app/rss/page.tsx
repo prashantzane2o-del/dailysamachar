@@ -1,0 +1,1 @@
+import { StaticPage } from "@/features/home/components/static-page"; export default function Rss() { return <StaticPage eyebrow="Follow DailySamachar" title="RSS feeds."><p>Use RSS to read DailySamachar in your preferred reader. Topic-specific feeds will be available alongside every category and author page.</p><p>Primary feed: dailysamachar.in/rss.xml</p></StaticPage>; }

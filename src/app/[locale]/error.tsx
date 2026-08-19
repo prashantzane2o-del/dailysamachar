@@ -1,0 +1,2 @@
+"use client";
+export default function Error({ reset }: { error: Error; reset: () => void }) { return <main className="grid min-h-[70vh] place-items-center px-6 text-center"><div><div className="mx-auto h-20 w-20 rounded-3xl border-2 border-signal dot-grid"/><p className="kicker mt-8">Newsroom signal interrupted</p><h1 className="editorial mt-3 text-4xl font-bold">We couldn’t load this page.</h1><button onClick={reset} className="mt-6 rounded-lg bg-ink px-4 py-3 text-sm font-bold text-white">Try again</button></div></main>; }

@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+:root { --paper:#fffdfa; --ink:#111827; --muted:#64748b; --line:#e8e5df; --signal:#d32f2f; --soft:#f7f5f2; }
+[data-theme="dark"] { --paper:#111827; --ink:#f8fafc; --muted:#94a3b8; --line:#293548; --soft:#172033; }
+@theme inline { --color-paper:var(--paper); --color-ink:var(--ink); --color-muted:var(--muted); --color-line:var(--line); --color-signal:var(--signal); --font-sans:var(--font-inter); --font-display:var(--font-newsreader); }
+* { border-color:var(--line); }
+html { scroll-behavior:smooth; }
+body { background:var(--paper); color:var(--ink); font-family:Arial, sans-serif; }
+::selection { background:#d32f2f; color:white; }
+.editorial { font-family:Georgia, serif; }
+.container-page { width:min(100% - 2rem, 76rem); margin-inline:auto; }
+.kicker { color:var(--signal); font-size:.68rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }
+.image-zoom { transition:transform 700ms cubic-bezier(.2,.8,.2,1); }
+.group:hover .image-zoom { transform:scale(1.045); }
+.dot-grid { background-image:radial-gradient(#d32f2f 0.75px,transparent .75px); background-size:8px 8px; }
+[data-theme="dark"] .bg-white { background-color:#172033; }
+[data-theme="dark"] .text-slate-900, [data-theme="dark"] .text-slate-800 { color:#f8fafc; }
+[data-theme="dark"] .text-slate-600, [data-theme="dark"] .text-slate-500, [data-theme="dark"] .text-slate-400 { color:#94a3b8; }
+[data-theme="dark"] .bg-slate-200 { background-color:#263247; }
+@media (min-width: 768px) { .container-page { width:min(100% - 4rem, 76rem); } }

@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "siteName": "DailySamachar",
+    "homeTitle": "Latest News from India and Around the World",
+    "homeDescription": "DailySamachar brings you verified, independent news from India and around the world."
+  },
+  "common": {
+    "brand": "DailySamachar",
+    "advertisement": "Advertisement",
+    "changeLanguage": "Change language",
+    "india": "India",
+    "world": "World",
+    "business": "Business",
+    "video": "Video",
+    "lightMode": "Switch to light mode",
+    "darkMode": "Switch to dark mode",
+    "currentTime": "Current time"
+  },
+  "header": {
+    "skipToContent": "Skip to main content",
+    "signIn": "Sign In",
+    "subscribe": "Subscribe",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "searchStories": "Search stories",
+    "closeSearch": "Close search"
+  },
+  "footer": {
+    "footerHeading": "Site Footer",
+    "description": "Independent journalism for India and the world. We bring you the stories that shape our times, verified and unbiased.",
+    "subscribePrompt": "Subscribe to our newsletter",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "Enter your email",
+    "signUp": "Sign Up",
+    "sectionsHeading": "Sections",
+    "companyHeading": "Company",
+    "aboutUs": "About Us",
+    "careers": "Careers",
+    "advertise": "Advertise",
+    "legalHeading": "Legal",
+    "terms": "Terms of Use",
+    "privacy": "Privacy Policy",
+    "factCheck": "Fact Check Policy",
+    "allRightsReserved": "All rights reserved."
+  },
+  "navigation": {
+    "mainNavigation": "Main Navigation",
+    "india": "India",
+    "world": "World",
+    "politics": "Politics",
+    "business": "Business",
+    "technology": "Technology",
+    "sports": "Sports",
+    "opinion": "Opinion"
+  },
+  "markets": {
+    "tickerLabel": "Gold and Silver Market Rates",
+    "trendUp": "Trend Up",
+    "trendDown": "Trend Down"
+  },
+  "breakingNews": {
+    "regionLabel": "Breaking News Ticker",
+    "label": "Breaking"
+  },
+  "weather": {
+    "title": "Weather",
+    "empty": "Data unavailable",
+    "current": "Current"
+  },
+  "seo": {
+    "factCheck": {
+      "title": "Fact Check | DailySamachar",
+      "description": "We examine claims that travel quickly and explain the evidence that matters. Verified and independent fact-checking."
+    }
+  },
+  "factCheck": {
+    "heading": "Fact Check",
+    "subheading": "We examine claims that travel quickly and explain the evidence that matters. Verified and independent fact-checking.",
+    "emptyStateTitle": "No articles found",
+    "emptyStateDesc": "Please check back later for new fact checks."
+  }
+}

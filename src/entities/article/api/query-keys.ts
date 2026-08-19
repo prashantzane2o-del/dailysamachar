@@ -1,0 +1,1 @@
+export const articleKeys = { all: ["articles"] as const, lists: () => [...articleKeys.all, "list"] as const, list: (query: object) => [...articleKeys.lists(), query] as const, detail: (slug: string) => [...articleKeys.all, "detail", slug] as const };
