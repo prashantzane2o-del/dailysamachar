@@ -1,46 +1,51 @@
 import type { MetadataRoute } from "next";
+import { cmsClient } from "@/shared/api/cms";
+import { routing } from "@/i18n/routing";
 
-// Note: Ensure you import your actual routing config where locales are defined
-// Assuming it is located at "@/i18n/routing" based on your middleware.ts
-import { routing } from "@/i18n/routing"; 
+const origin = process.env.NEXT_PUBLIC_SITE_URL || "https://dailysamachar.org";
 
-// Use environment variables for the domain (Fallback for local dev)
-const origin = process.env.NEXT_PUBLIC_SITE_URL || "https://dailysamachar.in";
+function localizedPath(locale: string, path: string): string {
+  return locale === routing.defaultLocale ? path : "/" + locale + path;
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-
-  // 1. Base Static Routes
-  const staticRoutes = routing.locales.flatMap((locale) => [
-    { url: `${origin}/${locale}`, lastModified: now, changeFrequency: "daily" as const, priority: 1.0 },
-    { url: `${origin}/${locale}/fact-check`, lastModified: now, changeFrequency: "daily" as const, priority: 0.9 },
-    { url: `${origin}/${locale}/weather`, lastModified: now, changeFrequency: "hourly" as const, priority: 0.8 },
-    { url: `${origin}/${locale}/markets`, lastModified: now, changeFrequency: "hourly" as const, priority: 0.8 },
+  const staticPaths = ["/", "/fact-check", "/weather", "/markets", "/search"];
+  const [categories, posts] = await Promise.all([
+    cmsClient.getCategories().catch((error: unknown) => {
+      console.error("Failed to build category sitemap entries", error);
+      return [];
+    }),
+    cmsClient.getPostSitemapEntries().catch((error: unknown) => {
+      console.error("Failed to build article sitemap entries", error);
+      return [];
+    }),
   ]);
 
-  // 2. Dynamic Categories Navigation
-  const categories = ["india", "world", "politics", "business", "technology", "sports", "opinion"];
+  const staticRoutes = routing.locales.flatMap((locale) =>
+    staticPaths.map((path) => ({
+      url: origin + localizedPath(locale, path),
+      lastModified: now,
+      changeFrequency: path === "/weather" || path === "/markets" ? "hourly" as const : "daily" as const,
+      priority: path === "/" ? 1 : 0.7,
+    })),
+  );
   const categoryRoutes = routing.locales.flatMap((locale) =>
     categories.map((category) => ({
-      url: `${origin}/${locale}/category/${category}`,
+      url: origin + localizedPath(locale, "/category/" + category.slug),
       lastModified: now,
       changeFrequency: "daily" as const,
       priority: 0.8,
-    }))
+    })),
+  );
+  const articleRoutes = routing.locales.flatMap((locale) =>
+    posts.map((article) => ({
+      url: origin + localizedPath(locale, "/news/" + article.slug),
+      lastModified: new Date(article.updatedAt || article.publishedAt),
+      changeFrequency: "daily" as const,
+      priority: 0.7,
+    })),
   );
 
-  // 3. Dynamic Article Routes (CMS Integration as per Architecture Rule 13.2)
-  // TODO: Import your CMS service, e.g., `import { getRecentArticles } from "@/services/news";`
-  // const recentArticles = await getRecentArticles();
-  // const articleRoutes = recentArticles.map((article) => ({
-  //   url: `${origin}/${article.locale}/news/${article.slug}`,
-  //   lastModified: article.updatedAt,
-  //   changeFrequency: "never" as const,
-  //   priority: 0.7,
-  // }));
-  
-  const articleRoutes: MetadataRoute.Sitemap = []; // Remove this once CMS is integrated
-
-  // Combine all routes into the final sitemap
   return [...staticRoutes, ...categoryRoutes, ...articleRoutes];
 }

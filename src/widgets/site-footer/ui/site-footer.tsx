@@ -8,7 +8,7 @@ export function SiteFooter() {
 
   return (
     <footer
-      className="mt-16 border-t-[6px] border-ink bg-soft pt-16 pb-8"
+      className="mt-16 border-t-[6px] border-ink bg-soft pt-16 pb-8 dark:border-gray-700 dark:bg-gray-900"
       aria-labelledby="footer-heading"
     >
       <h2 id="footer-heading" className="sr-only">{tFooter("footerHeading")}</h2>
@@ -20,7 +20,7 @@ export function SiteFooter() {
           <div className="lg:col-span-2">
             <Link
               href="/"
-              className="editorial text-3xl font-black tracking-tight text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal rounded-sm"
+              className="editorial rounded-sm text-3xl font-black tracking-tight text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal dark:text-gray-100"
               aria-label={tCommon("brand")}
             >
               {tCommon("brand")}.
@@ -40,7 +40,7 @@ export function SiteFooter() {
                   autoComplete="email"
                   required
                   placeholder={tFooter("emailPlaceholder")}
-                  className="w-full rounded-md border border-line bg-paper px-4 py-2 text-sm text-ink placeholder:text-muted focus-visible:border-signal focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-signal"
+                  className="w-full rounded-md border border-line bg-paper px-4 py-2 text-sm text-ink placeholder:text-muted focus-visible:border-signal focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-signal dark:bg-gray-950 dark:text-gray-100"
                 />
                 <button
                   type="submit"

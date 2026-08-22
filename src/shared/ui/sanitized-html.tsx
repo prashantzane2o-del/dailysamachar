@@ -1,23 +1,62 @@
-"use client";
+import sanitizeHtml from "sanitize-html";
 
-import DOMPurify from "isomorphic-dompurify"; // npm install isomorphic-dompurify
+const ALLOWED_TAGS = [
+  "a",
+  "b",
+  "blockquote",
+  "br",
+  "code",
+  "em",
+  "figcaption",
+  "figure",
+  "h2",
+  "h3",
+  "h4",
+  "i",
+  "img",
+  "li",
+  "ol",
+  "p",
+  "pre",
+  "strong",
+  "ul",
+] as const;
 
-interface SanitizedHtmlProps {
-  html: string;
-  className?: string;
+const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
+  allowedTags: [...ALLOWED_TAGS],
+  allowedAttributes: {
+    "*": ["class"],
+    a: ["href", "target", "rel"],
+    img: ["src", "alt", "width", "height"],
+  },
+  allowedSchemes: ["http", "https", "mailto"],
+  allowedSchemesByTag: { img: ["http", "https"] },
+  allowProtocolRelative: false,
+};
+
+export function sanitizeCmsHtml(html: string | null | undefined): string {
+  return sanitizeHtml(html ?? "", SANITIZE_OPTIONS);
 }
 
-export function SanitizedHtml({ html, className }: SanitizedHtmlProps) {
-  // Safe HTML rendering for WordPress content
-  const cleanHtml = DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote', 'img', 'figure', 'figcaption'],
-    ALLOWED_ATTR: ['href', 'target', 'src', 'alt', 'class'],
-  });
+export function stripCmsHtml(html: string | null | undefined): string {
+  return sanitizeHtml(html ?? "", {
+    ...SANITIZE_OPTIONS,
+    allowedTags: [],
+    allowedAttributes: {},
+  }).trim();
+}
 
-  return (
-    <div 
-      className={className}
-      dangerouslySetInnerHTML={{ __html: cleanHtml }} 
-    />
-  );
+type SanitizedHtmlElement = "div" | "span" | "p" | "h2" | "h3" | "h4" | "blockquote";
+
+interface SanitizedHtmlProps {
+  html: string | null | undefined;
+  className?: string;
+  as?: SanitizedHtmlElement;
+}
+
+/** Renders CMS HTML only after it has crossed the sanitizer boundary. */
+export function SanitizedHtml({ html, className, as = "div" }: SanitizedHtmlProps) {
+  const Element = as;
+
+  return <Element className={className} dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(html) }} />;
 }

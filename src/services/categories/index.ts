@@ -1,2 +1,6 @@
-import { categories } from "@/services/news/content";
-export async function getCategoryBySlug(slug: string) { return categories.find(category => category.slug === slug) ?? null; }
+import { cmsClient } from "@/shared/api/cms";
+import type { Category } from "@/types/news";
+
+export async function getCategoryBySlug(slug: string): Promise<Category | null> {
+  return cmsClient.getCategoryBySlug(slug);
+}

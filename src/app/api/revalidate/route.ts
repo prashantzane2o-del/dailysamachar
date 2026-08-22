@@ -1,52 +1,39 @@
-import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath, revalidateTag } from "next/cache";
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+
+const payloadSchema = z.object({
+  tag: z.string().min(1).max(120).optional(),
+  path: z.string().startsWith("/").max(240).optional(),
+  type: z.enum(["page", "layout"]).optional(),
+  post: z.object({ post_name: z.string().regex(/^[a-z0-9-]+$/i) }).optional(),
+}).strict();
 
 export async function POST(request: NextRequest) {
+  const expectedSecret = process.env.REVALIDATION_SECRET;
+  const authorization = request.headers.get("authorization");
+  if (!expectedSecret || authorization !== "Bearer " + expectedSecret) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
-    const authHeader = request.headers.get("authorization");
-    const expectedToken = `Bearer ${process.env.REVALIDATION_SECRET}`;
-
-    if (!process.env.REVALIDATION_SECRET || authHeader !== expectedToken) {
-      return NextResponse.json(
-        { error: "Unauthorized: Invalid or missing token" },
-        { status: 401 }
-      );
+    const payload = payloadSchema.parse(await request.json());
+    if (payload.tag) {
+      revalidateTag(payload.tag);
+      return NextResponse.json({ revalidated: true, strategy: "tag", tag: payload.tag });
     }
-
-    const body = await request.json();
-    const { tag, path, type } = body;
-
-    if (tag && typeof tag === "string") {
-      revalidateTag(tag);
-      return NextResponse.json({
-        revalidated: true,
-        strategy: "tag",
-        tag,
-        timestamp: Date.now(),
-      });
+    if (payload.path) {
+      revalidatePath(payload.path, payload.type ?? "page");
+      return NextResponse.json({ revalidated: true, strategy: "path", path: payload.path });
     }
-
-    if (path && typeof path === "string") {
-      const revalidationType = type === "layout" || type === "page" ? type : "page";
-      revalidatePath(path, revalidationType);
-      return NextResponse.json({
-        revalidated: true,
-        strategy: "path",
-        path,
-        type: revalidationType,
-        timestamp: Date.now(),
-      });
+    if (payload.post) {
+      revalidatePath("/[locale]/news/" + payload.post.post_name, "page");
+      return NextResponse.json({ revalidated: true, strategy: "post", slug: payload.post.post_name });
     }
-
-    return NextResponse.json(
-      { error: "Bad Request: Provide a valid 'tag' or 'path' in the payload" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Provide tag, path, or post.post_name" }, { status: 400 });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-    return NextResponse.json(
-      { error: "Internal Server Error", details: errorMessage },
-      { status: 500 }
-    );
+    if (error instanceof z.ZodError) return NextResponse.json({ error: "Invalid revalidation payload" }, { status: 400 });
+    console.error("Revalidation failed", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

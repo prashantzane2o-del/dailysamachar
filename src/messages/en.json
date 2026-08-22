@@ -23,8 +23,8 @@
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "searchStories": "Search stories",
-    "closeSearch": "Close search"
-    ,"sections": "Sections"
+    "closeSearch": "Close search",
+    "sections": "Sections"
   },
   "footer": {
     "footerHeading": "Site Footer",
@@ -74,7 +74,16 @@
     "factCheck": {
       "title": "Fact Check | DailySamachar",
       "description": "We examine claims that travel quickly and explain the evidence that matters. Verified and independent fact-checking."
+    },
+    "home": {
+      "title": "DailySamachar | Latest News & Updates",
+      "description": "DailySamachar brings you verified, independent news from India and around the world."
     }
+  },
+  "home": {
+    "title": "Latest News",
+    "description": "Welcome to Daily Samachar",
+    "noNews": "No news available at the moment."
   },
   "factCheck": {
     "heading": "Fact Check",

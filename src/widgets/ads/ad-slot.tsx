@@ -29,8 +29,8 @@ export function AdSlot({ placement, className }: { placement: Placement; classNa
         if (entry.isIntersecting) {
           setIsLoaded(true);
           node.dataset.loaded = "true";
-          // TODO: Call your ad network logic here (e.g., Google Publisher Tag push)
-          
+          // The data-loaded marker is the integration seam for the ad provider.
+
           // Stop observing once the ad request is triggered
           observer.disconnect();
         }

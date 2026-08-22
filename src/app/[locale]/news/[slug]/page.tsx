@@ -1,64 +1,39 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getLocale } from "next-intl/server";
+import { cmsClient } from "@/shared/api/cms";
+import { ArticleSchema } from "@/components/seo/article-schema";
 import { ArticlePage } from "@/features/article/ui/article-page";
-import { getArticleBySlug, getRelatedArticles } from "@/services/news";
+import { stripCmsHtml } from "@/shared/ui/sanitized-html";
 
-// 1. SEO Metadata Generation (Architecture SEO Standards)
-export async function generateMetadata({ 
-  params 
-}: { 
-  params: Promise<{ slug: string }> 
-}): Promise<Metadata> {
-  const slug = (await params).slug;
-  const article = await getArticleBySlug(slug);
+type ArticleRouteProps = { params: Promise<{ locale: string; slug: string }> };
 
-  if (!article) {
-    return { title: "Article Not Found | DailySamachar" };
-  }
+export const revalidate = 60;
 
+export async function generateMetadata({ params }: ArticleRouteProps): Promise<Metadata> {
+  const { slug } = await params;
+  const article = await cmsClient.getPostBySlug(slug);
+  if (!article) return { title: "Story not found" };
+  const title = stripCmsHtml(article.title) || "DailySamachar story";
+  const description = stripCmsHtml(article.excerpt);
   return {
-    title: `${article.title} | DailySamachar`,
-    description: article.excerpt || "Read the latest news and verified reporting on DailySamachar.",
-    alternates: {
-      canonical: `/news/${slug}`,
-    },
-    openGraph: {
-      title: `${article.title} | DailySamachar`,
-      description: article.excerpt || "Read the full article on DailySamachar.",
-      type: "article",
-      publishedTime: article.publishedAt,
-      // FIX 1: article.author string type hai, isliye seedha string pass karenge 
-      authors: article.author ? [article.author] : undefined,
-    },
+    title,
+    description,
+    openGraph: { title, description, type: "article", images: article.image ? [article.image] : undefined },
   };
 }
 
-// 2. Server Component for the Route
-export default async function NewsArticleRoute({ 
-  params 
-}: { 
-  params: Promise<{ slug: string }> 
-}) {
-  const slug = (await params).slug;
-  const locale = await getLocale();
-  
-  // Data sequentially fetch kar rahe hain taaki error na aaye
-  const article = await getArticleBySlug(slug);
+export default async function NewsArticlePage({ params }: ArticleRouteProps) {
+  const { slug, locale } = await params;
+  const article = await cmsClient.getPostBySlug(slug);
+  if (!article) notFound();
 
-  if (!article) {
-    notFound();
-  }
-
-  // FIX 2: getRelatedArticles expects 2 arguments. Locale/Category ko 1st arg ke taur par pass kiya.
-  // Agar aapke services/news/index.ts mein 1st arg categorySlug hai, toh (article.category, slug) use karein.
-  const relatedArticles = await getRelatedArticles(locale, slug);
+  const relatedResponse = await cmsClient.getPosts({ perPage: 8 });
+  const related = relatedResponse.data.filter((candidate) => candidate.slug !== article.slug).slice(0, 3);
 
   return (
-    // FIX 3: Prop ka naam 'relatedArticles' se badal kar 'related' kiya gaya
-    <ArticlePage 
-      article={article} 
-      related={relatedArticles} 
-    />
+    <>
+      <ArticleSchema article={article} locale={locale} />
+      <ArticlePage article={article} related={related} />
+    </>
   );
 }

@@ -1,7 +1,7 @@
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { routing } from "@/i18n/routing";
+import { routing, type Locale } from "@/i18n/routing";
 
 import { ThemeProvider } from "@/providers/theme-provider";
 import { QueryProvider } from "@/providers/query-provider";
@@ -37,7 +37,7 @@ export default async function LocaleLayout({
   const { locale } = await params;
 
   // Validate that the incoming `locale` is supported
-  if (!routing.locales.includes(locale as any)) {
+  if (!routing.locales.includes(locale as Locale)) {
     notFound();
   }
 
@@ -45,8 +45,8 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <NextIntlClientProvider messages={messages}>
-      <ThemeProvider defaultTheme="system">
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <ThemeProvider defaultTheme="light">
         <QueryProvider>
           <MainLayout
             utility={<BreakingTicker />}

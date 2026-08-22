@@ -1,50 +1,37 @@
-"use client";
+import { cmsClient } from "@/shared/api/cms";
+import type { Category } from "@/types/news";
+import { Link } from "@/i18n/navigation";
 
-import { usePathname, Link } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
+export async function MainNavigation() {
+  let categories: Category[] = [];
+  try {
+    categories = await cmsClient.getCategories();
+  } catch (error) {
+    console.error("Failed to fetch categories for main navigation:", error);
+  }
 
-export function MainNavigation() {
-  const tNav = useTranslations("navigation");
-  const pathname = usePathname();
-
-  // Navigation Links localized securely via next-intl
-  const navLinks = [
-    { label: tNav("india"), href: "/category/india" },
-    { label: tNav("world"), href: "/category/world" },
-    { label: tNav("politics"), href: "/category/politics" },
-    { label: tNav("business"), href: "/category/business" },
-    { label: tNav("technology"), href: "/category/technology" },
-    { label: tNav("sports"), href: "/category/sports" },
-    { label: tNav("opinion"), href: "/category/opinion" },
-  ];
+  const sortedCategories = [...categories].sort((a: Category, b: Category) => {
+    return a.title.localeCompare(b.title);
+  });
 
   return (
-    <nav
-      aria-label={tNav("mainNavigation") || "Main Navigation"}
-      className="hidden border-b border-line bg-paper shadow-sm md:block"
-    >
-      <ul className="container-page flex items-center justify-center gap-8 py-3">
-        {navLinks.map((link) => {
-          // Check if the current route matches the link href or starts with it (for nested pages)
-          const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+    <nav className="hidden md:flex items-center space-x-6">
+      <Link href="/" className="font-medium text-ink transition-colors hover:text-signal dark:text-gray-100">
+        Home
+      </Link>
 
-          return (
-            <li key={link.label}>
-              <Link
-                href={link.href}
-                aria-current={isActive ? "page" : undefined}
-                className={`block rounded-sm text-[13px] font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-4 ${
-                  isActive
-                    ? "border-b-2 border-signal pb-0.5 text-signal" // Visual indicator for active state
-                    : "pb-1.5 text-ink/80 hover:text-signal" // FIXED: Replaced pb-[6px] with pb-1.5
-                }`}
-              >
-                {link.label}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      {sortedCategories.map((category: Category) => (
+        <Link
+          key={category.slug}
+          href={`/category/${category.slug}`}
+          className="font-medium capitalize text-ink transition-colors hover:text-signal dark:text-gray-100"
+        >
+          {category.title}
+        </Link>
+      ))}
     </nav>
   );
 }
+
+// Depending on how this was imported in site-header.tsx, you may need a default export
+export default MainNavigation;

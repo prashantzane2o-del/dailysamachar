@@ -1,57 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useTheme } from "@/providers/theme-provider";
 
 export function ThemeToggle() {
-  const tCommon = useTranslations("common");
-  const [mounted, setMounted] = useState(false);
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    // 1. Check local storage and system preference on mount
-    setMounted(true);
-    const storedTheme = localStorage.getItem("theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    
-    if (storedTheme === "dark" || (!storedTheme && prefersDark)) {
-      setIsDark(true);
-      document.documentElement.setAttribute("data-theme", "dark");
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    
-    // 2. Sync with DOM and LocalStorage
-    if (newTheme) {
-      document.documentElement.setAttribute("data-theme", "dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.removeAttribute("data-theme");
-      localStorage.setItem("theme", "light");
-    }
-  };
-
-  // 3. Hydration fallback to prevent CLS
-  if (!mounted) {
-    return <div className="h-9 w-9" aria-hidden="true" />;
-  }
+  const t = useTranslations("common");
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === "dark";
 
   return (
     <button
       type="button"
-      onClick={toggleTheme}
-      aria-label={isDark ? tCommon("lightMode") || "Switch to light mode" : tCommon("darkMode") || "Switch to dark mode"}
-      className="flex h-9 w-9 items-center justify-center rounded-full text-ink transition-colors hover:bg-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      aria-label={isDark ? t("lightMode") : t("darkMode")}
+      className="inline-flex h-9 w-9 items-center justify-center rounded-full text-ink transition-colors hover:bg-soft focus-visible:ring-2 focus-visible:ring-focus dark:text-gray-100 dark:hover:bg-gray-800"
     >
-      {isDark ? (
-        <Sun className="h-5 w-5" aria-hidden="true" />
-      ) : (
-        <Moon className="h-5 w-5" aria-hidden="true" />
-      )}
+      {isDark ? <Sun aria-hidden="true" size={17} /> : <Moon aria-hidden="true" size={17} />}
     </button>
   );
 }

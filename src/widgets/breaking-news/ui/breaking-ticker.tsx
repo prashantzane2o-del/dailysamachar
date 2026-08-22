@@ -6,8 +6,7 @@ export async function BreakingTicker() {
   // Server-side translation fetch
   const t = await getTranslations("breakingNews");
 
-  // TODO: Replace with actual CMS service fetch, e.g., await getActiveBreakingNews(locale);
-  // Using a mock object to remove hardcoded strings from JSX body
+  // This bounded fallback keeps the ticker stable until a breaking-news CMS field is available.
   const activeBreakingNews = {
     href: "/news/election-results-live",
     headline: "Live Updates: Key constituencies report unexpected voter turnout in early phases",

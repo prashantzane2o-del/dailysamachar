@@ -1,10 +1,12 @@
 "use client";
 
 import { Menu, Search, X } from "lucide-react";
+import NextLink from "next/link";
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/widgets/widgets";
+import { getLocalizedPath } from "@/i18n/path";
 
 const navigationKeys = [
   "india",
@@ -25,7 +27,10 @@ export function SiteHeader() {
   const t = useTranslations();
   const pathname = usePathname();
   const router = useRouter();
-  const switchLocale = () => router.replace(pathname, { locale: locale === "hi" ? "en" : "hi" });
+  const switchLocale = () => {
+    const pathWithoutLocale = pathname.replace(/^\/(?:en|hi)(?=\/|$)/, "") || "/";
+    router.replace(getLocalizedPath(locale === "hi" ? "en" : "hi", pathWithoutLocale));
+  };
   const trends = t.raw("header.trends") as string[];
 
   return (
@@ -40,18 +45,18 @@ export function SiteHeader() {
           >
             {open ? <X size={20} /> : <Menu size={20} />}
           </button>
-          <Link href="/" className="editorial text-2xl font-black tracking-tight">
+          <NextLink href={getLocalizedPath(locale, "/")} className="editorial text-2xl font-black tracking-tight">
             {t("common.brand")}
-          </Link>
+          </NextLink>
           <nav aria-label={t("navigation.india")} className="hidden h-full items-center gap-5 md:flex">
             {navigationKeys.slice(0, 6).map((key) => (
-              <Link
+              <NextLink
                 className="hover:text-ink after:bg-signal relative text-xs font-bold text-slate-600 transition after:absolute after:-bottom-1 after:left-0 after:h-px after:w-0 after:transition-all hover:after:w-full"
-                href={`/#${key}`}
+                href={getLocalizedPath(locale, `/#${key}`)}
                 key={key}
               >
                 {t(`navigation.${key}`)}
-              </Link>
+              </NextLink>
             ))}
           </nav>
           <div className="flex items-center gap-1">
@@ -85,9 +90,9 @@ export function SiteHeader() {
         {open && (
           <nav className="container-page border-line border-t py-4 md:hidden">
             {navigationKeys.map((key) => (
-              <Link href={`/#${key}`} key={key} className="block py-2 text-sm font-semibold">
+              <NextLink href={getLocalizedPath(locale, `/#${key}`)} key={key} className="block py-2 text-sm font-semibold">
                 {t(`navigation.${key}`)}
-              </Link>
+              </NextLink>
             ))}
           </nav>
         )}

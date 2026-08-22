@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark" | "system";
+export type Theme = "light" | "dark";
 
 interface ThemeProviderState {
   theme: Theme;
@@ -13,26 +13,23 @@ const ThemeProviderContext = createContext<ThemeProviderState | undefined>(undef
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
+  defaultTheme = "light",
 }: {
   children: React.ReactNode;
   defaultTheme?: Theme;
 }) {
-  const [theme, setTheme] = useState<Theme>(defaultTheme);
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window !== "undefined") {
+      const savedTheme = window.localStorage.getItem("theme");
+      if (savedTheme === "light" || savedTheme === "dark") return savedTheme;
+    }
+    return defaultTheme;
+  });
 
   useEffect(() => {
     const root = window.document.documentElement;
-    root.removeAttribute("data-theme");
-
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
-      root.setAttribute("data-theme", systemTheme);
-      return;
-    }
-
     root.setAttribute("data-theme", theme);
+    window.localStorage.setItem("theme", theme);
   }, [theme]);
 
   return (

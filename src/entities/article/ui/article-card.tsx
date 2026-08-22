@@ -1,65 +1,58 @@
 import Image from "next/image";
-import { Link } from "@/i18n/routing";
-import { Article } from "@/types/news";
+import NextLink from "next/link";
+import { useLocale } from "next-intl";
+import { getLocalizedPath } from "@/i18n/path";
+import { SanitizedHtml } from "@/shared/ui/sanitized-html";
+import type { Article as DomainArticle } from "@/entities/article/model/types";
+import type { Article as NewsArticle } from "@/types/news";
 
 interface ArticleCardProps {
-  article: Article;
+  article: DomainArticle | NewsArticle;
+  className?: string;
 }
 
-export function ArticleCard({ article }: ArticleCardProps) {
-  // Using explicit dimensions for the image or the fill approach per Next.js 15 best practices.
-  // We'll use the 'fill' approach with a relative container for responsive design.
-  const imageUrl = article.image;
+function isNewsArticle(article: DomainArticle | NewsArticle): article is NewsArticle {
+  return typeof article.author === "string";
+}
+
+export function ArticleCard({ article, className = "" }: ArticleCardProps) {
+  const locale = useLocale();
+  const newsArticle = isNewsArticle(article);
+  const image = newsArticle ? article.image : article.featuredImage?.url;
+  const imageAlt = newsArticle ? article.imageAlt || article.title : article.featuredImage?.alt || article.title;
+  const category = newsArticle
+    ? { name: article.category, slug: article.category.toLowerCase().replaceAll(" ", "-") }
+    : article.category;
+  const author = newsArticle ? article.author : article.author?.name || "DailySamachar Desk";
+  const storyPath = getLocalizedPath(locale, `/news/${article.slug}`);
+  const categoryPath = getLocalizedPath(locale, `/category/${category.slug}`);
+  const publishedAt = new Date(article.publishedAt);
+  const formattedDate = Number.isNaN(publishedAt.getTime())
+    ? article.publishedAt
+    : new Intl.DateTimeFormat(locale, { year: "numeric", month: "long", day: "numeric" }).format(publishedAt);
 
   return (
-    <Link 
-      href={`/news/${article.slug}`}
-      className="group flex h-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
-    >
-      <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={article.title}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-          />
+    <article className={`group flex h-full flex-col gap-4 ${className}`}>
+      <NextLink href={storyPath} className="relative block aspect-video overflow-hidden rounded-xl bg-soft focus-visible:ring-2 focus-visible:ring-focus" aria-label={article.title}>
+        {image ? (
+          <Image src={image} alt={imageAlt} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-400">
-            <span className="text-sm">No image available</span>
-          </div>
+          <div className="flex h-full w-full items-center justify-center text-muted"><span className="text-sm font-medium uppercase tracking-widest">DailySamachar</span></div>
         )}
-      </div>
+      </NextLink>
 
-      <div className="flex flex-1 flex-col p-4">
-        {article.category && (
-          <span className="mb-2 text-xs font-semibold uppercase tracking-wider text-blue-600">
-            {article.category}
-          </span>
-        )}
-        
-        <h3 className="mb-2 text-lg font-bold leading-tight text-gray-900 group-hover:text-blue-600 line-clamp-2">
-          {article.title}
-        </h3>
-        
-        <p className="mb-4 flex-1 text-sm text-gray-600 line-clamp-3">
-          {article.excerpt || article.summary || ""}
-        </p>
-
-        <div className="mt-auto flex items-center justify-between text-xs font-medium text-gray-500">
-          <span className="truncate pr-2">
-            {article.author || "Editorial Desk"}
-          </span>
-          <time dateTime={article.publishedAt} className="shrink-0">
-            {new Intl.DateTimeFormat("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric"
-            }).format(new Date(article.publishedAt))}
-          </time>
+      <div className="flex grow flex-col gap-2">
+        <NextLink href={categoryPath} className="kicker inline-block text-[11px] hover:underline focus-visible:ring-2 focus-visible:ring-focus">{category.name}</NextLink>
+        <h2 className="editorial line-clamp-2 text-xl font-bold leading-snug tracking-tight text-ink transition-colors group-hover:text-signal dark:text-gray-100">
+          <NextLink href={storyPath} className="rounded-sm focus-visible:ring-2 focus-visible:ring-focus">
+            <SanitizedHtml as="span" html={article.title || "Untitled story"} />
+          </NextLink>
+        </h2>
+        <SanitizedHtml html={article.excerpt || ""} className="line-clamp-3 text-sm leading-relaxed text-muted" />
+        <div className="mt-auto flex items-center gap-2 pt-2 text-xs font-medium text-muted">
+          <span>{author}</span><span aria-hidden="true" className="h-1 w-1 rounded-full bg-line" /><time dateTime={article.publishedAt}>{formattedDate}</time>
         </div>
       </div>
-    </Link>
+    </article>
   );
 }

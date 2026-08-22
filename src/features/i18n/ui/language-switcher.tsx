@@ -2,8 +2,9 @@
 
 import { ChangeEvent, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter, usePathname } from "@/i18n/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Globe } from "lucide-react";
+import { getLocalizedPath } from "@/i18n/path";
 
 export function LanguageSwitcher() {
   const tCommon = useTranslations("common");
@@ -14,10 +15,11 @@ export function LanguageSwitcher() {
 
   const onSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const nextLocale = e.target.value;
+    const localePrefix = new RegExp(`^/(?:${locale}|en|hi)(?=/|$)`);
+    const localizedPath = pathname.replace(localePrefix, "") || "/";
     
     startTransition(() => {
-      // Replace the current route with the new locale
-      router.replace(pathname, { locale: nextLocale });
+      router.replace(getLocalizedPath(nextLocale, localizedPath));
     });
   };
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getFeaturedArticles } from "@/services/news";
+import type { Article } from "@/types/news";
 
 // Note: Consider moving these legacy components to FSD widgets/entities
 import { Container, Section } from "@/components/layout/layout";
@@ -28,7 +29,7 @@ export default async function FactCheckPage() {
   const t = await getTranslations("factCheck");
   
   // FIXED: Added explicit type to satisfy TypeScript strict mode
-  let factCheckArticles: any[] = [];
+  let factCheckArticles: Article[] = [];
   
   try {
     factCheckArticles = await getFeaturedArticles(locale);
@@ -63,7 +64,7 @@ export default async function FactCheckPage() {
           </div>
         ) : (
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {factCheckArticles.map((article: any) => (
+            {factCheckArticles.map((article) => (
               <HorizontalCard key={article.id} article={article} />
             ))}
           </div>

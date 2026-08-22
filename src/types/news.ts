@@ -9,10 +9,18 @@ export type Author = {
 };
 
 export type Category = {
+  id: string;
   slug: string;
+  name: string;
   title: string;
   description?: string;
   image: string;
+};
+
+export type Tag = {
+  id: string;
+  name: string;
+  slug: string;
 };
 
 export type Article = {
@@ -23,16 +31,16 @@ export type Article = {
   excerpt?: string;
   image: string;
   imageUrl?: string;
-  imageAlt?: string; // ADDED: For screen reader accessibility (WCAG 2.2 AA)
+  imageAlt?: string;
   author: string;
   authorSlug?: string;
   publishedAt: string;
-  publishedAtIso?: string; // ADDED: For semantic <time dateTime="..."> tags
+  publishedAtIso?: string;
   readTime?: string;
   summary?: string;
   updatedAt?: string;
   views?: string;
   caption?: string;
   tags?: string[];
-  content?: Array<{ type: string; value: string }>;
+  content?: string | Array<{ type: "paragraph" | "heading" | "quote"; value: string }>;
 };
