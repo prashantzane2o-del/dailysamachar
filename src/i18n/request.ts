@@ -1,21 +1,23 @@
-import { getRequestConfig } from 'next-intl/server';
-import { routing, type Locale } from './routing';
-
-function isLocale(value: string | undefined): value is Locale {
-  return value !== undefined && routing.locales.includes(value as Locale);
-}
+import { notFound } from "next/navigation";
+import { getRequestConfig } from "next-intl/server";
+import { isSupportedLocale, routing, type Locale } from "./routing";
 
 export default getRequestConfig(async ({ requestLocale }) => {
-  let locale = await requestLocale;
-  
-  // Validate if the requested locale is supported
-  if (!isLocale(locale)) {
-    locale = routing.defaultLocale;
+  const requestedLocale = await requestLocale;
+  let locale: Locale = routing.defaultLocale;
+
+  if (isSupportedLocale(requestedLocale)) {
+    locale = requestedLocale;
   }
 
-  return {
-    locale,
-    // FIX: Updated path to look inside src/messages
-    messages: (await import(`../messages/${locale}.json`)).default
-  };
+  try {
+    return {
+      locale,
+      // Dynamically import the translation dictionaries based on the validated locale
+      messages: (await import(`../messages/${locale}.json`)).default,
+    };
+  } catch (error) {
+    console.error(`Failed to load messages for locale: ${locale}`, error);
+    notFound();
+  }
 });

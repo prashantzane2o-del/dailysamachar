@@ -1,2 +1,12 @@
 import { Container, Section } from "@/components/layout/layout";
-export function StaticPage({ eyebrow, title, children }: React.PropsWithChildren<{ eyebrow: string; title: string }>) { return <Section><Container className="max-w-3xl"><p className="kicker">{eyebrow}</p><h1 className="editorial mt-3 text-5xl font-bold tracking-tight">{title}</h1><div className="mt-8 space-y-6 text-[1.05rem] leading-8 text-slate-700">{children}</div></Container></Section>; }
+export function StaticPage({ eyebrow, title, children }: React.PropsWithChildren<{ eyebrow: string; title: string }>) {
+  return (
+    <Section>
+      <Container className="max-w-3xl">
+        <p className="kicker">{eyebrow}</p>
+        <h1 className="editorial mt-3 text-5xl font-bold tracking-tight">{title}</h1>
+        <div className="mt-8 space-y-6 text-[1.05rem] leading-8 text-slate-700">{children}</div>
+      </Container>
+    </Section>
+  );
+}

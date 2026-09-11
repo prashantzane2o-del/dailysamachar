@@ -1,8 +1,54 @@
 import Image from "next/image";
 import type { Article, Category } from "@/types/news";
 import { Container, ContentGrid, Section, SidebarLayout } from "@/components/layout/layout";
-import { FeatureCard, HorizontalCard, TrendingCard } from "@/components/cards/card-system";
+import { FeatureCard, TrendingCard } from "@/components/cards/card-system";
 import { AdPlaceholder } from "@/components/widgets/widgets";
 import { Pagination, Tabs } from "@/components/ui/feedback";
 
-export function CategoryPage({ category, articles }: { category: Category; articles: Article[] }) { const hero = articles[0]; return <><section className="relative overflow-hidden bg-ink text-white"><div className="absolute inset-0 opacity-25"><Image src={category.image} alt="" fill priority sizes="100vw" className="object-cover"/></div><Container className="relative py-14 sm:py-20"><p className="kicker text-red-300">Section</p><h1 className="editorial mt-3 text-5xl font-bold">{category.title}</h1><p className="mt-4 max-w-xl text-slate-300">{category.description}</p></Container></section><Section><Container><SidebarLayout sidebar={<div className="space-y-5"><AdPlaceholder/><p className="kicker">Most read</p>{articles.slice(0, 3).map((article, index) => <TrendingCard key={article.id} rank={index + 1} article={article}/>)}</div>}><Tabs tabs={["Latest", "Popular", "Explainers", "Analysis"]}/>{hero && <div className="mt-8"><FeatureCard article={hero} size="lg"/></div>}<ContentGrid className="mt-10">{articles.slice(1).map(article => <FeatureCard key={article.id} article={article}/>)}</ContentGrid><div className="mt-10 flex justify-center"><Pagination total={3}/></div></SidebarLayout></Container></Section></>; }
+export function CategoryPage({ category, articles }: { category: Category; articles: Article[] }) {
+  const hero = articles[0];
+  return (
+    <>
+      <section className="bg-ink relative overflow-hidden text-white">
+        <div className="absolute inset-0 opacity-25">
+          <Image src={category.image} alt="" fill priority sizes="100vw" className="object-cover" />
+        </div>
+        <Container className="relative py-14 sm:py-20">
+          <p className="kicker text-red-300">Section</p>
+          <h1 className="editorial mt-3 text-5xl font-bold">{category.title}</h1>
+          <p className="mt-4 max-w-xl text-slate-300">{category.description}</p>
+        </Container>
+      </section>
+      <Section>
+        <Container>
+          <SidebarLayout
+            sidebar={
+              <div className="space-y-5">
+                <AdPlaceholder />
+                <p className="kicker">Most read</p>
+                {articles.slice(0, 3).map((article, index) => (
+                  <TrendingCard key={article.id} rank={index + 1} article={article} />
+                ))}
+              </div>
+            }
+          >
+            <Tabs tabs={["Latest", "Popular", "Explainers", "Analysis"]} />
+            {hero && (
+              <div className="mt-8">
+                <FeatureCard article={hero} size="lg" />
+              </div>
+            )}
+            <ContentGrid className="mt-10">
+              {articles.slice(1).map((article) => (
+                <FeatureCard key={article.id} article={article} />
+              ))}
+            </ContentGrid>
+            <div className="mt-10 flex justify-center">
+              <Pagination total={3} />
+            </div>
+          </SidebarLayout>
+        </Container>
+      </Section>
+    </>
+  );
+}

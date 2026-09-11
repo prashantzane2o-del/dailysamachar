@@ -1,33 +1,66 @@
 "use client";
 
-import { CloudSun } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
-type WeatherWidgetData = { city: string; temperatureC: number; condition: string };
+import { motion } from "framer-motion";
+import { AlertCircle, CloudSun, Droplets, Wind } from "lucide-react";
+import { useWeather } from "@/entities/weather/lib/use-weather";
 
-function WeatherLoading() { return <div className="h-5 w-40 animate-pulse rounded bg-soft" aria-label="Loading weather" />; }
+export interface WeatherWidgetProps {
+  city?: string;
+}
 
-export function WeatherWidget({ city = "New Delhi" }: { city?: string }) {
-  const t = useTranslations("weather");
-  const [weather, setWeather] = useState<WeatherWidgetData | null>(null);
-  const [loading, setLoading] = useState(true);
+export function WeatherWidget({ city = "Meerut" }: WeatherWidgetProps) {
+  const query = useWeather(city);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true);
-    fetch(`/api/weather?city=${encodeURIComponent(city)}`, { signal: controller.signal, headers: { Accept: "application/json" } })
-      .then(async (response) => {
-        const payload = (await response.json()) as { data?: WeatherWidgetData } & Partial<WeatherWidgetData>;
-        if (!response.ok) throw new Error("Weather unavailable");
-        return (payload.data ?? payload) as WeatherWidgetData;
-      })
-      .then(setWeather)
-      .catch((error: unknown) => { if ((error as Error).name !== "AbortError") setWeather(null); })
-      .finally(() => setLoading(false));
-    return () => controller.abort();
-  }, [city]);
+  if (query.isLoading) {
+    return (
+      <div
+        className="h-48 w-full animate-pulse rounded-xl bg-slate-100 dark:bg-slate-900"
+        aria-label="Loading weather"
+      />
+    );
+  }
 
-  if (loading) return <WeatherLoading />;
-  if (!weather || weather.condition === "Weather unavailable") return <div className="flex items-center gap-2 text-xs font-semibold text-muted" role="status"><CloudSun className="h-4 w-4 opacity-50" aria-hidden="true" /><span>{t("title")}: {t("empty")}</span></div>;
-  return <div className="flex items-center gap-2 text-xs font-semibold" role="region" aria-label={t("title")}><CloudSun className="h-4 w-4 text-signal" aria-hidden="true" /><span>{weather.city}</span><span className="text-muted">{Math.round(weather.temperatureC)}°C</span><span className="hidden text-muted sm:inline">{weather.condition}</span></div>;
+  if (query.isError || !query.data) {
+    return (
+      <div role="status" className="flex items-center gap-2 rounded-xl border p-5 text-sm text-slate-500">
+        <AlertCircle size={18} aria-hidden="true" />
+        Weather unavailable
+      </div>
+    );
+  }
+
+  const weather = query.data;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="flex w-full flex-col gap-6 overflow-hidden rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-sm font-bold tracking-wide text-gray-600 uppercase dark:text-gray-400">{weather.city}</p>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{weather.condition}</p>
+        </div>
+        <CloudSun className="h-10 w-10 text-amber-500" aria-hidden="true" />
+      </div>
+
+      <p className="font-serif text-5xl font-black tracking-tighter text-gray-900 dark:text-white">{weather.temp}°</p>
+
+      <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
+        {weather.humidity !== undefined && (
+          <span className="flex items-center gap-1.5">
+            <Droplets className="text-signal h-4 w-4" aria-hidden="true" />
+            {weather.humidity}%
+          </span>
+        )}
+        {weather.windSpeed !== undefined && (
+          <span className="flex items-center gap-1.5">
+            <Wind className="h-4 w-4 text-teal-500" aria-hidden="true" />
+            {weather.windSpeed} km/h
+          </span>
+        )}
+      </div>
+    </motion.div>
+  );
 }

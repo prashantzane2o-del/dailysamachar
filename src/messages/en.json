@@ -14,7 +14,12 @@
     "video": "Video",
     "lightMode": "Switch to light mode",
     "darkMode": "Switch to dark mode",
-    "currentTime": "Current time"
+    "currentTime": "Current time",
+    "retry": "Try again",
+    "loading": "Loading",
+    "language": "Change language",
+    "switchToEnglish": "English",
+    "switchToHindi": "हिन्दी"
   },
   "header": {
     "skipToContent": "Skip to main content",
@@ -24,6 +29,10 @@
     "closeMenu": "Close menu",
     "searchStories": "Search stories",
     "closeSearch": "Close search",
+    "search": "Search",
+    "searchPlaceholder": "Search stories",
+    "trending": "Trending",
+    "trends": ["India", "Technology", "Markets", "Climate"],
     "sections": "Sections"
   },
   "footer": {
@@ -42,33 +51,124 @@
     "terms": "Terms of Use",
     "privacy": "Privacy Policy",
     "factCheck": "Fact Check Policy",
-    "allRightsReserved": "All rights reserved."
+    "allRightsReserved": "All rights reserved.",
+    "sections": "Sections",
+    "world": "World",
+    "politics": "Politics",
+    "business": "Business",
+    "tech": "Technology",
+    "automobile": "Automobile",
+    "sportsNews": "Sports News",
+    "yojana": "Yojana",
+    "businessFinance": "Business & Finance",
+    "jobs": "Jobs",
+    "science": "Science",
+    "health": "Health",
+    "sports": "Sports",
+    "entertainment": "Entertainment",
+    "ourStory": "Our story",
+    "journalismEthics": "Editorial policy",
+    "contact": "Contact",
+    "legal": "Legal",
+    "termsOfService": "Terms of service",
+    "privacyPolicy": "Privacy policy",
+    "cookiePolicy": "Cookie policy",
+    "accessibility": "Accessibility",
+    "doNotSell": "Do not sell my information",
+    "followUs": "Follow us",
+    "missionStatement": "Delivering accurate, unbiased, and comprehensive news from around the globe. Empowering readers with truth and context.",
+    "emailPlaceholder": "Your email address",
+    "subscribe": "Subscribe",
+    "newsletterDisclaimer": "By subscribing, you agree to our Terms of Service and Privacy Policy.",
+    "downloadIOS": "Download for iOS",
+    "downloadAndroid": "Download for Android"
   },
   "navigation": {
     "mainNavigation": "Main Navigation",
+    "home": "Home",
     "india": "India",
     "world": "World",
     "politics": "Politics",
     "business": "Business",
+    "tech": "Technology",
     "technology": "Technology",
+    "science": "Science",
+    "health": "Health",
     "sports": "Sports",
-    "opinion": "Opinion"
+    "automobile": "Automobile",
+    "sportsNews": "Sports News",
+    "yojana": "Yojana",
+    "businessFinance": "Business & Finance",
+    "jobs": "Jobs",
+    "entertainment": "Entertainment",
+    "lifestyle": "Lifestyle",
+    "tools": "Tools",
+    "chanakyaNiti": "Chanakya Niti Special",
+    "lifeLessons": "Life Lessons",
+    "opinion": "Opinion",
+    "trendingIn": "Trending in {category}",
+    "featuredHeadlinePlaceholder": "Market hits record high as tech stocks rally in afternoon trading"
   },
   "markets": {
     "tickerLabel": "Gold and Silver Market Rates",
+    "markets": "Markets",
+    "live": "LIVE",
+    "viewAllMarkets": "View all markets",
     "trendUp": "Trend Up",
     "trendDown": "Trend Down",
-    "empty": "Commodity prices unavailable"
+    "empty": "Commodity prices unavailable",
+    "loading": "Loading market data",
+    "error": "Market data is temporarily unavailable",
+    "futureChart": "Live values update periodically",
+    "sensex": "Sensex",
+    "nifty50": "Nifty 50",
+    "bankNifty": "Bank Nifty",
+    "gold": "Gold",
+    "silver": "Silver",
+    "usdInr": "USD/INR",
+    "bitcoin": "Bitcoin",
+    "ethereum": "Ethereum"
   },
   "breakingNews": {
     "regionLabel": "Breaking News Ticker",
-    "label": "Breaking"
+    "label": "Breaking",
+    "breaking": "Breaking",
+    "dismiss": "Dismiss breaking news",
+    "goToHeadline": "Go to headline {number}"
   },
   "weather": {
     "title": "Weather",
+    "today": "Today",
+    "sunny": "Sunny",
+    "cloudy": "Cloudy",
+    "rainy": "Rainy",
+    "stormy": "Stormy",
+    "snowy": "Snowy",
     "empty": "Data unavailable",
     "error": "Weather is temporarily unavailable",
-    "current": "Current"
+    "current": "Current",
+    "loading": "Loading weather",
+    "description": "Live weather conditions and forecasts for major Indian cities.",
+    "selectCity": "Select city",
+    "feelsLike": "Feels like",
+    "min": "Low",
+    "max": "High",
+    "humidity": "Humidity",
+    "humidityUnit": "%",
+    "wind": "Wind",
+    "windUnit": "km/h",
+    "pressure": "Pressure",
+    "pressureUnit": "hPa",
+    "visibility": "Visibility",
+    "visibilityUnit": "km",
+    "uvIndex": "UV index",
+    "aqi": "Air quality",
+    "aqiPlaceholder": "Unavailable",
+    "sunrise": "Sunrise",
+    "sunset": "Sunset",
+    "hourly": "Hourly forecast",
+    "sevenDay": "Seven-day forecast",
+    "favoritePlaceholder": "Save a city to track its weather later."
   },
   "seo": {
     "factCheck": {
@@ -83,12 +183,108 @@
   "home": {
     "title": "Latest News",
     "description": "Welcome to Daily Samachar",
-    "noNews": "No news available at the moment."
+    "noNews": "No news available at the moment.",
+    "markets": "Markets",
+    "section": "Section",
+    "viewAll": "View all",
+    "moreLatest": "More Latest News",
+    "storyCount": "{count} stories",
+    "temporaryUnavailable": "News is temporarily unavailable. Please try again shortly.",
+    "intro": "Verified reporting, useful explainers and context from the DailySamachar newsroom."
   },
   "factCheck": {
     "heading": "Fact Check",
     "subheading": "We examine claims that travel quickly and explain the evidence that matters. Verified and independent fact-checking.",
     "emptyStateTitle": "No articles found",
     "emptyStateDesc": "Please check back later for new fact checks."
+  },
+  "search": {
+    "label": "Search",
+    "title": "Find your next story",
+    "resultsFor": "Results for “{query}”",
+    "placeholder": "Search news…",
+    "submit": "Search",
+    "emptyQuery": "Enter a search term to find articles.",
+    "noResults": "No articles found matching your search."
+  },
+  "utilityBar": {
+    "newsletters": "Newsletters",
+    "video": "Video",
+    "podcasts": "Podcasts",
+    "contact": "Contact",
+    "accessibility": "Accessibility",
+    "textSize": "Text size",
+    "normal": "Normal",
+    "large": "Large",
+    "largest": "Largest",
+    "contrast": "Contrast / Theme",
+    "lightMode": "Light mode",
+    "darkMode": "Dark mode",
+    "systemMode": "System default"
+  },
+  "badges": {
+    "exclusive": "Exclusive",
+    "premium": "Premium",
+    "live": "Live",
+    "opinion": "Opinion"
+  },
+  "heroWidget": {
+    "minRead": "min read",
+    "trendingNow": "Trending now",
+    "viewAll": "View all"
+  },
+  "newsletter": {
+    "subscribeTitle": "Stay ahead of the curve.",
+    "subscribeDescription": "Get the latest breaking news and exclusive analysis delivered directly to your inbox.",
+    "emailPlaceholder": "Enter your email",
+    "subscribeButton": "Subscribe"
+  },
+  "newsGrid": {
+    "seeMore": "See more",
+    "min": "min"
+  },
+  "opinionWidget": {
+    "defaultTitle": "Opinion & Analysis",
+    "viewAll": "View all",
+    "readArticle": "Read full analysis"
+  },
+  "multimedia": {
+    "inFocus": "In Focus: Photos & Videos",
+    "viewAll": "View all media"
+  },
+  "videoPlayer": {
+    "live": "Live",
+    "maximize": "Maximize",
+    "minimize": "Minimize",
+    "close": "Close",
+    "pause": "Pause",
+    "play": "Play",
+    "mute": "Mute",
+    "unmute": "Unmute"
+  },
+  "article": {
+    "desk": "DailySamachar Desk",
+    "updated": "Updated",
+    "inBrief": "In brief",
+    "continueReading": "Continue reading"
+  },
+  "articleToolbar": {
+    "pauseAudio": "Pause audio",
+    "playAudio": "Listen to article",
+    "playing": "Playing",
+    "listen": "Listen",
+    "textSize": "Adjust text size",
+    "jumpToComments": "Jump to comments",
+    "removeBookmark": "Remove bookmark",
+    "saveArticle": "Save article",
+    "share": "Share article",
+    "linkCopied": "Link copied to clipboard"
+  },
+  "bookmarks": {
+    "eyebrow": "Your reading list",
+    "title": "Bookmarks",
+    "description": "Save stories on this device and return to them whenever you are ready.",
+    "empty": "Your reading list is empty. Save a story to see it here.",
+    "remove": "Remove"
   }
 }

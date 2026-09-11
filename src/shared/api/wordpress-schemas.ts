@@ -1,59 +1,73 @@
 import { z } from "zod";
 
+// Helper for safe fallbacks (never fails)
+const safeString = (fallback = "") => z.string().nullish().catch(fallback).transform(v => v ?? fallback);
+const safeNumber = (fallback = 0) => z.number().nullish().catch(fallback).transform(v => v ?? fallback);
+
 export const wpImageSchema = z.object({
-  source_url: z.string().url(),
-  alt_text: z.string().optional().default(""),
-});
+  source_url: safeString(),
+  alt_text: safeString(),
+}).passthrough();
 
 export const wpAuthorSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  slug: z.string().optional().default(""),
-  description: z.string().optional().default(""),
-  // In Zod v4, z.record requires both key and value schemas if specifying the key type
-  avatar_urls: z.record(z.string(), z.string().url()).optional(),
-});
+  id: safeNumber(),
+  name: safeString("DailySamachar Desk"),
+  slug: safeString(),
+  description: safeString(),
+  avatar_urls: z.record(z.string(), z.string()).nullish().catch({}),
+}).passthrough();
 
 export const wpCategorySchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  slug: z.string(),
-  description: z.string().optional().default(""),
-  count: z.number().optional().default(0),
-});
+  id: safeNumber(),
+  name: safeString("News"),
+  slug: safeString("news"),
+  description: safeString(),
+  count: safeNumber(),
+}).passthrough();
 
+// AAA-Level Article Schema: Tolerates missing/null fields smoothly
 export const wpArticleSchema = z.object({
-  id: z.number(),
-  date: z.string(),
-  slug: z.string(),
-  title: z.object({
-    rendered: z.string(),
-  }),
-  content: z.object({
-    rendered: z.string(),
-  }),
-  excerpt: z.object({
-    rendered: z.string(),
-  }),
-  _embedded: z
-    .object({
-      author: z.array(wpAuthorSchema).optional(),
-      "wp:featuredmedia": z.array(wpImageSchema).optional(),
-      "wp:term": z.array(z.array(wpCategorySchema)).optional(),
-    })
-    .optional(),
+  id: z.union([z.number(), z.string()]).transform(Number),
+  date: safeString(new Date().toISOString()),
+  modified: safeString(new Date().toISOString()),
+  slug: safeString(""),
+  title: z.object({ rendered: safeString("Untitled") }).passthrough().catch({ rendered: "Untitled" }),
+  content: z.object({ rendered: safeString("") }).passthrough().catch({ rendered: "" }),
+  excerpt: z.object({ rendered: safeString("") }).passthrough().catch({ rendered: "" }),
+  _embedded: z.object({
+    author: z.array(wpAuthorSchema).nullish().catch([]),
+    "wp:featuredmedia": z.array(wpImageSchema).nullish().catch([]),
+    "wp:term": z.array(z.array(wpCategorySchema)).nullish().catch([]),
+  }).passthrough().nullish().catch({}),
+}).passthrough();
+
+// Advanced Array Schema: Filters out bad posts instead of failing the whole batch
+export const wpArticleArraySchema = z.array(z.any()).transform((arr) => {
+  return arr.reduce<z.infer<typeof wpArticleSchema>[]>((validPosts, item) => {
+    const parsed = wpArticleSchema.safeParse(item);
+    if (parsed.success) {
+      validPosts.push(parsed.data);
+    } else {
+      console.warn("⚠️ [WP Schema Warning] Skipped a malformed post:", parsed.error.format());
+    }
+    return validPosts;
+  }, []);
 });
 
-export const wpArticleArraySchema = z.array(wpArticleSchema);
-
-export const wpPostSitemapArraySchema = z.array(
-  z.object({
-    id: z.number(),
-    slug: z.string(),
-    date: z.string(),
-    modified: z.string(),
-  }),
-);
+// Sitemap Schema
+export const wpPostSitemapArraySchema = z.array(z.any()).transform((arr) => {
+  return arr.reduce<any[]>((valid, item) => {
+    if (item && item.id && item.slug) {
+      valid.push({
+        id: item.id,
+        slug: item.slug,
+        date: item.date || new Date().toISOString(),
+        modified: item.modified || new Date().toISOString(),
+      });
+    }
+    return valid;
+  }, []);
+});
 
 export type WpArticle = z.infer<typeof wpArticleSchema>;
 export type WpCategory = z.infer<typeof wpCategorySchema>;

@@ -1,94 +1,67 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@theme {
+  /* Brand Colors Derived from Logo */
+  --color-brand-blue: #0D1B2A; /* Deep Navy Blue */
+  --color-brand-blue-light: #1B263B;
+  
+  /* Red adjusted slightly for AAA Contrast with White text */
+  --color-brand-red: #B30000; 
+  --color-brand-red-light: #D90429; /* Accent only, not for small white text */
 
-:root {
-  color-scheme: light;
-  --paper: #fffdfa;
-  --ink: #111827;
-  --muted: #475569;
-  --line: #d9d5ce;
-  --signal: #a51d2d;
-  --soft: #f4f1ec;
-  --focus: #075985;
-  --glass: rgb(255 253 250 / 92%);
-  --measure-reading: 72ch;
+  /* Surface & Text Colors */
+  --color-surface-light: #FFFFFF;
+  --color-surface-dark: #0f172a; /* Slate 900 */
+  
+  --color-text-light: #1e293b; /* Slate 800 */
+  --color-text-dark: #f8fafc; /* Slate 50 */
 }
 
-[data-theme="dark"] {
-  color-scheme: dark;
-  --paper: #0b1220;
-  --ink: #f8fafc;
-  --muted: #cbd5e1;
-  --line: #334155;
-  --signal: #fb7185;
-  --soft: #172235;
-  --focus: #7dd3fc;
-  --glass: rgb(11 18 32 / 92%);
+/* Base Styles & Dark Mode Support */
+@layer base {
+  :root {
+    --background: var(--color-surface-light);
+    --foreground: var(--color-text-light);
+    --brand-primary: var(--color-brand-blue);
+    --brand-accent: var(--color-brand-red);
+  }
+
+  /* Dark Mode Variables */
+  .dark {
+    --background: var(--color-surface-dark);
+    --foreground: var(--color-text-dark);
+    --brand-primary: var(--color-surface-light); /* In dark mode, blue elements often invert to white/light */
+    --brand-accent: var(--color-brand-red-light); /* Brighter red pops better in dark mode */
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* AAA Accessibility: Global Focus Rings for Keyboard Navigation */
+  *:focus-visible {
+    outline: 3px solid var(--color-brand-red);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Smooth scroll for anchor links */
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
-@theme inline {
-  --color-paper: var(--paper);
-  --color-ink: var(--ink);
-  --color-muted: var(--muted);
-  --color-line: var(--line);
-  --color-signal: var(--signal);
-  --color-soft: var(--soft);
-  --color-focus: var(--focus);
-  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
-  --font-display: Georgia, Cambria, "Times New Roman", serif;
-  --animate-fade-up: fade-up 420ms cubic-bezier(.2,.8,.2,1) both;
-  --animate-shimmer: shimmer 1.6s linear infinite;
-}
-
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes shimmer {
-  from { background-position: 200% 0; }
-  to { background-position: -200% 0; }
-}
-
-* { border-color: var(--line); }
-html { scroll-behavior: smooth; }
-body { background: var(--paper); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
-::selection { background: var(--signal); color: #fff; }
-:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
-
-.editorial { font-family: Georgia, Cambria, "Times New Roman", serif; }
-.container-page { width: min(calc(100% - 2rem), 76rem); margin-inline: auto; }
-.reading-measure { width: min(100%, var(--measure-reading)); }
-.glass { background: var(--glass); backdrop-filter: blur(16px) saturate(140%); -webkit-backdrop-filter: blur(16px) saturate(140%); }
-.kicker { color: var(--signal); font-size: .6875rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
-.image-zoom { transition: transform 700ms cubic-bezier(.2,.8,.2,1); }
-.group:hover .image-zoom { transform: scale(1.045); }
-.dot-grid { background-image: radial-gradient(var(--signal) .75px, transparent .75px); background-size: 8px 8px; }
-.skeleton { background: linear-gradient(100deg, var(--soft) 30%, color-mix(in srgb, var(--line) 65%, var(--paper)) 50%, var(--soft) 70%); background-size: 200% 100%; animation: shimmer 1.6s linear infinite; }
-.prose-readable { max-width: var(--measure-reading); font-size: 1.0625rem; line-height: 1.8; }
-
-/* Compatibility for legacy slices while they are migrated to semantic tokens. */
-[data-theme="dark"] .bg-white { background-color: var(--soft); }
-[data-theme="dark"] .text-gray-900,
-[data-theme="dark"] .text-gray-800,
-[data-theme="dark"] .text-slate-900,
-[data-theme="dark"] .text-slate-800,
-[data-theme="dark"] .text-slate-700 { color: var(--ink); }
-[data-theme="dark"] .text-gray-600,
-[data-theme="dark"] .text-gray-500,
-[data-theme="dark"] .text-gray-400,
-[data-theme="dark"] .text-slate-600,
-[data-theme="dark"] .text-slate-500,
-[data-theme="dark"] .text-slate-400,
-[data-theme="dark"] .text-slate-300 { color: var(--muted); }
-[data-theme="dark"] .border-gray-200,
-[data-theme="dark"] .border-gray-300 { border-color: var(--line); }
-[data-theme="dark"] .bg-gray-100,
-[data-theme="dark"] .bg-gray-200,
-[data-theme="dark"] .bg-slate-200 { background-color: var(--soft); }
-
-@media (min-width: 768px) { .container-page { width: min(calc(100% - 4rem), 76rem); } }
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+/* Hiding scrollbar for horizontal scrolling elements (like tickers) */
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }

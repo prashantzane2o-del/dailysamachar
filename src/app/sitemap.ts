@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
-import { cmsClient } from "@/shared/api/cms";
+import { cmsApi } from "@/shared/api/cms";
 import { routing } from "@/i18n/routing";
 
-const origin = process.env.NEXT_PUBLIC_SITE_URL || "https://dailysamachar.org";
+const origin = (process.env.NEXT_PUBLIC_SITE_URL || "https://dailysamachar.org").replace(/\/$/, "");
 
 function localizedPath(locale: string, path: string): string {
   return locale === routing.defaultLocale ? path : "/" + locale + path;
@@ -10,13 +10,33 @@ function localizedPath(locale: string, path: string): string {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const staticPaths = ["/", "/fact-check", "/weather", "/markets", "/search"];
+  const staticPaths = [
+    "/",
+    "/about",
+    "/advertise",
+    "/careers",
+    "/contact",
+    "/corrections-policy",
+    "/editorial-policy",
+    "/fact-check",
+    "/gallery",
+    "/live",
+    "/markets",
+    "/newsletters",
+    "/opinion",
+    "/privacy-policy",
+    "/rss",
+    "/search",
+    "/terms",
+    "/video",
+    "/weather",
+  ];
   const [categories, posts] = await Promise.all([
-    cmsClient.getCategories().catch((error: unknown) => {
+    cmsApi.getCategories().catch((error: unknown) => {
       console.error("Failed to build category sitemap entries", error);
       return [];
     }),
-    cmsClient.getPostSitemapEntries().catch((error: unknown) => {
+    cmsApi.getPostSitemapEntries().catch((error: unknown) => {
       console.error("Failed to build article sitemap entries", error);
       return [];
     }),
@@ -26,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     staticPaths.map((path) => ({
       url: origin + localizedPath(locale, path),
       lastModified: now,
-      changeFrequency: path === "/weather" || path === "/markets" ? "hourly" as const : "daily" as const,
+      changeFrequency: path === "/weather" || path === "/markets" ? ("hourly" as const) : ("daily" as const),
       priority: path === "/" ? 1 : 0.7,
     })),
   );

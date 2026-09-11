@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { getLocale, getTranslations } from "next-intl/server";
-import { getFeaturedArticles } from "@/services/news";
+import { getTranslations } from "next-intl/server";
+import { cmsApi } from "@/shared/api/cms";
 import type { Article } from "@/types/news";
 
 // Note: Consider moving these legacy components to FSD widgets/entities
@@ -9,7 +9,7 @@ import { HorizontalCard } from "@/components/cards/card-system";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("seo.factCheck");
-  
+
   return {
     title: t("title") || "Fact Check | DailySamachar",
     description: t("description") || "Verified and independent fact-checking.",
@@ -25,15 +25,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function FactCheckPage() {
-  const locale = await getLocale();
   const t = await getTranslations("factCheck");
-  
+
   // FIXED: Added explicit type to satisfy TypeScript strict mode
   let factCheckArticles: Article[] = [];
-  
+
   try {
-    factCheckArticles = await getFeaturedArticles(locale);
-  } catch (error) {
+    factCheckArticles = await cmsApi.getFeaturedArticles();
+  } catch {
     // Graceful degradation on failure
     factCheckArticles = [];
   }
@@ -42,23 +41,20 @@ export default async function FactCheckPage() {
     <Container className="py-8">
       <Section>
         {/* Page Header */}
-        <div className="mb-8 border-b border-line pb-4">
-          <h1 className="editorial text-4xl font-black text-ink md:text-5xl">
-            {t("heading") || "Fact Check"}
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg text-muted">
-            {t("subheading") || "We examine claims that travel quickly and explain the evidence that matters. Verified and independent fact-checking."}
+        <div className="border-line mb-8 border-b pb-4">
+          <h1 className="editorial text-ink text-4xl font-black md:text-5xl">{t("heading") || "Fact Check"}</h1>
+          <p className="text-muted mt-4 max-w-2xl text-lg">
+            {t("subheading") ||
+              "We examine claims that travel quickly and explain the evidence that matters. Verified and independent fact-checking."}
           </p>
         </div>
 
         {/* Empty State Handling */}
         {factCheckArticles.length === 0 ? (
           // FIXED: Replaced arbitrary min-h-[300px] with canonical min-h-75
-          <div className="flex min-h-75 flex-col items-center justify-center rounded-lg border border-dashed border-line bg-soft p-8 text-center">
-            <p className="text-lg font-medium text-ink">
-              {t("emptyStateTitle") || "No articles found"}
-            </p>
-            <p className="mt-2 text-sm text-muted">
+          <div className="border-line bg-soft flex min-h-75 flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
+            <p className="text-ink text-lg font-medium">{t("emptyStateTitle") || "No articles found"}</p>
+            <p className="text-muted mt-2 text-sm">
               {t("emptyStateDesc") || "Please check back later for new fact checks."}
             </p>
           </div>

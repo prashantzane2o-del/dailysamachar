@@ -1,7 +1,5 @@
 import { wpAdapter, type PostCollection, type PostQuery, type PostSitemapEntry } from "@/shared/api/wordpress-adapter";
 import type { Article, Author, Category, Tag } from "@/types/news";
-import { createArticleRepository } from "@/entities/article/api/repository";
-import type { CmsAdapter, CmsArticleDto } from "@/shared/types/cms";
 
 /** Stable application-facing CMS contract. Routes depend on this interface, never on WordPress DTOs. */
 export interface CmsClient {
@@ -17,36 +15,64 @@ export interface CmsClient {
   getPostsByTag(tagSlug: string, page?: number, perPage?: number): Promise<PostCollection>;
 }
 
-export const cmsClient: CmsClient = wpAdapter;
+const cmsClient: CmsClient = wpAdapter;
 
-function toEntityDto(article: Article): CmsArticleDto {
-  return {
-    id: article.id,
-    slug: article.slug,
-    title: article.title,
-    excerpt: article.excerpt,
-    content: typeof article.content === "string" ? article.content : undefined,
-    featuredImage: article.image ? { url: article.image, alt: article.imageAlt, caption: article.caption } : undefined,
-    categories: [{ name: article.category, slug: article.category.toLowerCase().replaceAll(" ", "-") }],
-    tags: (article.tags ?? []).map((tag) => ({ name: tag, slug: tag.toLowerCase().replaceAll(" ", "-") })),
-    author: { name: article.author, slug: article.authorSlug ?? article.author.toLowerCase().replaceAll(" ", "-") },
-    date: article.publishedAt,
-    modified: article.updatedAt,
-  };
-}
-
-/** Compatibility repository for client-side entity hooks; its only source is the CMS contract above. */
-const entityCmsAdapter: CmsAdapter = {
-  async getArticle(slug) {
-    const article = await cmsClient.getPostBySlug(slug);
-    return article ? toEntityDto(article) : null;
+export const cmsApi = {
+  async getArticleCollection(params?: PostQuery): Promise<PostCollection> {
+    return cmsClient.getPosts(params);
   },
-  async listArticles(query = {}) {
-    const result = query.query ? await cmsClient.searchPosts(query.query) : await cmsClient.getPosts({ categorySlug: query.category });
-    return { nodes: result.data.map(toEntityDto) };
+
+  async getArticles(params?: PostQuery): Promise<Article[]> {
+    return (await cmsClient.getPosts(params)).data;
+  },
+
+  async getLatestArticles(limit = 10, page = 1): Promise<Article[]> {
+    return (await cmsClient.getPosts({ page, perPage: limit })).data;
+  },
+
+  async getFeaturedArticles(limit = 6): Promise<Article[]> {
+    return (await cmsClient.getPosts({ perPage: limit })).data;
+  },
+
+  async getArticleBySlug(slug: string): Promise<Article | null> {
+    return cmsClient.getPostBySlug(slug);
+  },
+
+  async getCategoryBySlug(slug: string): Promise<Category | null> {
+    return cmsClient.getCategoryBySlug(slug);
+  },
+
+  async getTagBySlug(slug: string): Promise<Tag | null> {
+    return cmsClient.getTagBySlug(slug);
+  },
+
+  async getCategories(): Promise<Category[]> {
+    return cmsClient.getCategories();
+  },
+
+  async getArticlesByCategory(slug: string, page = 1, perPage = 12): Promise<Article[]> {
+    return (await cmsClient.getPosts({ categorySlug: slug, page, perPage })).data;
+  },
+
+  async getAuthorBySlug(slug: string): Promise<Author | null> {
+    return cmsClient.getAuthorBySlug(slug);
+  },
+
+  async getArticlesByAuthor(slug: string, page = 1, perPage = 12): Promise<Article[]> {
+    return (await cmsClient.getPosts({ authorSlug: slug, page, perPage })).data;
+  },
+
+  async getArticlesByTag(slug: string, page = 1, perPage = 12): Promise<Article[]> {
+    return (await cmsClient.getPosts({ tagSlug: slug, page, perPage })).data;
+  },
+
+  async searchArticles(query: string, page = 1, perPage = 12): Promise<Article[]> {
+    return (await cmsClient.searchPosts(query, page, perPage)).data;
+  },
+
+  async getPostSitemapEntries(): Promise<PostSitemapEntry[]> {
+    return cmsClient.getPostSitemapEntries();
   },
 };
-
-export const articleRepository = createArticleRepository(entityCmsAdapter);
 
 export type { Article, Author, Category, PostCollection, PostQuery, PostSitemapEntry, Tag };

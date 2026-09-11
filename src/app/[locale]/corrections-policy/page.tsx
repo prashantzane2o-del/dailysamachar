@@ -1,1 +1,15 @@
-import { StaticPage } from "@/features/home/components/static-page"; export default function CorrectionsPolicy() { return <StaticPage eyebrow="Accountability" title="Corrections policy."><p>When we make a factual error, we correct it promptly and clearly. Material changes are noted in the article with an explanation of what changed.</p><p>To report a potential error, contact corrections@dailysamachar.in with the article URL and supporting information.</p></StaticPage>; }
+import { StaticPage } from "@/features/home/components/static-page";
+export default function CorrectionsPolicy() {
+  return (
+    <StaticPage eyebrow="Accountability" title="Corrections policy.">
+      <p>
+        When we make a factual error, we correct it promptly and clearly. Material changes are noted in the article with
+        an explanation of what changed.
+      </p>
+      <p>
+        To report a potential error, contact corrections@dailysamachar.in with the article URL and supporting
+        information.
+      </p>
+    </StaticPage>
+  );
+}

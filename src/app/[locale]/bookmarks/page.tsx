@@ -1,1 +1,5 @@
-import { Container, Section } from "@/components/layout/layout"; import { EmptyState } from "@/components/ui/feedback"; export default function Bookmarks() { return <Section><Container className="max-w-3xl"><p className="kicker">Your reading list</p><h1 className="editorial mt-2 text-5xl font-bold">Bookmarks</h1><div className="mt-8"><EmptyState title="Your reading list is ready" description="Save stories to return to them across devices once your account is connected."/></div></Container></Section>; }
+import { BookmarksPage } from "@/features/bookmarks/ui/bookmarks-page";
+
+export default function BookmarksRoute() {
+  return <BookmarksPage />;
+}

@@ -1,2 +1,13 @@
 import type { MetadataRoute } from "next";
-export default function manifest(): MetadataRoute.Manifest { return { name: "DailySamachar", short_name: "DailySamachar", description: "Independent journalism for India and the world.", start_url: "/", display: "standalone", background_color: "#fffdfa", theme_color: "#d32f2f", icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }] }; }
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: "DailySamachar.org",
+    short_name: "DailySamachar",
+    description: "सच खबर, सही दिशा — independent journalism for India and the world.",
+    start_url: "/",
+    display: "standalone",
+    background_color: "#ffffff",
+    theme_color: "#e30613",
+    icons: [{ src: "/Logo.svg", sizes: "500x500", type: "image/png" }],
+  };
+}

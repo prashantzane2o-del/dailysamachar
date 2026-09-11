@@ -19,12 +19,14 @@ export default function TermsPage() {
   return (
     <StaticPage eyebrow="Legal" title="Terms of use.">
       {/* 2. Added proper text styles and semantic spacing for readability */}
-      <div className="prose prose-slate max-w-none text-muted" aria-label="Terms and conditions">
+      <div className="prose prose-slate text-muted max-w-none" aria-label="Terms and conditions">
         <p className="text-lg leading-relaxed">
-          DailySamachar content is protected by applicable copyright law. You may link to and share our reporting, but reproduction requires written permission except where law allows otherwise.
+          DailySamachar content is protected by applicable copyright law. You may link to and share our reporting, but
+          reproduction requires written permission except where law allows otherwise.
         </p>
         <p className="mt-4 text-lg leading-relaxed">
-          We work to keep the service available and accurate, while acknowledging that reporting evolves as new facts are established.
+          We work to keep the service available and accurate, while acknowledging that reporting evolves as new facts
+          are established.
         </p>
       </div>
     </StaticPage>

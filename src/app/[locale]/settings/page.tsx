@@ -1,1 +1,10 @@
-import { StaticPage } from "@/features/home/components/static-page"; import { Tabs } from "@/components/ui/feedback"; export default function Settings() { return <StaticPage eyebrow="Your account" title="Settings"><Tabs tabs={["Preferences", "Notifications", "Privacy"]}/><p>Manage language, newsletter and reading preferences after signing in.</p></StaticPage>; }
+import { StaticPage } from "@/features/home/components/static-page";
+import { Tabs } from "@/components/ui/feedback";
+export default function Settings() {
+  return (
+    <StaticPage eyebrow="Your account" title="Settings">
+      <Tabs tabs={["Preferences", "Notifications", "Privacy"]} />
+      <p>Manage language, newsletter and reading preferences after signing in.</p>
+    </StaticPage>
+  );
+}

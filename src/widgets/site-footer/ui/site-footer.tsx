@@ -1,94 +1,127 @@
-import { Link } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
+// src/widgets/site-footer/ui/site-footer.tsx
+
+import { Link } from '@/i18n/navigation';
+import { BrandLogo } from '@/shared/ui/brand-logo';
+import { MAIN_NAVIGATION, FOOTER_NAVIGATION } from '@/shared/config/navigation';
 
 export function SiteFooter() {
-  const tFooter = useTranslations("footer");
-  const tCommon = useTranslations("common");
   const currentYear = new Date().getFullYear();
 
+  // Filter main navigation to show only relevant categories in footer
+  const topCategories = MAIN_NAVIGATION.filter(
+    (nav) => nav.href.includes('/category') || nav.href === '/markets' || nav.href === '/opinion'
+  );
+
+  // Combine company and legal links
+  const legalAndCompanyLinks = [...FOOTER_NAVIGATION.company, ...FOOTER_NAVIGATION.legal];
+
   return (
-    <footer
-      className="mt-16 border-t-[6px] border-ink bg-soft pt-16 pb-8 dark:border-gray-700 dark:bg-gray-900"
+    <footer 
+      className="bg-brand-primary text-gray-300 mt-auto border-t-4 border-brand-accent"
       aria-labelledby="footer-heading"
     >
-      <h2 id="footer-heading" className="sr-only">{tFooter("footerHeading")}</h2>
+      <h2 id="footer-heading" className="sr-only">Site Footer</h2>
       
-      <div className="container-page">
-        <div className="grid gap-12 md:grid-cols-4 lg:grid-cols-5">
+      <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           
-          {/* Brand & Newsletter */}
-          <div className="lg:col-span-2">
-            <Link
-              href="/"
-              className="editorial rounded-sm text-3xl font-black tracking-tight text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal dark:text-gray-100"
-              aria-label={tCommon("brand")}
-            >
-              {tCommon("brand")}.
-            </Link>
-            <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
-              {tFooter("description")}
-            </p>
-            
-            <div className="mt-6">
-              <p className="text-sm font-bold text-ink">{tFooter("subscribePrompt")}</p>
-              <form className="mt-2 flex max-w-sm items-center gap-2" action="#">
-                <label htmlFor="email-address" className="sr-only">{tFooter("emailLabel")}</label>
-                <input
-                  id="email-address"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  placeholder={tFooter("emailPlaceholder")}
-                  className="w-full rounded-md border border-line bg-paper px-4 py-2 text-sm text-ink placeholder:text-muted focus-visible:border-signal focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-signal dark:bg-gray-950 dark:text-gray-100"
-                />
-                <button
-                  type="submit"
-                  className="rounded-md bg-signal px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-red-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2"
-                >
-                  {tFooter("signUp")}
-                </button>
-              </form>
+          {/* Column 1: Brand & About */}
+          <div className="space-y-6">
+            <div className="bg-white/95 inline-block px-3 py-2 rounded-md shadow-sm">
+              <BrandLogo />
             </div>
+            <p className="text-sm leading-relaxed font-devanagari text-gray-400">
+              (DailySamachar.org) - स्वतंत्र और निष्पक्ष पत्रकारिता।
+            </p>
           </div>
 
-          {/* Links: Sections */}
+          {/* Column 2: Top Categories (Config Sync) */}
           <div>
-            <h3 className="kicker mb-4 text-ink">{tFooter("sectionsHeading")}</h3>
-            <ul className="space-y-3 text-sm font-medium text-muted">
-              <li><Link href="/category/india" className="rounded-sm hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal">{tCommon("india")}</Link></li>
-              <li><Link href="/category/world" className="rounded-sm hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal">{tCommon("world")}</Link></li>
-              <li><Link href="/category/business" className="rounded-sm hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal">{tCommon("business")}</Link></li>
-              <li><Link href="/video" className="rounded-sm hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal">{tCommon("video")}</Link></li>
+            <h3 className="text-white text-lg font-bold uppercase tracking-wider mb-6 border-l-4 border-brand-accent pl-3">
+              Top Categories
+            </h3>
+            <ul className="space-y-4 text-sm" role="list">
+              {topCategories.slice(0, 5).map((item) => (
+                <li key={item.href}>
+                  <Link 
+                    href={item.href}
+                    className="hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 focus-visible:ring-offset-brand-primary rounded-sm"
+                  >
+                    {item.title}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Links: Company */}
+          {/* Column 3: Legal & Policies (Config Sync) */}
           <div>
-            <h3 className="kicker mb-4 text-ink">{tFooter("companyHeading")}</h3>
-            <ul className="space-y-3 text-sm font-medium text-muted">
-              <li><Link href="/about" className="rounded-sm hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal">{tFooter("aboutUs")}</Link></li>
-              <li><Link href="/careers" className="rounded-sm hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal">{tFooter("careers")}</Link></li>
-              <li><Link href="/advertise" className="rounded-sm hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal">{tFooter("advertise")}</Link></li>
+            <h3 className="text-white text-lg font-bold uppercase tracking-wider mb-6 border-l-4 border-brand-accent pl-3">
+              Company & Legal
+            </h3>
+            <ul className="space-y-4 text-sm" role="list">
+              {legalAndCompanyLinks.map((item) => (
+                <li key={item.href}>
+                  <Link 
+                    href={item.href} 
+                    className="hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 focus-visible:ring-offset-brand-primary rounded-sm"
+                  >
+                    {item.title}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Links: Legal */}
+          {/* Column 4: Newsletter */}
           <div>
-            <h3 className="kicker mb-4 text-ink">{tFooter("legalHeading")}</h3>
-            <ul className="space-y-3 text-sm font-medium text-muted">
-              <li><Link href="/terms" className="rounded-sm hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal">{tFooter("terms")}</Link></li>
-              <li><Link href="/privacy" className="rounded-sm hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal">{tFooter("privacy")}</Link></li>
-              <li><Link href="/fact-check" className="rounded-sm hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal">{tFooter("factCheck")}</Link></li>
-            </ul>
+            <h3 className="text-white text-lg font-bold uppercase tracking-wider mb-6 border-l-4 border-brand-accent pl-3">
+              Stay Updated
+            </h3>
+            <p className="text-sm text-gray-400 mb-4">
+              Get the latest news alerts directly in your inbox.
+            </p>
+            <form className="flex" aria-label="Newsletter signup">
+              <input 
+                type="email" 
+                placeholder="Email address" 
+                required
+                aria-label="Email address for newsletter"
+                className="w-full px-4 py-2 bg-brand-blue-light text-white border border-gray-600 rounded-l-md focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-transparent placeholder-gray-400"
+              />
+              <button 
+                type="submit"
+                className="bg-brand-accent hover:bg-brand-red-light text-white px-4 py-2 rounded-r-md font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-brand-primary shrink-0"
+              >
+                Subscribe
+              </button>
+            </form>
           </div>
-
         </div>
-        
-        <div className="mt-16 flex flex-col items-center justify-between border-t border-line pt-8 md:flex-row">
-          <p className="text-xs text-muted">
-            &copy; {currentYear} {tCommon("brand")} Media. {tFooter("allRightsReserved")}
+      </div>
+
+      {/* Copyright Bar - FIXED: Replaced hardcoded bg-[#08111A] with scalable bg-black/30 */}
+      <div className="border-t border-gray-800 bg-black/30">
+        <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-gray-500">
+            &copy; {currentYear} Daily Samachar. All rights reserved.
           </p>
+          
+          {/* Added Social Links from config */}
+          <div className="flex gap-4">
+            {FOOTER_NAVIGATION.social.map((social) => (
+              <a
+                key={social.title}
+                href={social.href}
+                target={social.isExternal ? "_blank" : undefined}
+                rel={social.isExternal ? "noopener noreferrer" : undefined}
+                className="text-gray-500 hover:text-white transition-colors text-sm"
+                aria-label={social.title}
+              >
+                {social.title}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </footer>

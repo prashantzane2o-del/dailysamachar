@@ -1,1 +1,9 @@
-import { StaticPage } from "@/features/home/components/static-page"; import { EmptyState } from "@/components/ui/feedback"; export default function Notifications() { return <StaticPage eyebrow="Your account" title="Notifications"><EmptyState title="You’re all caught up" description="News alerts and saved-topic updates will appear here."/></StaticPage>; }
+import { StaticPage } from "@/features/home/components/static-page";
+import { EmptyState } from "@/components/ui/feedback";
+export default function Notifications() {
+  return (
+    <StaticPage eyebrow="Your account" title="Notifications">
+      <EmptyState title="You’re all caught up" description="News alerts and saved-topic updates will appear here." />
+    </StaticPage>
+  );
+}

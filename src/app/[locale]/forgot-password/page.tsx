@@ -1,1 +1,13 @@
-import { AuthForm } from "@/features/auth/ui/auth-form"; export default function ForgotPassword() { return <main className="container-page grid min-h-[70vh] place-items-center py-12"><section className="w-full max-w-md rounded-2xl border bg-paper p-7 shadow-sm"><p className="kicker">Account recovery</p><h1 className="editorial mt-2 text-4xl font-bold">Reset your password.</h1><p className="mt-3 text-sm text-muted">We’ll email you a secure reset link.</p><AuthForm mode="reset"/></section></main>; }
+import { AuthForm } from "@/features/auth/ui/auth-form";
+export default function ForgotPassword() {
+  return (
+    <main className="container-page grid min-h-[70vh] place-items-center py-12">
+      <section className="bg-paper w-full max-w-md rounded-2xl border p-7 shadow-sm">
+        <p className="kicker">Account recovery</p>
+        <h1 className="editorial mt-2 text-4xl font-bold">Reset your password.</h1>
+        <p className="text-muted mt-3 text-sm">We’ll email you a secure reset link.</p>
+        <AuthForm mode="reset" />
+      </section>
+    </main>
+  );
+}

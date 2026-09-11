@@ -1,1 +1,15 @@
-import { StaticPage } from "@/features/home/components/static-page"; export default function EditorialPolicy() { return <StaticPage eyebrow="Our standards" title="Editorial policy."><p>Our reporting is independent of advertisers, political parties and commercial interests. Stories are reviewed for accuracy, context, fairness and clarity before publication.</p><p>Opinion is clearly labelled. Sources are protected when necessary and anonymous sourcing is used only when the public interest outweighs the limitation.</p></StaticPage>; }
+import { StaticPage } from "@/features/home/components/static-page";
+export default function EditorialPolicy() {
+  return (
+    <StaticPage eyebrow="Our standards" title="Editorial policy.">
+      <p>
+        Our reporting is independent of advertisers, political parties and commercial interests. Stories are reviewed
+        for accuracy, context, fairness and clarity before publication.
+      </p>
+      <p>
+        Opinion is clearly labelled. Sources are protected when necessary and anonymous sourcing is used only when the
+        public interest outweighs the limitation.
+      </p>
+    </StaticPage>
+  );
+}

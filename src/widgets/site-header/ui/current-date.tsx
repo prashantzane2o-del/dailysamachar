@@ -1,44 +1,38 @@
+// src/widgets/site-header/ui/current-date.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 
 export function CurrentDate() {
-  const locale = useLocale();
   const [mounted, setMounted] = useState(false);
-  const [dateInfo, setDateInfo] = useState({ text: "", iso: "" });
+  const [currentDate, setCurrentDate] = useState<Date | null>(null);
+  const locale = useLocale();
 
   useEffect(() => {
-    // Ye code sirf client side par chalega, isliye hamesha user ka local time dikhega
-    const now = new Date();
-    setDateInfo({
-      text: new Intl.DateTimeFormat(locale, {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }).format(now),
-      iso: now.toISOString(),
-    });
     setMounted(true);
-  }, [locale]);
+    setCurrentDate(new Date());
 
-  // Jab tak component mount nahi hota (SSR ke dauran), hum ek stable empty state return karenge
-  // Isse UI shift (CLS) nahi hoga aur hydration error avoid ho jayega
-  if (!mounted) {
-    return (
-      <time 
-        className="inline-block min-w-37.5 opacity-0" // FIXED: Replaced min-w-[150px] with min-w-37.5
-        aria-hidden="true"
-      >
-        Loading date...
-      </time>
-    );
+    // Optional: Agar aap chahein toh midnight par date auto-update karne ke liye interval laga sakte hain
+    // But normally news sites par page load/navigate hone par update kaafi hota hai.
+  }, []);
+
+  // Hydration fix: Jab tak client par mount na ho, ek skeleton dikhayein
+  if (!mounted || !currentDate) {
+    return <div className="h-4 w-32 animate-pulse rounded bg-gray-200 dark:bg-gray-800" aria-hidden="true"></div>;
   }
 
+  // Locale ke hisaab se date format karein (English vs Hindi)
+  const formattedDate = currentDate.toLocaleDateString(locale === "hi" ? "hi-IN" : "en-IN", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
   return (
-    <time dateTime={dateInfo.iso} aria-label="Current Date" className="animate-in fade-in duration-300">
-      {dateInfo.text}
+    <time dateTime={currentDate.toISOString()} className="text-muted text-xs font-medium md:text-sm dark:text-gray-400">
+      {formattedDate}
     </time>
   );
 }

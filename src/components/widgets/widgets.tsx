@@ -1,16 +1,173 @@
 "use client";
-import { ArrowUp, CloudSun, Facebook, Linkedin, Moon, Share2, Sun, Twitter } from "lucide-react";
+import { ArrowUp, CloudSun, Facebook, Linkedin, Share2, Twitter } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useTheme } from "@/providers/theme-provider";
-import { Button, Input } from "@/components/ui/primitives";
+import { useLocale } from "next-intl";
+import Link from "next/link";
+import { getLocalizedPath } from "@/i18n/path";
 
-export function ThemeToggle() { const { theme, setTheme } = useTheme(); const isDark = theme === "dark"; return <button onClick={() => setTheme(isDark ? "light" : "dark")} aria-label="Toggle dark mode" className="rounded-lg p-2 hover:bg-soft">{isDark ? <Sun size={17}/> : <Moon size={17}/>}</button>; }
-export function LanguageSwitcher() { return <select aria-label="Language" className="bg-transparent text-xs font-bold outline-none"><option>English</option><option>हिंदी</option><option>বাংলা</option></select>; }
-export function ReadingProgress() { const [progress, setProgress] = useState(0); useEffect(() => { const update = () => setProgress(Math.min(100, scrollY / Math.max(1, document.body.scrollHeight - innerHeight) * 100)); addEventListener("scroll", update, { passive: true }); update(); return () => removeEventListener("scroll", update); }, []); return <progress aria-label="Reading progress" className="fixed inset-x-0 top-0 z-[60] h-0.5 w-full appearance-none [&::-webkit-progress-bar]:bg-transparent [&::-webkit-progress-value]:bg-signal [&::-moz-progress-bar]:bg-signal" value={progress} max="100"/>; }
-export function BackToTop() { const [visible, setVisible] = useState(false); useEffect(() => { const update = () => setVisible(scrollY > 600); addEventListener("scroll", update, { passive: true }); return () => removeEventListener("scroll", update); }, []); return visible ? <button aria-label="Back to top" onClick={() => scrollTo({ top: 0, behavior: "smooth" })} className="fixed bottom-5 right-5 z-30 grid h-10 w-10 place-items-center rounded-full bg-ink text-white shadow-xl hover:bg-signal"><ArrowUp size={18}/></button> : null; }
-export function ShareButtons() { return <div aria-label="Share this story" className="flex gap-2"><button aria-label="Share on X" className="rounded-lg border p-2 hover:text-signal"><Twitter size={15}/></button><button aria-label="Share on Facebook" className="rounded-lg border p-2 hover:text-signal"><Facebook size={15}/></button><button aria-label="Share on LinkedIn" className="rounded-lg border p-2 hover:text-signal"><Linkedin size={15}/></button><button aria-label="Copy link" className="rounded-lg border p-2 hover:text-signal"><Share2 size={15}/></button></div>; }
-export function StickySocialBar() { return <div className="fixed left-4 top-1/2 z-20 hidden -translate-y-1/2 rounded-xl border bg-paper p-1 shadow-sm xl:block"><ShareButtons/></div>; }
-export function AdPlaceholder({ label = "Advertisement" }: { label?: string }) { return <div className="grid min-h-28 place-items-center rounded-xl border border-dashed bg-soft px-4 text-[10px] font-bold uppercase tracking-[.18em] text-muted">{label}</div>; }
-export function NewsletterCard() { return <div className="rounded-2xl bg-ink p-6 text-white"><p className="kicker text-red-400">The Daily Brief</p><h3 className="editorial mt-2 text-2xl font-bold">Make room for better news.</h3><p className="mt-2 text-sm leading-6 text-slate-400">A considered morning read, delivered daily.</p><form className="mt-5 flex gap-2"><Input type="email" aria-label="Email address" placeholder="Email address" className="border-0 bg-white text-ink"/><Button type="submit" size="sm">Join</Button></form></div>; }
-export function WeatherWidget() { return <div className="rounded-xl border p-4"><CloudSun className="text-signal"/><p className="mt-3 text-xs font-bold text-muted">NEW DELHI</p><p className="editorial text-3xl font-bold">29°</p><p className="text-xs text-muted">Hazy sunshine · Feels like 31°</p></div>; }
-export function StockWidget() { return <div className="rounded-xl border p-4"><p className="text-xs font-bold text-muted">MARKETS</p><div className="mt-3 flex items-end justify-between"><div><p className="font-bold">NIFTY 50</p><p className="text-xs text-muted">24,869.25</p></div><span className="text-xs font-bold text-emerald-600">+0.62%</span></div></div>; }
+export function LanguageSwitcher() {
+  return (
+    <select aria-label="Language" className="bg-transparent text-xs font-bold outline-none">
+      <option>English</option>
+      <option>हिंदी</option>
+      <option>বাংলা</option>
+    </select>
+  );
+}
+export function ReadingProgress() {
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    const update = () =>
+      setProgress(Math.min(100, (scrollY / Math.max(1, document.body.scrollHeight - innerHeight)) * 100));
+    addEventListener("scroll", update, { passive: true });
+    update();
+    return () => removeEventListener("scroll", update);
+  }, []);
+  return (
+    <progress
+      aria-label="Reading progress"
+      className="[&::-webkit-progress-value]:bg-signal [&::-moz-progress-bar]:bg-signal fixed inset-x-0 top-0 z-60 h-0.5 w-full appearance-none [&::-webkit-progress-bar]:bg-transparent"
+      value={progress}
+      max="100"
+    />
+  );
+}
+export function BackToTop() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const update = () => setVisible(scrollY > 600);
+    addEventListener("scroll", update, { passive: true });
+    return () => removeEventListener("scroll", update);
+  }, []);
+  return visible ? (
+    <button
+      aria-label="Back to top"
+      onClick={() => scrollTo({ top: 0, behavior: "smooth" })}
+      className="bg-ink hover:bg-signal fixed right-5 bottom-5 z-30 grid h-10 w-10 place-items-center rounded-full text-white shadow-xl"
+    >
+      <ArrowUp size={18} />
+    </button>
+  ) : null;
+}
+export function ShareButtons() {
+  const [copied, setCopied] = useState(false);
+
+  const share = (network: "x" | "facebook" | "linkedin") => {
+    const url = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent(document.title);
+    const shareUrl = {
+      x: `https://twitter.com/intent/tweet?url=${url}&text=${title}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+    }[network];
+
+    window.open(shareUrl, "share-window", "noopener,noreferrer,width=640,height=560");
+  };
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  return (
+    <div aria-label="Share this story" className="flex gap-2">
+      <button
+        type="button"
+        aria-label="Share on X"
+        onClick={() => share("x")}
+        className="hover:text-signal rounded-lg border p-2"
+      >
+        <Twitter size={15} />
+      </button>
+      <button
+        type="button"
+        aria-label="Share on Facebook"
+        onClick={() => share("facebook")}
+        className="hover:text-signal rounded-lg border p-2"
+      >
+        <Facebook size={15} />
+      </button>
+      <button
+        type="button"
+        aria-label="Share on LinkedIn"
+        onClick={() => share("linkedin")}
+        className="hover:text-signal rounded-lg border p-2"
+      >
+        <Linkedin size={15} />
+      </button>
+      <button
+        type="button"
+        aria-label="Copy link"
+        onClick={copyLink}
+        className="hover:text-signal rounded-lg border p-2"
+      >
+        <Share2 size={15} />
+      </button>
+      {copied && (
+        <span className="sr-only" role="status">
+          Link copied
+        </span>
+      )}
+    </div>
+  );
+}
+export function StickySocialBar() {
+  return (
+    <div className="bg-paper fixed top-1/2 left-4 z-20 hidden -translate-y-1/2 rounded-xl border p-1 shadow-sm xl:block">
+      <ShareButtons />
+    </div>
+  );
+}
+export function AdPlaceholder({ label = "Advertisement" }: { label?: string }) {
+  return (
+    <div className="bg-soft text-muted grid min-h-28 place-items-center rounded-xl border border-dashed px-4 text-[10px] font-bold tracking-[.18em] uppercase">
+      {label}
+    </div>
+  );
+}
+export function NewsletterCard() {
+  const locale = useLocale();
+
+  return (
+    <div className="bg-ink rounded-2xl p-6 text-white">
+      <p className="kicker text-red-400">The Daily Brief</p>
+      <h3 className="editorial mt-2 text-2xl font-bold">Make room for better news.</h3>
+      <p className="mt-2 text-sm leading-6 text-slate-400">A considered morning read, delivered daily.</p>
+      <Link
+        href={getLocalizedPath(locale, "/newsletters")}
+        className="bg-signal mt-5 inline-flex rounded-lg px-4 py-2 text-sm font-bold text-white transition hover:bg-red-800"
+      >
+        Join the Daily Brief
+      </Link>
+    </div>
+  );
+}
+export function WeatherWidget() {
+  return (
+    <div className="rounded-xl border p-4">
+      <CloudSun className="text-signal" />
+      <p className="text-muted mt-3 text-xs font-bold">NEW DELHI</p>
+      <p className="editorial text-3xl font-bold">29°</p>
+      <p className="text-muted text-xs">Hazy sunshine · Feels like 31°</p>
+    </div>
+  );
+}
+export function StockWidget() {
+  return (
+    <div className="rounded-xl border p-4">
+      <p className="text-muted text-xs font-bold">MARKETS</p>
+      <div className="mt-3 flex items-end justify-between">
+        <div>
+          <p className="font-bold">NIFTY 50</p>
+          <p className="text-muted text-xs">24,869.25</p>
+        </div>
+        <span className="text-xs font-bold text-emerald-600">+0.62%</span>
+      </div>
+    </div>
+  );
+}

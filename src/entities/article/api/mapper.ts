@@ -14,7 +14,7 @@ export function mapCmsArticle(dto: CmsArticleDto): Article {
     updatedAt: dto.modified,
     author: {
       name: dto.author.name,
-      avatar: dto.author.avatarUrl,
+      avatar: dto.author.avatar,
     },
     category: {
       name: category.name,
@@ -24,9 +24,7 @@ export function mapCmsArticle(dto: CmsArticleDto): Article {
       ? {
           url: dto.featuredImage.url,
           alt: dto.featuredImage.alt ?? dto.title,
-          ...(dto.featuredImage.caption
-            ? { caption: dto.featuredImage.caption }
-            : {}),
+          ...(dto.featuredImage.caption ? { caption: dto.featuredImage.caption } : {}),
         }
       : undefined,
     tags: dto.tags.map((tag) => ({ title: tag.name, slug: tag.slug })),

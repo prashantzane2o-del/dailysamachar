@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 import { useTranslations } from "next-intl";
 
 type Placement = "top" | "sidebar" | "inline" | "sticky" | "video";
@@ -35,11 +35,11 @@ export function AdSlot({ placement, className }: { placement: Placement; classNa
           observer.disconnect();
         }
       },
-      { rootMargin: "300px" } // Trigger 300px before the ad enters the viewport
+      { rootMargin: "300px" }, // Trigger 300px before the ad enters the viewport
     );
 
     observer.observe(node);
-    
+
     return () => observer.disconnect();
   }, []);
 
@@ -53,9 +53,9 @@ export function AdSlot({ placement, className }: { placement: Placement; classNa
       // Reserving strict dimensions to prevent layout shift (CLS)
       style={{ minHeight: dimensions.height, width: "100%", maxWidth: dimensions.width }}
       className={cn(
-        "relative mx-auto flex items-center justify-center overflow-hidden rounded-sm bg-soft text-[10px] font-bold uppercase tracking-widest text-muted transition-colors",
-        !isLoaded && "border border-dashed border-line",
-        className
+        "bg-soft text-muted relative mx-auto flex items-center justify-center overflow-hidden rounded-sm text-[10px] font-bold tracking-widest uppercase transition-colors",
+        !isLoaded && "border-line border border-dashed",
+        className,
       )}
     >
       {!isLoaded && <span>{tCommon("advertisement")}</span>}

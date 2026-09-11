@@ -1,16 +1,22 @@
-import { NextResponse } from "next/server";
-import { createWeatherFallback, getWeather } from "@/services/weather";
+import { NextRequest, NextResponse } from "next/server";
+import { weatherApi } from "@/entities/weather/api/weather.api";
 
-export async function GET(request: Request) {
-  const city = new URL(request.url).searchParams.get("city")?.trim();
-  if (!city || city.length > 80) return NextResponse.json({ error: "Invalid city" }, { status: 400 });
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  const city = request.nextUrl.searchParams.get("city")?.trim().slice(0, 80) || "New Delhi";
 
   try {
-    const weather = await getWeather(city);
+    const weather = await weatherApi.getWeatherByCity(city);
     return NextResponse.json(weather, {
-      headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" },
+      headers: { "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600" },
     });
-  } catch {
-    return NextResponse.json({ error: "Weather unavailable", data: createWeatherFallback(city) }, { status: 502 });
+  } catch (error) {
+    console.error("Weather API error", error);
+    return NextResponse.json(
+      { error: "Weather unavailable" },
+      {
+        status: 502,
+        headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" },
+      },
+    );
   }
 }

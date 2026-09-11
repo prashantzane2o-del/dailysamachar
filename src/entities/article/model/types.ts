@@ -72,7 +72,7 @@ export interface WPPost {
       description: string;
       avatar_urls?: Record<string, string>;
     }>;
-    'wp:featuredmedia'?: Array<{
+    "wp:featuredmedia"?: Array<{
       id: number;
       source_url: string;
       alt_text: string;
@@ -81,7 +81,7 @@ export interface WPPost {
         height: number;
       };
     }>;
-    'wp:term'?: Array<
+    "wp:term"?: Array<
       Array<{
         id: number;
         name: string;

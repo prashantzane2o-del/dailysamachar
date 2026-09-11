@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { createMarketRepository, mapMarket } from "@/services/markets";
 import { MarketDashboard } from "@/features/markets/ui/market-dashboard";
 import { Container, Section } from "@/components/layout/layout";
+import { JsonLd } from "@/shared/ui/json-ld";
+import { getLocalizedPath } from "@/i18n/path";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const t = await getTranslations("markets");
@@ -10,7 +11,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: t("title"),
     description: t("description"),
-    alternates: { canonical: `/${locale}/markets`, languages: { hi: "/hi/markets", en: "/en/markets" } },
+    alternates: {
+      canonical: getLocalizedPath(locale, "/markets"),
+      languages: { hi: "/hi/markets", en: "/markets" },
+    },
     openGraph: { title: t("title"), description: t("description"), type: "website" },
     twitter: { card: "summary_large_image", title: t("title"), description: t("description") },
   };
@@ -18,13 +22,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 export default async function MarketsPage() {
   const common = await getTranslations("common");
-  let markets;
-  try {
-    const quotes = await createMarketRepository().listQuotes();
-    markets = quotes.map(mapMarket);
-  } catch {
-    markets = undefined;
-  }
   const t = await getTranslations("markets");
   return (
     <main>
@@ -35,16 +32,13 @@ export default async function MarketsPage() {
             <h1 className="editorial mt-3 text-5xl font-bold">{t("title")}</h1>
             <p className="text-muted mt-3 max-w-2xl">{t("description")}</p>
           </div>
-          <MarketDashboard initialData={markets} />
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "Dataset",
-                name: t("title"),
-                description: t("description"),
-              }),
+          <MarketDashboard />
+          <JsonLd
+            data={{
+              "@context": "https://schema.org",
+              "@type": "Dataset",
+              name: t("title"),
+              description: t("description"),
             }}
           />
         </Container>

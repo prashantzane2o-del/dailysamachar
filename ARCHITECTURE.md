@@ -283,7 +283,7 @@ The current repository is transitioning from legacy `src/components` folders to 
 | `config`     | Environment-derived configuration                 | `process.env`, validation           | JSX and request-specific data               | `config/env.ts`                            |
 | `types`      | Cross-cutting TypeScript contracts                | TypeScript                          | Runtime implementations                     | `types/brand.ts`                           |
 | `animations` | Motion variants and transitions                   | Framer Motion types                 | Business decisions                          | `animations/fade-in.ts`                    |
-| `public`     | Immutable browser-addressable assets              | None                                | Secrets, generated user data                | `public/icon.svg`                          |
+| `public`     | Immutable browser-addressable assets              | None                                | Secrets, generated user data                | `public/Logo.svg`                          |
 
 ### 3.2 Slice layout
 
@@ -335,8 +335,8 @@ import { ArticlePage } from "@/features/article";
 // Good: widget consumes a stable entity contract.
 import { ArticleCard } from "@/entities/article";
 
-// Bad: route knows transport details.
-import { ARTICLE_QUERY } from "@/services/cms/graphql/article-query";
+// Good: route uses the shared CMS facade.
+import { cmsApi } from "@/shared/api/cms";
 
 // Bad: one feature reaches into another feature's private file.
 import { useBookmarkMutation } from "@/features/bookmarks/model/use-bookmark-mutation";

@@ -1,74 +1,82 @@
-import Image from "next/image";
-import { Link } from "@/i18n/navigation";
-import { useLocale } from "next-intl";
-import type { Article } from "@/entities/article/model/types";
-import { SanitizedHtml } from "@/shared/ui/sanitized-html";
+// src/widgets/news-feed/ui/hero-story-widget.tsx
 
-interface HeroStoryWidgetProps {
-  article: Article;
+import { ArticleCard } from '@/entities/article/ui/article-card';
+import { Link } from '@/i18n/navigation';
+import type { Article } from '@/types/news';
+
+export interface HeroStoryWidgetProps {
+  // FIXED: Removed local 'Story' interface and used strict 'Article' type
+  mainStory?: Article | null;
+  sideStories?: Article[];
+  sectionTitle?: string;
 }
 
-export function HeroStoryWidget({ article }: HeroStoryWidgetProps) {
-  const locale = useLocale();
-  const formattedDate = new Intl.DateTimeFormat(locale, {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  }).format(new Date(article.publishedAt));
+export function HeroStoryWidget({ 
+  mainStory, 
+  sideStories = [], // Default to empty array
+  sectionTitle = "Top Stories" 
+}: HeroStoryWidgetProps) {
+  // FAIL-SAFE: Agar mainStory data server se nahi aaya, toh component crash nahi hoga, null return karega.
+  if (!mainStory) {
+    return null; 
+  }
+
+  // Ensure sideStories is always an array
+  const safeSideStories = Array.isArray(sideStories) ? sideStories : [];
 
   return (
-    <article className="group mb-12 flex flex-col gap-6 md:flex-row md:items-center">
-      {/* Large Featured Image (2/3 width on desktop) */}
-      <Link 
-        href={`/news/${article.slug}`} 
-        className="relative block w-full overflow-hidden rounded-md bg-soft aspect-video md:w-2/3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2"
-        aria-hidden="true"
-        tabIndex={-1}
-      >
-        {article.featuredImage ? (
-          <Image
-            src={article.featuredImage.url}
-            alt={article.featuredImage.alt || "Featured story thumbnail"}
-            fill
-            priority // Critical for LCP (Largest Contentful Paint) SEO metric
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, 66vw"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-muted">
-            <span className="font-medium uppercase tracking-widest text-lg">DailySamachar</span>
-          </div>
-        )}
-      </Link>
-
-      {/* Hero Content (1/3 width on desktop) */}
-      <div className="flex w-full flex-col gap-4 md:w-1/3">
-        <div>
-          <Link 
-            href={`/category/${article.category.slug}`}
-            className="kicker inline-block text-xs text-signal hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2"
+    <section 
+      className="py-8 w-full"
+      aria-labelledby="hero-section-heading"
+    >
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Section Heading */}
+        <div className="flex items-center justify-between mb-6 border-b-2 border-brand-primary dark:border-gray-700 pb-2">
+          <h2 
+            id="hero-section-heading" 
+            className="text-2xl font-bold uppercase tracking-wide text-brand-primary dark:text-gray-100 flex items-center gap-3"
           >
-            {article.category.name}
+            <span className="w-3 h-6 bg-brand-accent inline-block" aria-hidden="true"></span>
+            {sectionTitle}
+          </h2>
+
+          <Link 
+            href="/latest" 
+            className="text-sm font-bold text-brand-accent hover:text-brand-primary dark:hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:rounded-sm"
+            aria-label={`View all ${sectionTitle.toLowerCase()} stories`}
+          >
+            View All &raquo;
           </Link>
         </div>
 
-        <h2 className="editorial text-3xl font-black leading-tight text-ink md:text-4xl lg:text-5xl group-hover:text-signal transition-colors">
-          <Link 
-            href={`/news/${article.slug}`}
-            className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2 rounded-sm"
-          >
-            <SanitizedHtml as="span" html={article.title || "Untitled story"} />
-          </Link>
-        </h2>
+        {/* Hero Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          {/* Main Lead Story */}
+          <div className="lg:col-span-8">
+            {/* FIXED: Passing the entire article object directly to the updated ArticleCard */}
+            <ArticleCard article={mainStory} />
+          </div>
 
-        <SanitizedHtml html={article.excerpt || ""} className="line-clamp-3 text-base text-muted prose-p:m-0" />
-
-        <div className="mt-2 flex items-center gap-2 text-sm font-medium text-muted">
-          <span>{article.author.name}</span>
-          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-line"></span>
-          <time dateTime={article.publishedAt}>{formattedDate}</time>
+          {/* Side Stories (Safe mapping) */}
+          {safeSideStories.length > 0 && (
+            <div 
+              className="lg:col-span-4 flex flex-col gap-6" 
+              role="feed" 
+              aria-label="Related side stories"
+            >
+              {safeSideStories.slice(0, 2).map((story, index) => (
+                <ArticleCard
+                  key={story?.id || `side-story-${index}`}
+                  article={story}
+                />
+              ))}
+            </div>
+          )}
+          
         </div>
       </div>
-    </article>
+    </section>
   );
 }

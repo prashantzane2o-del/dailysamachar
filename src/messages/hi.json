@@ -14,7 +14,12 @@
     "video": "वीडियो",
     "lightMode": "लाइट मोड चालू करें",
     "darkMode": "डार्क मोड चालू करें",
-    "currentTime": "वर्तमान समय"
+    "currentTime": "वर्तमान समय",
+    "retry": "फिर कोशिश करें",
+    "loading": "लोड हो रहा है",
+    "language": "भाषा बदलें",
+    "switchToEnglish": "English",
+    "switchToHindi": "हिन्दी"
   },
   "header": {
     "skipToContent": "मुख्य सामग्री पर जाएं",
@@ -23,8 +28,12 @@
     "openMenu": "मेनू खोलें",
     "closeMenu": "मेनू बंद करें",
     "searchStories": "खबरें खोजें",
-    "closeSearch": "खोज बंद करें"
-    ,"sections": "सेक्शन"
+    "closeSearch": "खोज बंद करें",
+    "search": "खोजें",
+    "searchPlaceholder": "खबरें खोजें",
+    "trending": "ट्रेंडिंग",
+    "trends": ["भारत", "टेक्नोलॉजी", "बाज़ार", "जलवायु"],
+    "sections": "सेक्शन"
   },
   "footer": {
     "footerHeading": "साइट फुटर",
@@ -42,38 +51,136 @@
     "terms": "उपयोग की शर्तें",
     "privacy": "प्राइवेसी पॉलिसी",
     "factCheck": "फ़ैक्ट चेक पॉलिसी",
-    "allRightsReserved": "सर्वाधिकार सुरक्षित।"
+    "allRightsReserved": "सर्वाधिकार सुरक्षित।",
+    "sections": "सेक्शन",
+    "world": "दुनिया",
+    "politics": "राजनीति",
+    "business": "कारोबार",
+    "tech": "टेक्नोलॉजी",
+    "automobile": "ऑटोमोबाइल",
+    "sportsNews": "स्पोर्ट्स न्यूज़",
+    "yojana": "योजना",
+    "businessFinance": "बिज़नेस और फ़ाइनेंस",
+    "jobs": "नौकरियां",
+    "science": "विज्ञान",
+    "health": "स्वास्थ्य",
+    "sports": "खेल",
+    "entertainment": "मनोरंजन",
+    "ourStory": "हमारी कहानी",
+    "journalismEthics": "संपादकीय नीति",
+    "contact": "संपर्क",
+    "legal": "कानूनी जानकारी",
+    "termsOfService": "सेवा की शर्तें",
+    "privacyPolicy": "प्राइवेसी पॉलिसी",
+    "cookiePolicy": "कुकी पॉलिसी",
+    "accessibility": "सुलभता",
+    "doNotSell": "मेरी जानकारी न बेचें",
+    "followUs": "हमें फ़ॉलो करें",
+    "missionStatement": "दुनिया भर से सटीक, निष्पक्ष और व्यापक खबरें। सच और संदर्भ के साथ पाठकों को सशक्त बनाना हमारा उद्देश्य है।",
+    "emailPlaceholder": "अपना ईमेल दर्ज करें",
+    "subscribe": "सब्सक्राइब करें",
+    "newsletterDisclaimer": "सब्सक्राइब करके आप हमारी सेवा की शर्तों और प्राइवेसी पॉलिसी से सहमत होते हैं।",
+    "downloadIOS": "iOS के लिए डाउनलोड करें",
+    "downloadAndroid": "Android के लिए डाउनलोड करें"
   },
   "navigation": {
     "mainNavigation": "मुख्य नेविगेशन",
+    "home": "होम",
     "india": "भारत",
     "world": "दुनिया",
     "politics": "राजनीति",
     "business": "कारोबार",
+    "tech": "टेक्नोलॉजी",
     "technology": "टेक्नोलॉजी",
+    "science": "विज्ञान",
+    "health": "स्वास्थ्य",
     "sports": "खेल",
-    "opinion": "ओपिनियन"
+    "automobile": "ऑटोमोबाइल",
+    "sportsNews": "स्पोर्ट्स न्यूज़",
+    "yojana": "योजना",
+    "businessFinance": "बिज़नेस और फ़ाइनेंस",
+    "jobs": "नौकरियां",
+    "entertainment": "मनोरंजन",
+    "lifestyle": "लाइफ़स्टाइल",
+    "tools": "टूल्स",
+    "chanakyaNiti": "चाणक्य नीति स्पेशल",
+    "lifeLessons": "जीवन सीख",
+    "opinion": "ओपिनियन",
+    "trendingIn": "{category} में ट्रेंडिंग",
+    "featuredHeadlinePlaceholder": "दोपहर के कारोबार में टेक शेयरों की तेजी से बाजार नई ऊंचाई पर"
   },
   "home": {
     "title": "ताज़ा खबरें",
     "description": "भारत और दुनिया की सत्यापित, स्वतंत्र खबरें।",
-    "noNews": "इस समय कोई खबर उपलब्ध नहीं है।"
+    "noNews": "इस समय कोई खबर उपलब्ध नहीं है।",
+    "markets": "बाज़ार",
+    "section": "सेक्शन",
+    "viewAll": "सभी देखें",
+    "moreLatest": "अन्य ताज़ा समाचार",
+    "storyCount": "{count} खबरें",
+    "temporaryUnavailable": "समाचार सेवा अस्थायी रूप से उपलब्ध नहीं है। कृपया थोड़ी देर बाद फिर प्रयास करें।",
+    "intro": "DailySamachar न्यूज़रूम से सत्यापित रिपोर्टिंग, उपयोगी एक्सप्लेनर और ज़रूरी संदर्भ।"
   },
   "markets": {
     "tickerLabel": "सोने और चांदी के बाज़ार भाव",
+    "markets": "बाज़ार",
+    "live": "लाइव",
+    "viewAllMarkets": "सभी बाज़ार देखें",
     "trendUp": "भाव ऊपर",
     "trendDown": "भाव नीचे",
-    "empty": "कमोडिटी भाव उपलब्ध नहीं हैं"
+    "empty": "कमोडिटी भाव उपलब्ध नहीं हैं",
+    "loading": "बाज़ार डेटा लोड हो रहा है",
+    "error": "बाज़ार डेटा अस्थायी रूप से उपलब्ध नहीं है",
+    "futureChart": "लाइव भाव समय-समय पर अपडेट होते हैं",
+    "sensex": "सेंसेक्स",
+    "nifty50": "निफ्टी 50",
+    "bankNifty": "बैंक निफ्टी",
+    "gold": "सोना",
+    "silver": "चांदी",
+    "usdInr": "डॉलर/रुपया",
+    "bitcoin": "बिटकॉइन",
+    "ethereum": "इथेरियम"
   },
   "breakingNews": {
     "regionLabel": "ब्रेकिंग न्यूज़ टिकर",
-    "label": "ब्रेकिंग"
+    "label": "ब्रेकिंग",
+    "breaking": "ब्रेकिंग",
+    "dismiss": "ब्रेकिंग न्यूज़ बंद करें",
+    "goToHeadline": "हेडलाइन {number} पर जाएं"
   },
   "weather": {
     "title": "मौसम",
+    "today": "आज",
+    "sunny": "धूप",
+    "cloudy": "बादल",
+    "rainy": "बारिश",
+    "stormy": "तूफ़ान",
+    "snowy": "बर्फ़बारी",
     "empty": "डेटा उपलब्ध नहीं है",
     "error": "मौसम सेवा अस्थायी रूप से उपलब्ध नहीं है",
-    "current": "वर्तमान"
+    "current": "वर्तमान",
+    "loading": "मौसम लोड हो रहा है",
+    "description": "भारत के प्रमुख शहरों के लिए लाइव मौसम और पूर्वानुमान।",
+    "selectCity": "शहर चुनें",
+    "feelsLike": "महसूस होता है",
+    "min": "न्यूनतम",
+    "max": "अधिकतम",
+    "humidity": "नमी",
+    "humidityUnit": "%",
+    "wind": "हवा",
+    "windUnit": "किमी/घंटा",
+    "pressure": "दबाव",
+    "pressureUnit": "hPa",
+    "visibility": "दृश्यता",
+    "visibilityUnit": "किमी",
+    "uvIndex": "UV सूचकांक",
+    "aqi": "वायु गुणवत्ता",
+    "aqiPlaceholder": "उपलब्ध नहीं",
+    "sunrise": "सूर्योदय",
+    "sunset": "सूर्यास्त",
+    "hourly": "घंटेवार पूर्वानुमान",
+    "sevenDay": "सात दिन का पूर्वानुमान",
+    "favoritePlaceholder": "बाद में देखने के लिए शहर सेव करें।"
   },
   "seo": {
     "factCheck": {
@@ -86,5 +193,94 @@
     "subheading": "हम उन दावों की पड़ताल करते हैं जो तेज़ी से फैलते हैं और उन साक्ष्यों को स्पष्ट करते हैं जो मायने रखते हैं। सत्यापित और स्वतंत्र फ़ैक्ट-चेकिंग।",
     "emptyStateTitle": "कोई लेख नहीं मिला",
     "emptyStateDesc": "कृपया नए फ़ैक्ट चेक के लिए बाद में वापस आएं।"
+  },
+  "search": {
+    "label": "खोजें",
+    "title": "अपनी अगली खबर खोजें",
+    "resultsFor": "“{query}” के लिए नतीजे",
+    "placeholder": "समाचार खोजें…",
+    "submit": "खोजें",
+    "emptyQuery": "लेख खोजने के लिए कोई शब्द दर्ज करें।",
+    "noResults": "आपकी खोज से मेल खाता कोई लेख नहीं मिला।"
+  },
+  "utilityBar": {
+    "newsletters": "न्यूज़लेटर्स",
+    "video": "वीडियो",
+    "podcasts": "पॉडकास्ट",
+    "contact": "संपर्क",
+    "accessibility": "सुलभता",
+    "textSize": "टेक्स्ट का आकार",
+    "normal": "सामान्य",
+    "large": "बड़ा",
+    "largest": "सबसे बड़ा",
+    "contrast": "कॉन्ट्रास्ट / थीम",
+    "lightMode": "लाइट मोड",
+    "darkMode": "डार्क मोड",
+    "systemMode": "सिस्टम डिफ़ॉल्ट"
+  },
+  "badges": {
+    "exclusive": "विशेष",
+    "premium": "प्रीमियम",
+    "live": "लाइव",
+    "opinion": "ओपिनियन"
+  },
+  "heroWidget": {
+    "minRead": "मिनट पढ़ने का समय",
+    "trendingNow": "अभी ट्रेंडिंग",
+    "viewAll": "सभी देखें"
+  },
+  "newsletter": {
+    "subscribeTitle": "खबरों से हमेशा आगे रहें।",
+    "subscribeDescription": "ब्रेकिंग न्यूज़ और विशेष विश्लेषण सीधे अपने इनबॉक्स में पाएं।",
+    "emailPlaceholder": "अपना ईमेल दर्ज करें",
+    "subscribeButton": "सब्सक्राइब करें"
+  },
+  "newsGrid": {
+    "seeMore": "और देखें",
+    "min": "मिनट"
+  },
+  "opinionWidget": {
+    "defaultTitle": "ओपिनियन और विश्लेषण",
+    "viewAll": "सभी देखें",
+    "readArticle": "पूरा विश्लेषण पढ़ें"
+  },
+  "multimedia": {
+    "inFocus": "फोकस में: फ़ोटो और वीडियो",
+    "viewAll": "सभी मीडिया देखें"
+  },
+  "videoPlayer": {
+    "live": "लाइव",
+    "maximize": "बड़ा करें",
+    "minimize": "छोटा करें",
+    "close": "बंद करें",
+    "pause": "रोकें",
+    "play": "चलाएं",
+    "mute": "म्यूट करें",
+    "unmute": "म्यूट हटाएं"
+  },
+  "article": {
+    "desk": "DailySamachar डेस्क",
+    "updated": "अपडेट",
+    "inBrief": "संक्षेप में",
+    "continueReading": "आगे पढ़ें"
+  },
+  "articleToolbar": {
+    "pauseAudio": "ऑडियो रोकें",
+    "playAudio": "लेख सुनें",
+    "playing": "चल रहा है",
+    "listen": "सुनें",
+    "textSize": "टेक्स्ट का आकार बदलें",
+    "jumpToComments": "कमेंट्स पर जाएं",
+    "removeBookmark": "बुकमार्क हटाएं",
+    "saveArticle": "लेख सेव करें",
+    "share": "लेख शेयर करें",
+    "linkCopied": "लिंक क्लिपबोर्ड पर कॉपी हो गया"
+  },
+  "bookmarks": {
+    "eyebrow": "आपकी रीडिंग लिस्ट",
+    "title": "बुकमार्क",
+    "description": "लेखों को इस डिवाइस पर सेव करें और जब चाहें पढ़ें।",
+    "empty": "आपकी रीडिंग लिस्ट खाली है। कोई लेख सेव करने पर वह यहां दिखाई देगा।",
+    "remove": "हटाएं"
   }
 }

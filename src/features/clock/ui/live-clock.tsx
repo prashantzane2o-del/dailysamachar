@@ -16,7 +16,7 @@ export function LiveClock({ locale }: { locale: string }) {
           hour: "numeric",
           minute: "2-digit",
           hour12: true, // Formats as 10:30 AM / PM
-        }).format(new Date())
+        }).format(new Date()),
       );
     };
 
@@ -25,7 +25,7 @@ export function LiveClock({ locale }: { locale: string }) {
 
     // Update every 10 seconds to keep the time accurate without excessive CPU usage
     const intervalId = setInterval(tick, 10000);
-    
+
     // Cleanup interval on unmount to prevent memory leaks
     return () => clearInterval(intervalId);
   }, [locale]);
@@ -33,16 +33,18 @@ export function LiveClock({ locale }: { locale: string }) {
   // Prevent hydration mismatch and Cumulative Layout Shift (CLS)
   if (!mounted) {
     return (
-      <span className="inline-block min-w-15 opacity-0" aria-hidden="true"> {/* FIXED: Replaced min-w-[60px] with min-w-15 */}
+      <span className="inline-block min-w-15 opacity-0" aria-hidden="true">
+        {" "}
+        {/* FIXED: Replaced min-w-[60px] with min-w-15 */}
         00:00 AM
       </span>
     );
   }
 
   return (
-    <time 
-      aria-label={tCommon("currentTime") || "Current time"} 
-      className="animate-in fade-in duration-300"
+    <time
+      aria-label={tCommon("currentTime") || "Current time"}
+      className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300"
     >
       {timeStr}
     </time>

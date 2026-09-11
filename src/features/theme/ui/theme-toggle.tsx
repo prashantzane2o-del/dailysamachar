@@ -1,22 +1,48 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useTheme } from "@/providers/theme-provider";
+import { Button } from "@/shared/ui/primitives";
 
 export function ThemeToggle() {
-  const t = useTranslations("common");
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        disabled
+        aria-label="Loading theme..."
+        className="cursor-not-allowed opacity-50"
+      >
+        <div className="h-5 w-5 animate-pulse rounded-full bg-slate-200 dark:bg-slate-800" />
+      </Button>
+    );
+  }
+
   const isDark = theme === "dark";
 
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
+      size="icon"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      aria-label={isDark ? t("lightMode") : t("darkMode")}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-full text-ink transition-colors hover:bg-soft focus-visible:ring-2 focus-visible:ring-focus dark:text-gray-100 dark:hover:bg-gray-800"
+      aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+      title={isDark ? "Switch to light theme" : "Switch to dark theme"}
     >
-      {isDark ? <Sun aria-hidden="true" size={17} /> : <Moon aria-hidden="true" size={17} />}
-    </button>
+      {isDark ? (
+        <Moon className="h-5 w-5 text-slate-50 transition-all hover:text-red-300" aria-hidden="true" />
+      ) : (
+        <Sun className="hover:text-signal h-5 w-5 text-slate-900 transition-all" aria-hidden="true" />
+      )}
+    </Button>
   );
 }

@@ -1,52 +1,49 @@
+// src/features/i18n/ui/language-switcher.tsx
 "use client";
 
-import { ChangeEvent, useTransition } from "react";
-import { useLocale, useTranslations } from "next-intl";
-import { usePathname, useRouter } from "next/navigation";
-import { Globe } from "lucide-react";
-import { getLocalizedPath } from "@/i18n/path";
+import { useLocale } from "next-intl";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useTransition } from "react";
+import { Languages } from "lucide-react"; // Ensure lucide-react is installed
 
 export function LanguageSwitcher() {
-  const tCommon = useTranslations("common");
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  const onSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    const nextLocale = e.target.value;
-    const localePrefix = new RegExp(`^/(?:${locale}|en|hi)(?=/|$)`);
-    const localizedPath = pathname.replace(localePrefix, "") || "/";
-    
+  const toggleLanguage = () => {
+    const nextLocale = locale === "en" ? "hi" : "en";
+
+    // 1. Current URL (pathname) ko break karke purana locale naye locale se replace karein
+    // Example: "/en/category/sports" -> ["", "en", "category", "sports"] -> ["", "hi", "category", "sports"]
+    const pathSegments = pathname.split("/");
+    pathSegments[1] = nextLocale;
+    const newPathname = pathSegments.join("/");
+
+    // 2. Existing search parameters ko preserve karein (like ?page=2 or ?q=news)
+    const currentParams = searchParams.toString();
+    const newUrl = currentParams ? `${newPathname}?${currentParams}` : newPathname;
+
+    // 3. Smooth transition ke sath route replace karein
     startTransition(() => {
-      router.replace(getLocalizedPath(nextLocale, localizedPath));
+      router.replace(newUrl, { scroll: false }); // scroll: false preserves the user's scroll position
     });
   };
 
   return (
-    <div className="relative flex items-center">
-      {/* 1. Visually hidden label for Screen Readers (WCAG 2.2 AA) */}
-      <label htmlFor="language-switcher" className="sr-only">
-        {tCommon("changeLanguage") || "Change language"}
-      </label>
-      
-      <Globe 
-        className="pointer-events-none absolute left-2 h-4 w-4 text-muted" 
-        aria-hidden="true" 
-      />
-      
-      {/* 2. Native select for maximum accessibility and mobile ease-of-use */}
-      <select
-        id="language-switcher"
-        value={locale}
-        disabled={isPending}
-        onChange={onSelectChange}
-        className="h-9 cursor-pointer appearance-none rounded-sm bg-transparent pl-7 pr-4 text-sm font-bold text-ink uppercase tracking-wide transition-colors hover:bg-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {/* Note: Update these options based on your supported routing.locales */}
-        <option value="en" className="text-ink bg-paper">EN</option>
-        <option value="hi" className="text-ink bg-paper">HI</option>
-      </select>
-    </div>
+    <button
+      onClick={toggleLanguage}
+      disabled={isPending}
+      className={`border-line text-ink hover:text-primary dark:hover:text-primary flex items-center gap-2 rounded-full border bg-gray-50 px-3 py-1.5 text-sm font-medium transition-colors hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 ${
+        isPending ? "cursor-not-allowed opacity-50" : ""
+      }`}
+      aria-label={locale === "en" ? "Switch to Hindi" : "Switch to English"}
+      title={locale === "en" ? "हिन्दी में पढ़ें" : "Read in English"}
+    >
+      <Languages className="h-4 w-4" />
+      <span>{locale === "en" ? "हिन्दी" : "English"}</span>
+    </button>
   );
 }
