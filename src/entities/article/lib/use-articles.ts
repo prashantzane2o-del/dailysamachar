@@ -1,10 +1,11 @@
+// src/entities/article/lib/use-articles.ts
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { cmsApi } from "@/shared/api/cms";
-import type { CmsArticle } from "@/shared/types/cms";
+import type { Article } from "@/types/news"; // FIXED: Changed CmsArticle to Article
 
-export function useInfiniteArticles(initialData?: CmsArticle[]) {
+export function useInfiniteArticles(initialData?: Article[]) {
   return useInfiniteQuery({
     queryKey: ["articles", "infinite"],
     queryFn: ({ pageParam = 1 }) => cmsApi.getLatestArticles(10, pageParam),
