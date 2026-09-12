@@ -1,3 +1,4 @@
+// src/shared/api/wordpress-schemas.ts
 import { z } from "zod";
 
 // Helper for safe fallbacks (never fails)
@@ -41,28 +42,29 @@ export const wpArticleSchema = z.object({
   }).passthrough().nullish().catch({}),
 }).passthrough();
 
-// Advanced Array Schema: Filters out bad posts instead of failing the whole batch
-export const wpArticleArraySchema = z.array(z.any()).transform((arr) => {
+// Advanced Array Schema: Filters out bad posts instead of failing the whole batch (Fixed 'any' type error)
+export const wpArticleArraySchema = z.array(z.unknown()).transform((arr) => {
   return arr.reduce<z.infer<typeof wpArticleSchema>[]>((validPosts, item) => {
     const parsed = wpArticleSchema.safeParse(item);
     if (parsed.success) {
       validPosts.push(parsed.data);
     } else {
-      console.warn("⚠️ [WP Schema Warning] Skipped a malformed post:", parsed.error.format());
+      console.warn("  [WP Schema Warning] Skipped a malformed post:", parsed.error.format());
     }
     return validPosts;
   }, []);
 });
 
-// Sitemap Schema
-export const wpPostSitemapArraySchema = z.array(z.any()).transform((arr) => {
-  return arr.reduce<any[]>((valid, item) => {
-    if (item && item.id && item.slug) {
+// Sitemap Schema (Fixed 'any' type error)
+export const wpPostSitemapArraySchema = z.array(z.unknown()).transform((arr) => {
+  return arr.reduce<Array<{ id: number; slug: string; date: string; modified: string }>>((valid, item) => {
+    if (item && typeof item === "object" && item !== null && "id" in item && "slug" in item) {
+      const record = item as Record<string, unknown>;
       valid.push({
-        id: item.id,
-        slug: item.slug,
-        date: item.date || new Date().toISOString(),
-        modified: item.modified || new Date().toISOString(),
+        id: Number(record.id) || 0,
+        slug: String(record.slug || ""),
+        date: String(record.date || new Date().toISOString()),
+        modified: String(record.modified || new Date().toISOString()),
       });
     }
     return valid;

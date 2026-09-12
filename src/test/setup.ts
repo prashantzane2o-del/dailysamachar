@@ -1,3 +1,4 @@
+// src/test/setup.ts
 import "@testing-library/jest-dom";
 import { vi } from "vitest";
 import React from "react";
@@ -31,60 +32,54 @@ vi.mock("next/headers", () => ({
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
   useLocale: () => "en",
-  useNow: () => new Date("2026-09-07T10:09:10Z"),
+  useNow: () => new Date("2026-09-12T23:24:45Z"),
   useTimeZone: () => "Asia/Kolkata",
 }));
 
-// 4. Mocking Framer Motion (Disable animations for faster tests & avoiding act() warnings)
+// Utility to clean Framer Motion props
+const filterMotionProps = (props: Record<string, unknown>) => {
+  const cleanProps = { ...props };
+  const motionKeys = [
+    "initial", "animate", "exit", "transition", "variants", 
+    "whileHover", "whileTap", "whileInView", "viewport", "layout"
+  ];
+  motionKeys.forEach((key) => delete cleanProps[key]);
+  return cleanProps;
+};
+
+// Forward Refs with Display Names
+const MockMotionDiv = React.forwardRef<HTMLDivElement, Record<string, unknown>>((props, ref) => {
+  return React.createElement("div", { ref, ...filterMotionProps(props) });
+});
+MockMotionDiv.displayName = "MockMotionDiv";
+
+const MockMotionSpan = React.forwardRef<HTMLSpanElement, Record<string, unknown>>((props, ref) => {
+  return React.createElement("span", { ref, ...filterMotionProps(props) });
+});
+MockMotionSpan.displayName = "MockMotionSpan";
+
+// 4. Mocking Framer Motion
 vi.mock("framer-motion", async () => {
-  const actual = await vi.importActual("framer-motion");
+  const actual = await vi.importActual<typeof import("framer-motion")>("framer-motion");
   return {
     ...actual,
     AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
     motion: {
       ...actual.motion,
-      div: React.forwardRef((props: any, ref: any) => {
-        const {
-          initial,
-          animate,
-          exit,
-          transition,
-          variants,
-          whileHover,
-          whileTap,
-          whileInView,
-          viewport,
-          ...rest
-        } = props;
-        return React.createElement("div", { ref, ...rest });
-      }),
-      span: React.forwardRef((props: any, ref: any) => {
-        const {
-          initial,
-          animate,
-          exit,
-          transition,
-          variants,
-          whileHover,
-          whileTap,
-          whileInView,
-          viewport,
-          ...rest
-        } = props;
-        return React.createElement("span", { ref, ...rest });
-      }),
+      div: MockMotionDiv,
+      span: MockMotionSpan,
     },
   };
 });
 
-// 5. Mocking IntersectionObserver (Required for infinite scrolling & lazy loading widgets)
+// 5. Mocking IntersectionObserver
 const mockIntersectionObserver = vi.fn();
 mockIntersectionObserver.mockReturnValue({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 });
-window.IntersectionObserver = mockIntersectionObserver;
+window.IntersectionObserver = mockIntersectionObserver as unknown as typeof IntersectionObserver;
 
 // 6. Mocking ResizeObserver
 const mockResizeObserver = vi.fn();
@@ -93,12 +88,12 @@ mockResizeObserver.mockReturnValue({
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 });
-window.ResizeObserver = mockResizeObserver;
+window.ResizeObserver = mockResizeObserver as unknown as typeof ResizeObserver;
 
-// 7. Mocking window.matchMedia (Required for Theme toggles)
+// 7. Mocking window.matchMedia
 Object.defineProperty(window, "matchMedia", {
   writable: true,
-  value: vi.fn().mockImplementation((query) => ({
+  value: vi.fn().mockImplementation((query: string) => ({
     matches: false,
     media: query,
     onchange: null,

@@ -1,12 +1,11 @@
 // src/widgets/news-feed/ui/news-grid-widget.tsx
-
 import { ArticleCard } from '@/entities/article/ui/article-card';
 import { Link } from '@/i18n/navigation';
 import type { Article } from '@/types/news';
 
 export interface NewsGridWidgetProps {
   title?: string;
-  articles?: Article[]; 
+  articles?: Article[];
   viewAllLink?: string;
 }
 
@@ -15,6 +14,7 @@ export function NewsGridWidget({
   articles = [], 
   viewAllLink = "/latest" 
 }: NewsGridWidgetProps) {
+  
   // Safe array check
   const safeArticles = Array.isArray(articles) ? articles : [];
 
@@ -51,7 +51,6 @@ export function NewsGridWidget({
         {safeArticles.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {safeArticles.map((article, index) => (
-              // FIXED: Passed the entire article object directly, eliminating TS errors for missing fields
               <ArticleCard
                 key={article.id || `article-${index}`}
                 article={article}
@@ -72,7 +71,8 @@ export function NewsGridWidget({
             </div>
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">No articles found</h3>
             <p className="text-gray-500 dark:text-gray-400 max-w-sm">
-              We couldn't load the articles for this section. Please check your API connection.
+              {/* FIXED: Unescaped entity couldn't changed to couldn&apos;t */}
+              We couldn&apos;t load the articles for this section. Please check your API connection.
             </p>
           </div>
         )}
