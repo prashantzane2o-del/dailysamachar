@@ -40,11 +40,11 @@ function readSecret(request: NextRequest): string | null {
 // Securely compare secrets to prevent timing attacks
 function secretsMatch(provided: string | null, expected: string | undefined): boolean {
   if (!provided || !expected) return false;
-  
+
   try {
     const providedBytes = Buffer.from(provided);
     const expectedBytes = Buffer.from(expected);
-    
+
     if (providedBytes.length !== expectedBytes.length) return false;
     return timingSafeEqual(providedBytes, expectedBytes);
   } catch {
@@ -116,13 +116,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // Fallback: Clear global cache if specific slug isn't found
     invalidateGlobalContent();
     console.log(`[Revalidation] Cleared global cache`);
-    
+
     return NextResponse.json({
       revalidated: true,
       now: Date.now(),
       message: "Successfully revalidated global feeds.",
     });
-
   } catch (error) {
     console.error("[Revalidation Error]:", error);
     return NextResponse.json(

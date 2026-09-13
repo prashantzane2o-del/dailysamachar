@@ -1,9 +1,9 @@
+// src/features/theme/ui/theme-toggle.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
-import { Button } from "@/shared/ui/primitives";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -15,34 +15,30 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button
-        variant="ghost"
-        size="icon"
+      <button
+        type="button"
         disabled
         aria-label="Loading theme..."
-        className="cursor-not-allowed opacity-50"
+        className="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-full opacity-50"
       >
-        <div className="h-5 w-5 animate-pulse rounded-full bg-slate-200 dark:bg-slate-800" />
-      </Button>
+        <div className="h-5 w-5 animate-pulse rounded-full bg-slate-200" />
+      </button>
     );
   }
 
   const isDark = theme === "dark";
 
   return (
-    <Button
+    <button
       type="button"
-      variant="ghost"
-      size="icon"
       onClick={() => setTheme(isDark ? "light" : "dark")}
       aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
       title={isDark ? "Switch to light theme" : "Switch to dark theme"}
+      // FIXED: Removed primitive Button component to avoid built-in dark mode conflicts.
+      // Forced permanent light styling to perfectly match the Calculator and Search icons.
+      className="hover:text-signal focus-visible:ring-signal flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition-colors hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
     >
-      {isDark ? (
-        <Moon className="h-5 w-5 text-slate-50 transition-all hover:text-red-300" aria-hidden="true" />
-      ) : (
-        <Sun className="hover:text-signal h-5 w-5 text-slate-900 transition-all" aria-hidden="true" />
-      )}
-    </Button>
+      {isDark ? <Sun className="h-5 w-5" aria-hidden="true" /> : <Moon className="h-5 w-5" aria-hidden="true" />}
+    </button>
   );
 }

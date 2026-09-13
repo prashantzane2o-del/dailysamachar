@@ -40,8 +40,16 @@ vi.mock("next-intl", () => ({
 const filterMotionProps = (props: Record<string, unknown>) => {
   const cleanProps = { ...props };
   const motionKeys = [
-    "initial", "animate", "exit", "transition", "variants", 
-    "whileHover", "whileTap", "whileInView", "viewport", "layout"
+    "initial",
+    "animate",
+    "exit",
+    "transition",
+    "variants",
+    "whileHover",
+    "whileTap",
+    "whileInView",
+    "viewport",
+    "layout",
   ];
   motionKeys.forEach((key) => delete cleanProps[key]);
   return cleanProps;

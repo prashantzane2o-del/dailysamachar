@@ -40,7 +40,7 @@ export type ArticlePage = {
   nextCursor?: string;
 };
 
-// Raw WordPress REST API Response Types (Headless WP Contract)
+// Raw WordPress REST API response types used only at the entity boundary.
 export interface WPPost {
   id: number;
   date: string;

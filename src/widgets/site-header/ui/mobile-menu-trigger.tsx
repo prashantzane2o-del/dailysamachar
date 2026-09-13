@@ -1,26 +1,28 @@
 // src/widgets/site-header/ui/mobile-menu-trigger.tsx
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 
-export function MobileMenuTrigger({ children }: { children?: React.ReactNode }) {
+interface MobileMenuTriggerProps {
+  links?: Array<{ title: string; href: string }>;
+  dropdownLinks?: Array<{ title: string; href: string }>;
+}
+
+export function MobileMenuTrigger({ links = [], dropdownLinks = [] }: MobileMenuTriggerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // 1. Auto-close when route changes
   useEffect(() => {
     setIsOpen(false);
   }, [pathname]);
 
-  // 2. Close the mobile menu and release the scroll lock when switching to desktop.
   useEffect(() => {
     const handleResize = () => {
-      // Changed to 1024px (lg breakpoint) as it aligns better with desktop menus
-      if (window.innerWidth >= 1024) { 
+      if (window.innerWidth >= 1024) {
         setIsOpen(false);
       }
     };
@@ -28,20 +30,17 @@ export function MobileMenuTrigger({ children }: { children?: React.ReactNode }) 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // 3. Prevent body scroll when menu is open (Prevents background scrolling)
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
     }
-    // Cleanup function
     return () => {
       document.body.style.overflow = "unset";
     };
   }, [isOpen]);
 
-  // 4. AAA Accessibility: Close menu on 'Escape' key press
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
@@ -54,10 +53,9 @@ export function MobileMenuTrigger({ children }: { children?: React.ReactNode }) 
 
   return (
     <div className="lg:hidden" ref={menuRef}>
-      {/* Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="text-ink hover:text-brand-accent flex items-center justify-center rounded-md p-2 transition-colors hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+        className="hover:text-signal focus-visible:ring-signal flex h-10 w-10 items-center justify-center rounded-md text-slate-900 transition-colors hover:bg-slate-100 focus:outline-none focus-visible:ring-2"
         aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
         aria-expanded={isOpen}
         aria-controls="mobile-navigation"
@@ -65,19 +63,44 @@ export function MobileMenuTrigger({ children }: { children?: React.ReactNode }) 
         {isOpen ? <X className="h-6 w-6" aria-hidden="true" /> : <Menu className="h-6 w-6" aria-hidden="true" />}
       </button>
 
-      {/* Dropdown / Overlay Menu */}
       {isOpen && (
-        <div 
+        <div
           id="mobile-navigation"
           role="dialog"
           aria-modal="true"
           aria-label="Mobile Navigation Menu"
-          /* FIXED: Replaced non-standard z-99 with standard z-50 and added max-height for scrolling */
-          className="absolute top-full left-0 z-50 w-full h-[calc(100vh-4rem)] overflow-y-auto border-b border-gray-200 bg-white px-4 py-6 shadow-xl dark:border-gray-800 dark:bg-gray-950"
+          className="absolute top-full left-0 z-50 h-[calc(100vh-4rem)] w-full overflow-y-auto border-b border-slate-200 bg-white px-4 py-6 shadow-xl"
         >
-          <nav className="flex flex-col gap-4">
-            {/* Render navigation links passed as children */}
-            {children}
+          <nav className="flex flex-col gap-2">
+            {links.map((nav) => (
+              <Link
+                key={nav.title}
+                href={nav.href}
+                onClick={() => setIsOpen(false)}
+                className="hover:text-signal block rounded-md px-4 py-3 text-lg font-bold text-slate-900 transition-colors hover:bg-slate-100"
+              >
+                {nav.title}
+              </Link>
+            ))}
+
+            {/* FIXED: Grouped Overflow Categories clearly in the mobile menu */}
+            {dropdownLinks.length > 0 && (
+              <div className="mt-4 border-t border-slate-200 pt-4">
+                <p className="mb-2 px-4 text-xs font-bold tracking-widest text-slate-500 uppercase">More Categories</p>
+                <div className="flex flex-col gap-1">
+                  {dropdownLinks.map((nav) => (
+                    <Link
+                      key={nav.title}
+                      href={nav.href}
+                      onClick={() => setIsOpen(false)}
+                      className="hover:text-signal block rounded-md px-4 py-2.5 text-base font-semibold text-slate-700 transition-colors hover:bg-slate-100"
+                    >
+                      {nav.title}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </nav>
         </div>
       )}

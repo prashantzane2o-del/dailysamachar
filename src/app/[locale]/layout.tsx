@@ -1,30 +1,15 @@
 // src/app/[locale]/layout.tsx
 import type { Metadata } from "next";
-import { Noto_Sans_Devanagari, Roboto } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-
 import { SiteFooter } from "@/widgets/site-footer";
 import { SiteHeader } from "@/widgets/site-header";
 import { AppProviders } from "../providers";
-import { DraftBanner } from "@/components/draft-banner"; // <-- YEH IMPORT KAREIN
+import { DraftBanner } from "@/components/draft-banner";
+
 import "../globals.css";
-
-const notoSansDevanagari = Noto_Sans_Devanagari({
-  subsets: ["devanagari", "latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-devanagari",
-  display: "swap",
-});
-
-const roboto = Roboto({
-  subsets: ["latin"],
-  weight: ["400", "500", "700", "900"],
-  variable: "--font-roboto",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "DailySamachar.org",
@@ -56,13 +41,9 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html
-      lang={locale}
-      dir={locale === "ur" || locale === "ar" ? "rtl" : "ltr"}
-      className={`${roboto.variable} ${notoSansDevanagari.variable}`}
-      suppressHydrationWarning
-    >
-      <body className="bg-background text-foreground selection:bg-brand-accent dark:bg-ink flex min-h-screen flex-col font-sans antialiased selection:text-white dark:text-gray-100">
+    <html lang={locale} dir={locale === "ur" || locale === "ar" ? "rtl" : "ltr"} suppressHydrationWarning>
+      {/* FIXED: Removed conflicting dark:bg-ink and let CSS variables handle the theme automatically */}
+      <body className="bg-background text-foreground selection:bg-brand-accent flex min-h-screen flex-col font-sans antialiased selection:text-white">
         <NextIntlClientProvider messages={messages}>
           <AppProviders>
             <a
@@ -71,18 +52,15 @@ export default async function LocaleLayout({
             >
               Skip to main content
             </a>
-            
+
             <SiteHeader />
-            
+
             <main id="main-content" className="w-full flex-1" role="main">
               {children}
             </main>
-            
+
             <SiteFooter />
-            
-            {/* ADDED: Draft Banner ko footer ke neeche add karein */}
             <DraftBanner />
-            
           </AppProviders>
         </NextIntlClientProvider>
       </body>

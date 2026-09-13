@@ -1,3 +1,4 @@
+// src/widgets/ads/ad-slot.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -30,7 +31,6 @@ export function AdSlot({ placement, className }: { placement: Placement; classNa
           setIsLoaded(true);
           node.dataset.loaded = "true";
           // The data-loaded marker is the integration seam for the ad provider.
-
           // Stop observing once the ad request is triggered
           observer.disconnect();
         }
@@ -39,7 +39,6 @@ export function AdSlot({ placement, className }: { placement: Placement; classNa
     );
 
     observer.observe(node);
-
     return () => observer.disconnect();
   }, []);
 
@@ -53,12 +52,28 @@ export function AdSlot({ placement, className }: { placement: Placement; classNa
       // Reserving strict dimensions to prevent layout shift (CLS)
       style={{ minHeight: dimensions.height, width: "100%", maxWidth: dimensions.width }}
       className={cn(
-        "bg-soft text-muted relative mx-auto flex items-center justify-center overflow-hidden rounded-sm text-[10px] font-bold tracking-widest uppercase transition-colors",
-        !isLoaded && "border-line border border-dashed",
+        "relative mx-auto flex items-center justify-center overflow-hidden rounded-lg transition-colors",
+        !isLoaded ? "bg-soft border-line border" : "bg-transparent",
         className,
       )}
     >
-      {!isLoaded && <span>{tCommon("advertisement")}</span>}
+      {/* FIXED: Beautiful Patterned Background for Placeholder instead of a dead gray box */}
+      {!isLoaded && (
+        <>
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.04] dark:opacity-[0.06]"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), repeating-linear-gradient(45deg, #000 25%, #fff 25%, #fff 75%, #000 75%, #000)",
+              backgroundPosition: "0 0, 10px 10px",
+              backgroundSize: "20px 20px",
+            }}
+          />
+          <span className="bg-paper/90 border-line text-muted z-10 rounded-full border px-4 py-1.5 text-[10px] font-bold tracking-widest uppercase shadow-sm backdrop-blur-sm">
+            {tCommon("advertisement")}
+          </span>
+        </>
+      )}
     </div>
   );
 }

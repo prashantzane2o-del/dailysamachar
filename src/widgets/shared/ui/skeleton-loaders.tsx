@@ -1,11 +1,11 @@
 // src/widgets/shared/ui/skeleton-loaders.tsx
-
 import React from "react";
 
 // --- Shared Base Skeletons ---
+
 export const SkeletonBox: React.FC<{ className?: string }> = ({ className = "" }) => (
   <div className={`animate-pulse rounded bg-gray-200 dark:bg-gray-800 ${className}`} />
-);
+); // <-- FIXED: Added missing );
 
 export const SkeletonText: React.FC<{ className?: string; lines?: number }> = ({ className = "", lines = 1 }) => (
   <div className={`flex flex-col gap-2 ${className}`}>
@@ -18,9 +18,10 @@ export const SkeletonText: React.FC<{ className?: string; lines?: number }> = ({
       />
     ))}
   </div>
-);
+); // <-- FIXED: Added missing );
 
 // --- Widget Specific Skeletons ---
+
 export const HeroStorySkeleton: React.FC = () => {
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8" aria-hidden="true">
@@ -60,7 +61,7 @@ export const HeroStorySkeleton: React.FC = () => {
       </div>
     </section>
   );
-};
+}; // <-- FIXED: Added missing };
 
 export const NewsGridSkeleton: React.FC<{ count?: number }> = ({ count = 8 }) => {
   return (

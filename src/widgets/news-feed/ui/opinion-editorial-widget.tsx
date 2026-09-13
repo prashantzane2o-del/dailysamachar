@@ -1,5 +1,4 @@
 // src/widgets/news-feed/ui/opinion-editorial-widget.tsx
-
 "use client";
 
 import React from "react";
@@ -8,59 +7,59 @@ import { ArrowRight, Quote } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import type { Article } from "@/types/news";
-import { SanitizedHtml } from "@/shared/ui/sanitized-html";
+import { SanitizedHtml, stripCmsHtml } from "@/shared/ui/sanitized-html";
 import { Avatar } from "@/shared/ui/legacy-primitives";
 
 interface OpinionEditorialWidgetProps {
   sectionTitle?: string;
-  // FIXED: Replaced local OpinionArticleNode with strict global Article type
-  articles?: Article[]; 
+  articles?: Article[];
 }
 
-export const OpinionEditorialWidget: React.FC<OpinionEditorialWidgetProps> = ({ 
-  sectionTitle, 
-  articles = [] 
-}) => {
+// FIXED: Helper function to clean up Author names if WordPress returns an Email ID
+function formatAuthorName(name: string): string {
+  if (!name) return "DailySamachar Desk";
+  if (name.includes("@")) {
+    const prefix = name.split("@")[0];
+    // Remove numbers/special chars and capitalize the first letter (e.g., dailysamachar56 -> Dailysamachar)
+    const cleanedName = prefix.replace(/[0-9_.-]/g, " ").trim();
+    return cleanedName.charAt(0).toUpperCase() + cleanedName.slice(1);
+  }
+  return name;
+}
+
+export const OpinionEditorialWidget: React.FC<OpinionEditorialWidgetProps> = ({ sectionTitle, articles = [] }) => {
   const t = useTranslations("opinionWidget");
   const title = sectionTitle || t("defaultTitle", { fallback: "Opinion & Analysis" });
 
-  // Safe array check
   const safeArticles = Array.isArray(articles) ? articles : [];
-
   if (safeArticles.length === 0) return null;
 
   return (
-    <section 
-      className="w-full border-y border-slate-200 bg-slate-50 py-16 dark:border-slate-800 dark:bg-slate-900/50"
-      aria-labelledby="opinion-section-heading"
-    >
+    <section className="border-line bg-soft w-full border-y py-16" aria-labelledby="opinion-section-heading">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="mb-10 flex items-end justify-between border-b-2 border-slate-900 pb-4 dark:border-slate-100">
-          <h2 
+        <div className="border-line mb-10 flex items-end justify-between border-b-2 pb-4">
+          <h2
             id="opinion-section-heading"
-            className="font-serif text-3xl font-black tracking-tight text-slate-900 uppercase md:text-4xl dark:text-white"
+            className="text-ink font-serif text-3xl font-black tracking-tight uppercase md:text-4xl"
           >
             {title}
           </h2>
           <Link
             href="/opinion"
-            className="group flex items-center text-sm font-bold tracking-wider text-blue-600 uppercase transition-colors hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-sm"
+            className="group text-signal hover:text-ink focus-visible:ring-signal flex items-center rounded-sm text-sm font-bold tracking-wider uppercase transition-colors focus-visible:ring-2 focus-visible:outline-none"
             aria-label={`View all ${title} articles`}
           >
             {t("viewAll", { fallback: "View All" })}
-            <ArrowRight className="ml-1 h-4 w-4 transform transition-transform group-hover:translate-x-1" aria-hidden="true" />
+            <ArrowRight
+              className="ml-1 h-4 w-4 transform transition-transform group-hover:translate-x-1"
+              aria-hidden="true"
+            />
           </Link>
         </div>
 
-        {/* Articles Grid */}
-        <div 
-          className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 xl:gap-12"
-          role="feed"
-          aria-label={title}
-        >
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 xl:gap-12" role="feed" aria-label={title}>
           {safeArticles.slice(0, 3).map((article, index) => {
-            const authorName = article.author || "DailySamachar Desk";
+            const authorName = formatAuthorName(article.author);
 
             return (
               <motion.article
@@ -69,48 +68,46 @@ export const OpinionEditorialWidget: React.FC<OpinionEditorialWidgetProps> = ({
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: index * 0.15 }}
-                className="group relative flex h-full flex-col"
+                // FIXED: Added proper Card styling (bg-paper, border, p-6) so text never disappears into the background
+                className="group bg-paper border-line relative flex h-full flex-col rounded-2xl border p-6 shadow-sm transition-shadow hover:shadow-md"
               >
-                <Link 
-                  href={`/news/${article.slug}`} 
-                  className="absolute inset-0 z-10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-500 rounded-lg"
+                <Link
+                  href={`/news/${article.slug}`}
+                  className="focus-visible:ring-signal absolute inset-0 z-10 rounded-2xl focus-visible:ring-4 focus-visible:outline-none"
                 >
-                  <span className="sr-only">Read opinion piece: {article.title}</span>
+                  <span className="sr-only">Read opinion piece: {stripCmsHtml(article.title)}</span>
                 </Link>
 
-                {/* Author Info & Avatar */}
-                <div className="mb-6 flex items-center gap-4">
-                  <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-slate-200 transition-colors duration-300 group-hover:border-blue-500 md:h-20 md:w-20 dark:border-slate-700 bg-white dark:bg-slate-800">
-                    {/* FIXED: Using the Avatar primitive for consistent fallback handling */}
-                    <Avatar name={authorName} size="lg" />
+                {/* z-20 and pointer-events-none ensures text sits above the link but doesn't block clicking */}
+                <div className="pointer-events-none relative z-20 mb-6 flex items-center gap-4">
+                  <div className="border-line group-hover:border-signal bg-soft relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-2 transition-colors duration-300">
+                    <Avatar name={authorName} size="md" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-sans text-lg font-bold text-slate-900 dark:text-white">
-                      {authorName}
-                    </span>
-                    <span className="text-sm font-medium tracking-wide text-blue-600 uppercase dark:text-blue-400">
-                      {/* Fallback to 'Columnist' if role is not available in standard Article type */}
-                      Columnist
-                    </span>
+                    <span className="text-ink font-sans text-lg font-bold capitalize">{authorName}</span>
+                    <span className="text-signal mt-0.5 text-xs font-bold tracking-wide uppercase">Columnist</span>
                   </div>
                 </div>
 
-                {/* Article Content */}
-                <div className="relative flex grow flex-col">
-                  <Quote className="absolute -top-2 -left-2 -z-10 h-8 w-8 -scale-x-100 transform text-slate-200 dark:text-slate-800" aria-hidden="true" />
-                  <h3 className="mb-3 font-serif text-xl leading-tight font-bold text-slate-900 transition-colors duration-300 group-hover:text-blue-600 md:text-2xl dark:text-white dark:group-hover:text-blue-400">
+                <div className="pointer-events-none relative z-20 flex grow flex-col">
+                  <Quote
+                    className="text-line absolute -top-4 -left-2 -z-10 h-10 w-10 -scale-x-100 transform opacity-60"
+                    aria-hidden="true"
+                  />
+                  <h3 className="text-ink group-hover:text-signal mb-3 line-clamp-4 font-serif text-xl leading-tight font-bold transition-colors duration-300 md:text-2xl">
                     <SanitizedHtml as="span" html={article.title} />
                   </h3>
                   {article.excerpt && (
-                    <p className="line-clamp-4 font-serif text-base text-slate-600 italic dark:text-slate-400">
-                      <SanitizedHtml as="span" html={article.excerpt} />
-                    </p>
+                    <SanitizedHtml
+                      as="div"
+                      html={article.excerpt}
+                      className="text-muted line-clamp-3 font-serif text-base italic"
+                    />
                   )}
                 </div>
 
-                {/* Read More Indicator */}
-                <div 
-                  className="mt-6 flex items-center border-t border-slate-200 pt-4 text-sm font-bold text-slate-900 transition-colors group-hover:text-blue-600 dark:border-slate-800 dark:text-white dark:group-hover:text-blue-400"
+                <div
+                  className="border-line text-muted group-hover:text-signal pointer-events-none z-20 mt-6 flex items-center border-t pt-4 text-xs font-bold tracking-wider uppercase transition-colors"
                   aria-hidden="true"
                 >
                   {t("readArticle", { fallback: "Read Full Analysis" })}

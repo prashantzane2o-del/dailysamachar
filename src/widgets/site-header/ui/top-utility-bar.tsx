@@ -1,66 +1,74 @@
-'use client';
+// src/widgets/site-header/ui/top-utility-bar.tsx
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Link } from '@/i18n/navigation';
+import { useEffect, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
+import { LiveClock } from "@/features/clock/ui/live-clock";
 
 export function TopUtilityBar() {
-  const [currentDate, setCurrentDate] = useState<string>('');
+  const [currentDate, setCurrentDate] = useState<string>("");
+  const [mounted, setMounted] = useState(false);
+  const locale = useLocale();
+  const tNav = useTranslations("navigation");
 
   useEffect(() => {
-    // Client-side date formatting to prevent Next.js hydration mismatch errors
+    setMounted(true);
     const date = new Date();
-    const options: Intl.DateTimeFormatOptions = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     };
-    // Format according to Indian locale
-    setCurrentDate(date.toLocaleDateString('en-IN', options));
-  }, []);
+    setCurrentDate(date.toLocaleDateString(locale === "hi" ? "hi-IN" : "en-IN", options));
+  }, [locale]);
 
-  // Theme Sync: Background ko Deep Navy Blue (brand-primary) diya hai.
-  // Text ko off-white (gray-200) rakha hai taaki AAA Contrast ratio maintain rahe.
   return (
-    <div className="bg-brand-primary text-gray-200 py-1.5 px-4 text-[13px] font-medium tracking-wide">
-      <div className="container mx-auto flex items-center justify-between">
-        
-        {/* Left Side: Live Indicator & Date */}
-        <div className="flex items-center gap-3">
+    // FIXED: Changed to light background (bg-slate-50) and black text (text-slate-900) to match the white header perfectly
+    <div className="border-b border-slate-200 bg-slate-50 py-1.5 text-[13px] font-bold tracking-wide text-slate-900">
+      <div className="container mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Left Side: Live Indicator, Date & Clock */}
+        <div className="flex items-center gap-2 sm:gap-3">
           <span className="flex items-center gap-2" aria-live="polite">
-            {/* Red pulsing dot to give a "News/Live" feel */}
-            <span className="w-2 h-2 rounded-full bg-brand-accent animate-pulse" aria-hidden="true"></span>
+            <span
+              className="bg-brand-accent h-2 w-2 animate-pulse rounded-full shadow-[0_0_8px_rgba(217,4,41,0.5)]"
+              aria-hidden="true"
+            ></span>
             <span className="sr-only">Current Date: </span>
-            {currentDate || 'Loading...'}
+
+            {!mounted ? (
+              <span className="inline-block h-4 w-32 animate-pulse rounded bg-slate-200"></span>
+            ) : (
+              <span>{currentDate}</span>
+            )}
           </span>
+          <span className="text-slate-300" aria-hidden="true">
+            |
+          </span>
+
+          <LiveClock locale={locale === "hi" ? "hi-IN" : "en-IN"} />
         </div>
 
-        {/* Right Side: Logo Tagline & Utility Links (Hidden on very small screens) */}
-        <div className="hidden sm:flex items-center gap-4 lg:gap-6">
-          
-          {/* Logo Tagline using the Devanagari font we set in Step 2 */}
-          <span className="font-devanagari text-gray-300">
-            सही खबर, सबके लिए
-          </span>
-          
-          {/* Visual Separator */}
-          <div className="h-3 w-px bg-gray-600" aria-hidden="true"></div>
-          
-          <Link 
-            href="/epaper" 
-            className="hover:text-white outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-1 focus-visible:ring-offset-brand-primary focus-visible:rounded-sm transition-colors"
+        {/* Right Side: Highlighted Utility Links */}
+        <div className="hidden items-center gap-4 sm:flex lg:gap-6">
+          {/* FIXED: Highlighted e-Paper with a light theme pill design */}
+          <Link
+            href="/epaper"
+            className="focus-visible:ring-brand-accent rounded-full bg-slate-200 px-3 py-1 text-slate-900 transition-colors outline-none hover:bg-slate-300 focus-visible:ring-2"
           >
             e-Paper
           </Link>
-          
-          <Link 
-            href="/live" 
-            className="flex items-center gap-1 text-white hover:text-brand-accent outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-1 focus-visible:ring-offset-brand-primary focus-visible:rounded-sm transition-colors"
-          >
-            <span className="w-2 h-2 rounded-sm bg-brand-accent inline-block" aria-hidden="true"></span>
-            Watch Live
-          </Link>
 
+          <div className="h-4 w-px bg-slate-300" aria-hidden="true"></div>
+
+          <Link
+            href="/live"
+            className="hover:text-brand-accent focus-visible:ring-brand-accent flex items-center gap-1.5 text-slate-900 transition-colors outline-none focus-visible:ring-2"
+          >
+            <span className="bg-brand-accent inline-block h-2 w-2 rounded-sm" aria-hidden="true"></span>
+            {tNav("live", { fallback: "Watch Live" })}
+          </Link>
         </div>
       </div>
     </div>

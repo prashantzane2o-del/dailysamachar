@@ -1,3 +1,4 @@
+// src/features/clock/ui/live-clock.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,34 +11,25 @@ export function LiveClock({ locale }: { locale: string }) {
 
   useEffect(() => {
     const tick = () => {
-      // Localize time format based on the current locale
       setTimeStr(
         new Intl.DateTimeFormat(locale, {
           hour: "numeric",
           minute: "2-digit",
-          hour12: true, // Formats as 10:30 AM / PM
+          hour12: true,
         }).format(new Date()),
       );
     };
-
     tick();
     setMounted(true);
 
-    // Update every 10 seconds to keep the time accurate without excessive CPU usage
     const intervalId = setInterval(tick, 10000);
-
-    // Cleanup interval on unmount to prevent memory leaks
     return () => clearInterval(intervalId);
   }, [locale]);
 
-  // Prevent hydration mismatch and Cumulative Layout Shift (CLS)
   if (!mounted) {
     return (
-      <span className="inline-block min-w-15 opacity-0" aria-hidden="true">
-        {" "}
-        {/* FIXED: Replaced min-w-[60px] with min-w-15 */}
-        00:00 AM
-      </span>
+      // FIXED: Updated skeleton color from dark blue to slate-200 to match the light theme
+      <span className="inline-block h-4 w-16 animate-pulse rounded bg-slate-200" aria-hidden="true"></span>
     );
   }
 

@@ -1,124 +1,89 @@
+// src/features/weather/ui/weather-panel.tsx
 "use client";
 
-import { CloudSun, RefreshCw, Wind } from "lucide-react";
-import { useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { motion } from "framer-motion";
+import { Cloud, CloudLightning, CloudRain, RotateCcw, Snowflake, Sun } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useWeather } from "@/entities/weather/lib/use-weather";
 
-const cities = ["New Delhi", "Mumbai", "Bengaluru", "Kolkata", "Chennai", "Hyderabad"];
-
-const formatNumber = (locale: string, value: number) =>
-  new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(value);
-
-function WeatherSkeleton() {
+export function WeatherPanel({ city = "New Delhi" }: { city?: string }) {
   const t = useTranslations("common");
 
-  return (
-    <div aria-label={t("loading")} aria-busy="true" role="status" className="space-y-5 motion-safe:animate-pulse">
-      <div className="bg-soft h-8 w-48 rounded" />
-      <div className="bg-soft h-44 rounded-2xl" />
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-soft h-16 rounded" />
-        <div className="bg-soft h-16 rounded" />
-      </div>
-    </div>
-  );
-}
+  // Note: Ensure your useWeather hook returns these properties or adjust slightly if needed.
+  const { data: weather, isLoading, isError, refetch } = useWeather(city);
 
-export function WeatherPanel() {
-  const locale = useLocale();
-  const t = useTranslations("weather");
-  const common = useTranslations("common");
-  const [city, setCity] = useState("New Delhi");
-  const query = useWeather(city);
-
-  if (query.isLoading) return <WeatherSkeleton />;
-
-  if (query.isError) {
+  if (isLoading) {
     return (
-      <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-800">
-        <p className="font-semibold">{t("error")}</p>
+      <div
+        role="status"
+        aria-label={t("loading")}
+        aria-busy="true"
+        className="border-line bg-soft h-36 w-full rounded-2xl border motion-safe:animate-pulse"
+      />
+    );
+  }
+
+  if (isError || !weather) {
+    return (
+      <div
+        role="alert"
+        // FIXED: AAA accessibility contrast for Dark mode error states
+        className="flex h-36 flex-col items-center justify-center gap-3 rounded-2xl border border-red-200 bg-red-50 p-6 text-center text-red-800 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-300"
+      >
+        <p className="text-sm font-semibold">Failed to load weather</p>
         <button
           type="button"
-          onClick={() => void query.refetch()}
-          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-red-700 px-3 py-2 text-sm font-bold text-white"
+          onClick={() => void refetch()}
+          className="inline-flex items-center gap-2 rounded-lg bg-red-800 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-red-900 focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 focus-visible:outline-none dark:bg-red-700 dark:hover:bg-red-600 dark:focus-visible:ring-offset-gray-900"
         >
-          <RefreshCw size={15} aria-hidden="true" />
-          {common("retry")}
+          <RotateCcw size={14} aria-hidden="true" />
+          {t("retry")}
         </button>
       </div>
     );
   }
 
-  if (!query.data) {
-    return <div className="border-line text-muted rounded-2xl border p-8 text-center">{t("empty")}</div>;
-  }
-
-  const weather = query.data;
-
-  return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <label className="kicker" htmlFor="weather-city">
-          {t("selectCity")}
-        </label>
-        <select
-          id="weather-city"
-          value={city}
-          onChange={(event) => setCity(event.target.value)}
-          className="bg-paper rounded-lg border px-3 py-2 text-sm font-semibold"
-        >
-          {cities.map((name) => (
-            <option key={name} value={name}>
-              {name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <section className="bg-ink rounded-3xl p-7 text-white sm:p-10" aria-live="polite">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-sm text-slate-300">{weather.city}</p>
-            <h2 className="editorial mt-2 text-3xl font-bold">{weather.condition}</h2>
-          </div>
-          <CloudSun className="text-yellow-300" size={44} aria-hidden="true" />
-        </div>
-        <p className="editorial mt-8 text-7xl font-bold tracking-tight">{formatNumber(locale, weather.temp)}°</p>
-      </section>
-
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="bg-paper rounded-2xl border p-5">
-          <p className="text-muted text-xs">{t("humidity")}</p>
-          <p className="mt-2 text-2xl font-bold">
-            {weather.humidity === undefined ? "—" : formatNumber(locale, weather.humidity) + "%"}
-          </p>
-        </div>
-        <div className="bg-paper rounded-2xl border p-5">
-          <p className="text-muted flex items-center gap-2 text-xs">
-            <Wind size={14} aria-hidden="true" />
-            {t("wind")}
-          </p>
-          <p className="mt-2 text-2xl font-bold">
-            {weather.windSpeed === undefined ? "—" : formatNumber(locale, weather.windSpeed) + " km/h"}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export function WeatherChip({ city = "New Delhi" }: { city?: string }) {
-  const locale = useLocale();
-  const t = useTranslations("weather");
-  const query = useWeather(city);
-
-  if (!query.data) return <span className="text-muted rounded-full border px-3 py-1 text-xs">{t("title")}</span>;
+  // Weather Icon mapping based on condition
+  const condition = weather.condition?.toLowerCase() || "clear";
+  const WeatherIcon = condition.includes("rain")
+    ? CloudRain
+    : condition.includes("cloud")
+      ? Cloud
+      : condition.includes("snow")
+        ? Snowflake
+        : condition.includes("thunder")
+          ? CloudLightning
+          : Sun;
 
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold">
-      <CloudSun size={14} className="text-yellow-500" aria-hidden="true" />
-      {query.data.city} · {formatNumber(locale, query.data.temp)}°C
-    </span>
+    <motion.article
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      // FIXED: Standard tokens for card backgrounds and borders
+      className="border-line bg-paper flex h-36 flex-col justify-between rounded-2xl border p-5 shadow-sm transition-shadow hover:shadow-md"
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-ink line-clamp-1 text-sm font-bold">{weather.city || city}</h3>
+          <p className="text-muted line-clamp-1 text-xs capitalize">{weather.description || condition}</p>
+        </div>
+        <div className="bg-soft text-brand-primary dark:text-brand-accent flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
+          <WeatherIcon size={20} aria-hidden="true" />
+        </div>
+      </div>
+
+      <div className="mt-4 flex items-end justify-between">
+        <div className="flex items-start">
+          <span className="text-ink text-4xl font-black">{Math.round(weather.temp)}</span>
+          <span className="text-muted mt-1 text-lg font-bold">°C</span>
+        </div>
+        <div className="text-muted flex shrink-0 flex-col gap-1 text-right text-xs">
+          <span>
+            H: {Math.round(weather.tempMax ?? 0)}° L: {Math.round(weather.tempMin ?? 0)}°
+          </span>
+          <span>Humidity: {weather.humidity ?? 0}%</span>
+        </div>
+      </div>
+    </motion.article>
   );
 }

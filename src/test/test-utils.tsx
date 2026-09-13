@@ -23,7 +23,7 @@ const createTestQueryClient = () =>
     defaultOptions: {
       queries: {
         retry: false, // Tests mein API fail hone par retry nahi karna chahiye
-        gcTime: 0,    // Cache turant clear ho jaye
+        gcTime: 0, // Cache turant clear ho jaye
       },
     },
   });
@@ -43,10 +43,8 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
 };
 
 // Custom render function jo default render ko override karega
-const customRender = (
-  ui: ReactElement,
-  options?: Omit<RenderOptions, "wrapper">
-) => render(ui, { wrapper: AllTheProviders, ...options });
+const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) =>
+  render(ui, { wrapper: AllTheProviders, ...options });
 
 // Testing library ki baaki sabhi utilities ko re-export kar rahe hain
 export * from "@testing-library/react";

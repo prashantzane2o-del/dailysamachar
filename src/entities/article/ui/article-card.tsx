@@ -1,119 +1,92 @@
 // src/entities/article/ui/article-card.tsx
-
-import Image from 'next/image';
-import { Link } from '@/i18n/navigation';
-import type { Article } from '@/types/news';
+import Image from "next/image";
+import { Link } from "@/i18n/navigation";
+import type { Article } from "@/types/news";
+import { stripCmsHtml, SanitizedHtml } from "@/shared/ui/sanitized-html";
 
 export interface ArticleCardProps {
-  // FIXED: Added 'article' prop to support <ArticleCard article={article} /> usages
-  article?: Article; 
-  id?: string;
-  title?: string;
-  excerpt?: string;
-  imageUrl?: string;
-  category?: string;
-  publishedAt?: string;
-  href?: string;
+  article: Article;
   isHindi?: boolean;
 }
 
-export function ArticleCard({
-  article,
-  title = '',
-  excerpt = '',
-  imageUrl = '',
-  category = 'News',
-  publishedAt = '',
-  href = '#',
-  isHindi = true,
-}: ArticleCardProps) {
-  // 1. Data Extraction: Use 'article' object if provided, otherwise fallback to individual props
-  const displayTitle = article?.title || title || ' ';
-  const displayExcerpt = article?.excerpt || excerpt || '';
-  const displayImageUrl = article?.image || article?.imageUrl || imageUrl || '';
-  const displayCategory = article?.category || category || 'News';
-  const displayPublishedAt = article?.publishedAt || publishedAt || '';
-  const displayHref = article?.slug ? `/news/${article.slug}` : href;
+export function ArticleCard({ article, isHindi = true }: ArticleCardProps) {
+  const displayTitle = article?.title || "Untitled";
 
-  // Safe ID string for accessibility IDs
-  const safeIdStr = displayTitle.replace(/\s+/g, '-').slice(0, 20);
+  // FIXED: Removed raw HTML tags like <p> using stripCmsHtml
+  const displayExcerpt = stripCmsHtml(article?.excerpt || "");
 
-  // 2. Safe Date Handling
-  let formattedDate = 'Recently';
+  const displayImageUrl = article?.image || article?.imageUrl || "";
+  const displayCategory = article?.category || "News";
+  const displayPublishedAt = article?.publishedAt || "";
+  const displayHref = article?.slug ? `/news/${article.slug}` : "#";
+
+  const safeIdStr = displayTitle.replace(/\s+/g, "-").slice(0, 20);
+
+  let formattedDate = "Recently";
   if (displayPublishedAt) {
     const dateObj = new Date(displayPublishedAt);
-    if (!isNaN(dateObj.getTime())) { // Check if date is valid
-      formattedDate = dateObj.toLocaleDateString('en-IN', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
+    if (!isNaN(dateObj.getTime())) {
+      formattedDate = dateObj.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
       });
     }
   }
 
-  // 3. Choose the font dynamically based on the language
-  const titleFontClass = isHindi ? 'font-devanagari tracking-normal' : 'font-roboto tracking-tight';
-  const textDir = isHindi ? 'ltr' : 'auto';
+  const titleFontClass = isHindi ? "font-devanagari tracking-normal" : "font-roboto tracking-tight";
+  const textDir = isHindi ? "ltr" : "auto";
 
   return (
-    <article 
-      className="group flex flex-col bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-800 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
+    <article
+      className="group bg-paper border-line flex flex-col overflow-hidden rounded-md border shadow-sm transition-shadow duration-300 hover:shadow-md"
       aria-labelledby={`article-title-${safeIdStr}`}
       dir={textDir}
     >
-      <Link 
+      <Link
         href={displayHref}
-        className="flex flex-col grow outline-none focus-visible:ring-4 focus-visible:ring-brand-accent focus-visible:ring-offset-2 dark:focus-visible:ring-offset-brand-primary"
+        className="focus-visible:ring-signal flex grow flex-col outline-none focus-visible:ring-4 focus-visible:ring-offset-2"
       >
-        {/* Image Container */}
-        <div className="relative w-full pt-[56.25%] overflow-hidden bg-gray-200 dark:bg-gray-800">
-          {/* Safe Image Rendering: Only render Next Image if URL exists */}
+        <div className="bg-soft relative aspect-video w-full overflow-hidden">
           {displayImageUrl ? (
             <Image
               src={displayImageUrl}
-              alt={`Cover image for ${displayTitle}`}
+              alt={`Cover image for ${stripCmsHtml(displayTitle)}`}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
-             /* Fallback UI if image is missing */
-            <div className="absolute inset-0 flex items-center justify-center text-gray-400 font-medium">
+            <div className="text-muted bg-soft absolute inset-0 flex items-center justify-center font-medium">
               No Image
             </div>
           )}
-          
-          {/* Category Badge */}
-          <div className="absolute top-0 left-0 m-3 z-10">
-            <span className="bg-brand-accent text-white text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-sm shadow-sm">
+
+          <div className="absolute top-0 left-0 z-10 m-3">
+            <span className="bg-signal rounded-sm px-2.5 py-1 text-xs font-bold tracking-wider text-white uppercase shadow-sm">
               {displayCategory}
             </span>
           </div>
         </div>
 
-        {/* Card Content Area */}
-        <div className="flex flex-col grow p-4 sm:p-5">
-          {/* Metadata */}
-          <time 
+        <div className="flex grow flex-col p-4 sm:p-5">
+          <time
             dateTime={displayPublishedAt || new Date().toISOString()}
-            className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide"
+            className="text-muted mb-2 text-xs font-medium tracking-wide uppercase"
           >
             {formattedDate}
           </time>
 
-          {/* Headline */}
-          <h2 
+          <h2
             id={`article-title-${safeIdStr}`}
-            className={`text-lg sm:text-xl font-bold leading-snug mb-3 text-brand-primary dark:text-gray-100 group-hover:text-brand-accent transition-colors line-clamp-3 ${titleFontClass}`}
+            className={`text-ink group-hover:text-signal mb-3 line-clamp-3 text-lg leading-snug font-bold transition-colors sm:text-xl ${titleFontClass}`}
           >
-            {displayTitle}
+            {/* FIXED: Ensure entities like &#8217; render correctly */}
+            <SanitizedHtml as="span" html={displayTitle} />
           </h2>
 
-          {/* Excerpt */}
           {displayExcerpt && (
-            <p className={`text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mt-auto ${titleFontClass}`}>
-              {displayExcerpt}
-            </p>
+            <p className={`text-muted mt-auto line-clamp-2 text-sm ${titleFontClass}`}>{displayExcerpt}</p>
           )}
         </div>
       </Link>

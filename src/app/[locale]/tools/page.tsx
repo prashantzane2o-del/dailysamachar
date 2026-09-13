@@ -20,9 +20,7 @@ export default function ToolsPage() {
             <h1 className="editorial mt-3 text-4xl font-bold tracking-tight md:text-5xl dark:text-gray-100">
               Tools & Calculators
             </h1>
-            <p className="text-muted mt-4 text-lg">
-              Calculate your health metrics and financial goals instantly.
-            </p>
+            <p className="text-muted mt-4 text-lg">Calculate your health metrics and financial goals instantly.</p>
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">

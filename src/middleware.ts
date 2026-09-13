@@ -1,5 +1,4 @@
 // src/middleware.ts
-
 import createMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
 import { NextRequest, NextResponse } from "next/server";
@@ -14,23 +13,21 @@ export default function middleware(request: NextRequest) {
   // 1. Route Handling (API vs Frontend)
   if (pathname.startsWith("/api")) {
     // Skip next-intl translation routing for /api/* endpoints
-    response = request.method === "OPTIONS" 
-      ? new NextResponse(null, { status: 204 }) 
-      : NextResponse.next();
-    
-    // Strict CORS for API routes
-    const origin = request.headers.get("origin") ?? "";
-    const allowedOrigins = [
-      "https://api.dailysamachar.org", // Your WordPress Backend
-      "https://dailysamachar.org",     // Your Frontend
-      "http://localhost:3000",         // Local development
-    ];
+    response = request.method === "OPTIONS" ? new NextResponse(null, { status: 204 }) : NextResponse.next();
 
-    // Only allow specific origins to interact with your internal APIs
-    if (allowedOrigins.includes(origin)) {
+    // Strict but Dynamic CORS for API routes
+    const origin = request.headers.get("origin") ?? "";
+    
+    const isLocalhost = origin.startsWith("http://localhost:");
+    const isProduction = origin === "https://dailysamachar.org" || origin === "https://api.dailysamachar.org";
+    const isVercelPreview = origin.endsWith(".vercel.app");
+
+    // Only allow specific origins or dynamic preview/local environments
+    if (isLocalhost || isProduction || isVercelPreview) {
       response.headers.set("Access-Control-Allow-Origin", origin);
       response.headers.set("Vary", "Origin");
     }
+
     response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
     response.headers.set("Access-Control-Max-Age", "600");
@@ -42,7 +39,7 @@ export default function middleware(request: NextRequest) {
   // 2. Enforce dynamic security headers
   response.headers.set("X-DNS-Prefetch-Control", "on");
   response.headers.set("X-XSS-Protection", "1; mode=block");
-  
+
   return response;
 }
 

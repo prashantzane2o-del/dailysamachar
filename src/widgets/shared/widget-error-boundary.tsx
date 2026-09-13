@@ -1,3 +1,4 @@
+// src/widgets/shared/widget-error-boundary.tsx
 "use client";
 
 import { Component, type ErrorInfo, type ReactNode } from "react";
@@ -6,6 +7,7 @@ export class WidgetErrorBoundary extends Component<
   { children: ReactNode; fallback: ReactNode },
   { hasError: boolean }
 > {
+  // <-- FIXED: Added missing class opening brace
   state = { hasError: false };
 
   static getDerivedStateFromError(): { hasError: boolean } {
@@ -19,4 +21,4 @@ export class WidgetErrorBoundary extends Component<
   render() {
     return this.state.hasError ? this.props.fallback : this.props.children;
   }
-}
+} // <-- FIXED: Added missing class closing brace

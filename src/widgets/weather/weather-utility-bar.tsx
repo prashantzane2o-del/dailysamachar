@@ -1,13 +1,35 @@
+// src/widgets/weather/weather-utility-bar.tsx
 import { getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 import type { Locale } from "@/i18n/routing";
 import { CloudSun } from "lucide-react";
 import { weatherApi } from "@/entities/weather/api/weather.api";
 
 export async function WeatherUtilityBar({ locale }: { locale: Locale }) {
   const t = await getTranslations("weather");
+  const defaultCity = process.env.DEFAULT_WEATHER_CITY || "Meerut";
+  
+  let queryParam = defaultCity;
 
   try {
-    const weather = await weatherApi.getWeatherByCity("New Delhi");
+    // Next.js 15 requires awaiting headers()
+    const headersList = await headers();
+    const forwardedFor = headersList.get("x-forwarded-for");
+    const realIp = headersList.get("x-real-ip");
+    
+    // Extract the first IP if multiple exist
+    const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : realIp;
+
+    // Use IP if valid, otherwise fallback to default city
+    if (ip && ip !== "::1" && ip !== "127.0.0.1" && ip !== "localhost") {
+      queryParam = ip;
+    }
+  } catch (e) {
+    // Gracefully ignore header errors during static page generation
+  }
+
+  try {
+    const weather = await weatherApi.getWeatherByCity(queryParam);
 
     return (
       <div
@@ -25,7 +47,6 @@ export async function WeatherUtilityBar({ locale }: { locale: Locale }) {
     );
   } catch {
     // Graceful degradation on failure (Engineering Rule: 16. Error Handling)
-    // If the weather service fails, we show a clean fallback instead of crashing the header.
     return (
       <div
         className="text-muted flex items-center gap-2 text-[11px] font-semibold tracking-wide"

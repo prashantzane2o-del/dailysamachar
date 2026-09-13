@@ -1,3 +1,4 @@
+// src/app/[locale]/search/page.tsx
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { cmsApi } from "@/shared/api/cms";
@@ -5,6 +6,7 @@ import { ArticleCard } from "@/entities/article/ui/article-card";
 import { getLocalizedPath } from "@/i18n/path";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
+
 type SearchPageProps = { params: Promise<{ locale: string }>; searchParams: SearchParams };
 
 function getQuery(value: string | string[] | undefined): string {
@@ -16,16 +18,25 @@ export async function generateMetadata({ params, searchParams }: SearchPageProps
   const resolvedSearchParams = await searchParams;
   const query = getQuery(resolvedSearchParams.q);
   const t = await getTranslations({ locale, namespace: "search" });
-  return { title: query ? t("resultsFor", { query }) : t("label"), robots: { index: false, follow: true } };
+  
+  return { 
+    title: query ? t("resultsFor", { query }) : t("label"), 
+    robots: { index: false, follow: true } 
+  };
 }
 
 export default async function SearchPage({ params, searchParams }: SearchPageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+  
   const resolvedSearchParams = await searchParams;
   const query = getQuery(resolvedSearchParams.q);
   const t = await getTranslations({ locale, namespace: "search" });
-  const posts = query
+
+  // SECURITY & PERFORMANCE: Require at least 3 characters before hitting the database
+  const isQueryValid = query.length >= 3;
+
+  const posts = isQueryValid
     ? await cmsApi.searchArticles(query).catch((error: unknown) => {
         console.error("Failed to search WordPress posts", error);
         return [];
@@ -58,9 +69,14 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
           </button>
         </form>
       </div>
+
       <div aria-live="polite" aria-atomic="true">
         {!query ? (
           <p className="text-muted py-16 text-center text-lg">{t("emptyQuery")}</p>
+        ) : !isQueryValid ? (
+          <p className="text-muted py-16 text-center text-lg">
+            Please enter at least 3 characters to search.
+          </p>
         ) : posts.length === 0 ? (
           <p className="text-muted py-16 text-center text-lg">{t("noResults")}</p>
         ) : (

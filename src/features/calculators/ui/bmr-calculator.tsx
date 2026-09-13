@@ -1,45 +1,45 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import { Flame, User, Ruler, Weight, Activity } from 'lucide-react';
+import { useState, useMemo } from "react";
+import { Flame, User, Ruler, Weight, Activity } from "lucide-react";
 
-type Gender = 'male' | 'female';
-type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active' | 'extreme';
+type Gender = "male" | "female";
+type ActivityLevel = "sedentary" | "light" | "moderate" | "active" | "extreme";
 
 const ACTIVITY_MULTIPLIERS: Record<ActivityLevel, { label: string; mult: number }> = {
-  sedentary: { label: 'Sedentary (Little or no exercise)', mult: 1.2 },
-  light: { label: 'Lightly active (1-3 days/week)', mult: 1.375 },
-  moderate: { label: 'Moderately active (3-5 days/week)', mult: 1.55 },
-  active: { label: 'Active (6-7 days/week)', mult: 1.725 },
-  extreme: { label: 'Very active (Hard exercise & physical job)', mult: 1.9 },
+  sedentary: { label: "Sedentary (Little or no exercise)", mult: 1.2 },
+  light: { label: "Lightly active (1-3 days/week)", mult: 1.375 },
+  moderate: { label: "Moderately active (3-5 days/week)", mult: 1.55 },
+  active: { label: "Active (6-7 days/week)", mult: 1.725 },
+  extreme: { label: "Very active (Hard exercise & physical job)", mult: 1.9 },
 };
 
 export function BmrCalculator() {
-  const [gender, setGender] = useState<Gender>('male');
+  const [gender, setGender] = useState<Gender>("male");
   const [age, setAge] = useState<number>(25);
   const [weight, setWeight] = useState<number>(70); // kg
   const [height, setHeight] = useState<number>(175); // cm
-  const [activity, setActivity] = useState<ActivityLevel>('moderate');
+  const [activity, setActivity] = useState<ActivityLevel>("moderate");
 
   // Calculate BMR (Mifflin-St Jeor Equation) & TDEE
   const { bmr, tdee } = useMemo(() => {
     if (!age || !weight || !height) return { bmr: 0, tdee: 0 };
 
     // BMR Formula
-    let baseBmr = (10 * weight) + (6.25 * height) - (5 * age);
-    baseBmr = gender === 'male' ? baseBmr + 5 : baseBmr - 161;
+    let baseBmr = 10 * weight + 6.25 * height - 5 * age;
+    baseBmr = gender === "male" ? baseBmr + 5 : baseBmr - 161;
 
     const roundedBmr = Math.round(baseBmr);
     const calculatedTdee = Math.round(roundedBmr * ACTIVITY_MULTIPLIERS[activity].mult);
 
-    return { 
-      bmr: Math.max(0, roundedBmr), 
-      tdee: Math.max(0, calculatedTdee) 
+    return {
+      bmr: Math.max(0, roundedBmr),
+      tdee: Math.max(0, calculatedTdee),
     };
   }, [gender, age, weight, height, activity]);
 
   return (
-    <section 
+    <section
       className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-slate-800 dark:bg-gray-900"
       aria-label="BMR and Calorie Calculator"
     >
@@ -51,29 +51,28 @@ export function BmrCalculator() {
       </div>
 
       <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-        
         {/* Gender Selection */}
         <div className="space-y-2">
           <label className="text-sm font-semibold text-slate-700 dark:text-gray-300">Gender</label>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
-              onClick={() => setGender('male')}
+              onClick={() => setGender("male")}
               className={`flex items-center justify-center gap-2 rounded-lg border p-2.5 text-sm font-bold transition-all ${
-                gender === 'male'
-                  ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:border-brand-accent dark:bg-brand-accent/20 dark:text-brand-accent'
-                  : 'border-slate-300 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-gray-800 dark:text-gray-400'
+                gender === "male"
+                  ? "border-brand-primary bg-brand-primary/10 text-brand-primary dark:border-brand-accent dark:bg-brand-accent/20 dark:text-brand-accent"
+                  : "border-slate-300 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-gray-800 dark:text-gray-400"
               }`}
             >
               Male
             </button>
             <button
               type="button"
-              onClick={() => setGender('female')}
+              onClick={() => setGender("female")}
               className={`flex items-center justify-center gap-2 rounded-lg border p-2.5 text-sm font-bold transition-all ${
-                gender === 'female'
-                  ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:border-brand-accent dark:bg-brand-accent/20 dark:text-brand-accent'
-                  : 'border-slate-300 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-gray-800 dark:text-gray-400'
+                gender === "female"
+                  ? "border-brand-primary bg-brand-primary/10 text-brand-primary dark:border-brand-accent dark:bg-brand-accent/20 dark:text-brand-accent"
+                  : "border-slate-300 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-gray-800 dark:text-gray-400"
               }`}
             >
               Female
@@ -98,7 +97,7 @@ export function BmrCalculator() {
                 max="100"
                 value={age}
                 onChange={(e) => setAge(Number(e.target.value))}
-                className="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2 pl-9 text-sm font-bold text-slate-900 focus:border-brand-primary focus:outline-none focus:ring-2 dark:border-slate-700 dark:bg-gray-800 dark:text-white"
+                className="focus:border-brand-primary block w-full rounded-lg border border-slate-300 bg-slate-50 p-2 pl-9 text-sm font-bold text-slate-900 focus:ring-2 focus:outline-none dark:border-slate-700 dark:bg-gray-800 dark:text-white"
               />
             </div>
           </div>
@@ -118,7 +117,7 @@ export function BmrCalculator() {
                 max="200"
                 value={weight}
                 onChange={(e) => setWeight(Number(e.target.value))}
-                className="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2 pl-9 text-sm font-bold text-slate-900 focus:border-brand-primary focus:outline-none focus:ring-2 dark:border-slate-700 dark:bg-gray-800 dark:text-white"
+                className="focus:border-brand-primary block w-full rounded-lg border border-slate-300 bg-slate-50 p-2 pl-9 text-sm font-bold text-slate-900 focus:ring-2 focus:outline-none dark:border-slate-700 dark:bg-gray-800 dark:text-white"
               />
             </div>
           </div>
@@ -140,7 +139,7 @@ export function BmrCalculator() {
               max="250"
               value={height}
               onChange={(e) => setHeight(Number(e.target.value))}
-              className="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2 pl-9 text-sm font-bold text-slate-900 focus:border-brand-primary focus:outline-none focus:ring-2 dark:border-slate-700 dark:bg-gray-800 dark:text-white"
+              className="focus:border-brand-primary block w-full rounded-lg border border-slate-300 bg-slate-50 p-2 pl-9 text-sm font-bold text-slate-900 focus:ring-2 focus:outline-none dark:border-slate-700 dark:bg-gray-800 dark:text-white"
             />
           </div>
         </div>
@@ -158,7 +157,7 @@ export function BmrCalculator() {
               id="bmr-activity"
               value={activity}
               onChange={(e) => setActivity(e.target.value as ActivityLevel)}
-              className="block w-full rounded-lg border border-slate-300 bg-slate-50 p-2.5 pl-9 text-sm font-medium text-slate-900 focus:border-brand-primary focus:outline-none focus:ring-2 dark:border-slate-700 dark:bg-gray-800 dark:text-white"
+              className="focus:border-brand-primary block w-full rounded-lg border border-slate-300 bg-slate-50 p-2.5 pl-9 text-sm font-medium text-slate-900 focus:ring-2 focus:outline-none dark:border-slate-700 dark:bg-gray-800 dark:text-white"
             >
               {Object.entries(ACTIVITY_MULTIPLIERS).map(([key, val]) => (
                 <option key={key} value={key}>
@@ -168,26 +167,21 @@ export function BmrCalculator() {
             </select>
           </div>
         </div>
-
       </form>
 
       {/* Results Section */}
-      <div 
-        className="mt-8 rounded-xl bg-slate-50 p-5 dark:bg-gray-950"
-        aria-live="polite"
-        aria-atomic="true"
-      >
+      <div className="mt-8 rounded-xl bg-slate-50 p-5 dark:bg-gray-950" aria-live="polite" aria-atomic="true">
         <div className="grid grid-cols-2 gap-4 divide-x divide-slate-200 dark:divide-slate-800">
           <div>
             <p className="text-xs text-slate-600 dark:text-slate-400">BMR (Basal Rate)</p>
             <p className="mt-1 text-xl font-black text-slate-900 dark:text-gray-100">
-              {bmr > 0 ? `${bmr} kcal` : '--'}
+              {bmr > 0 ? `${bmr} kcal` : "--"}
             </p>
           </div>
           <div className="pl-4">
             <p className="text-xs text-slate-600 dark:text-slate-400">Daily Calories (TDEE)</p>
             <p className="mt-1 text-xl font-black text-orange-600 dark:text-orange-400">
-              {tdee > 0 ? `${tdee} kcal` : '--'}
+              {tdee > 0 ? `${tdee} kcal` : "--"}
             </p>
           </div>
         </div>

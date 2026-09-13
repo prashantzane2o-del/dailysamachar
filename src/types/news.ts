@@ -1,3 +1,5 @@
+// src/types/news.ts
+
 export type Author = {
   slug: string;
   name: string;
@@ -30,7 +32,7 @@ export type Article = {
   title: string;
   excerpt?: string;
   image: string;
-  imageUrl?: string;
+  imageUrl?: string; // Legacy support ke liye
   imageAlt?: string;
   author: string;
   authorSlug?: string;

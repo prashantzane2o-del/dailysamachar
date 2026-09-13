@@ -1,5 +1,6 @@
+// src/components/cards/card-system.tsx
 import Image from "next/image";
-import { Camera, CirclePlay, Radio } from "lucide-react";
+import { CirclePlay, Radio } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { Article } from "@/types/news";
 import { SanitizedHtml } from "@/shared/ui/sanitized-html";
@@ -12,7 +13,7 @@ function CmsImage({ src, alt, className, sizes }: { src?: string; alt: string; c
   return src ? (
     <Image src={src} alt={alt} fill sizes={sizes} className={cn("image-zoom object-cover", className)} />
   ) : (
-    <div className="text-muted grid h-full place-items-center">
+    <div className="text-muted bg-soft grid h-full place-items-center">
       <span className="text-xs font-bold tracking-widest uppercase">DailySamachar</span>
     </div>
   );
@@ -20,13 +21,14 @@ function CmsImage({ src, alt, className, sizes }: { src?: string; alt: string; c
 
 export function FeatureCard({ article, size = "md" }: { article: Article; size?: CardSize }) {
   return (
-    <article className="group">
-      <Link href={"/news/" + article.slug} className="block">
+    <article className="group relative">
+      <Link
+        href={"/news/" + article.slug}
+        className="focus-visible:ring-signal block outline-none focus-visible:rounded-xl focus-visible:ring-4"
+        aria-label={`Read article: ${article.title}`}
+      >
         <div
-          className={cn(
-            "bg-soft relative overflow-hidden rounded-xl dark:bg-gray-900",
-            size === "lg" ? "aspect-16/10" : "aspect-4/3",
-          )}
+          className={cn("bg-soft relative overflow-hidden rounded-xl", size === "lg" ? "aspect-16/10" : "aspect-4/3")}
         >
           <CmsImage
             src={article.image}
@@ -35,17 +37,17 @@ export function FeatureCard({ article, size = "md" }: { article: Article; size?:
           />
         </div>
         <div className="pt-4">
-          <p className="kicker">{article.category}</p>
+          <p className="kicker text-muted">{article.category}</p>
           <h3
             className={cn(
-              "editorial text-ink group-hover:text-signal mt-2 leading-tight font-bold tracking-tight dark:text-gray-100",
+              "editorial text-ink group-hover:text-signal mt-2 leading-tight font-bold tracking-tight transition-colors",
               size === "lg" ? "text-3xl" : "text-xl",
             )}
           >
             <SanitizedHtml as="span" html={article.title} />
           </h3>
           <p className="text-muted mt-3 text-[11px] font-bold tracking-wider uppercase">
-            {article.author} · {article.readTime || "—"}
+            {article.author} • {article.readTime || "4 Min Read"}
           </p>
         </div>
       </Link>
@@ -58,31 +60,34 @@ export const VerticalCard = FeatureCard;
 
 export function HorizontalCard({ article, compact = false }: { article: Article; compact?: boolean }) {
   return (
-    <article className="group border-line flex gap-4 border-b py-4 last:border-0 dark:border-gray-800">
+    <article className="group border-line flex gap-4 border-b py-4 last:border-0">
+      {/* AAA FIX: Hide image link from screen readers to prevent redundant reading */}
       <Link
         href={"/news/" + article.slug}
-        className={cn(
-          "bg-soft relative shrink-0 overflow-hidden rounded-lg dark:bg-gray-900",
-          compact ? "h-20 w-24" : "h-28 w-40",
-        )}
-        aria-label={article.title}
+        tabIndex={-1}
+        aria-hidden="true"
+        className={cn("bg-soft relative shrink-0 overflow-hidden rounded-lg", compact ? "h-20 w-24" : "h-28 w-40")}
       >
-        <CmsImage src={article.image} alt={article.imageAlt || article.title} sizes="160px" />
+        <CmsImage src={article.image} alt="" sizes="160px" />
       </Link>
-      <div className="min-w-0">
-        <p className="kicker">{article.category}</p>
+      <div className="flex min-w-0 flex-col">
+        <p className="kicker text-muted">{article.category}</p>
         <h3
           className={cn(
-            "editorial text-ink group-hover:text-signal mt-1 leading-tight font-bold dark:text-gray-100",
+            "editorial text-ink group-hover:text-signal mt-1 leading-tight font-bold transition-colors",
             compact ? "text-base" : "text-xl",
           )}
         >
-          <Link href={"/news/" + article.slug}>
+          {/* Only title link is focusable and readable */}
+          <Link
+            href={"/news/" + article.slug}
+            className="focus-visible:ring-signal rounded-sm outline-none focus-visible:ring-2"
+          >
             <SanitizedHtml as="span" html={article.title} />
           </Link>
         </h3>
-        <p className="text-muted mt-2 text-[11px] font-bold tracking-wider uppercase">
-          {article.publishedAt} · {article.readTime || "—"}
+        <p className="text-muted mt-auto pt-2 text-[11px] font-bold tracking-wider uppercase">
+          {article.publishedAt} • {article.readTime || "4 Min Read"}
         </p>
       </div>
     </article>
@@ -91,38 +96,49 @@ export function HorizontalCard({ article, compact = false }: { article: Article;
 
 export const CompactCard = ({ article }: { article: Article }) => <HorizontalCard article={article} compact />;
 export const SidebarCard = CompactCard;
+export const RelatedCard = CompactCard;
 
 export function BreakingCard({ article }: { article: Article }) {
   return (
-    <article className="bg-ink rounded-xl p-5 text-white dark:bg-gray-900">
+    <article className="bg-ink text-paper relative rounded-xl p-5">
+      <Link
+        href={"/news/" + article.slug}
+        className="focus-visible:ring-signal absolute inset-0 z-10 rounded-xl outline-none focus-visible:ring-4"
+      >
+        <span className="sr-only">Read breaking news: {article.title}</span>
+      </Link>
       <div className="flex items-center gap-2">
-        <Radio size={14} className="text-red-400" />
-        <Badge className="bg-red-500/20 text-red-300">LIVE</Badge>
+        <Radio size={14} className="text-signal" />
+        <Badge className="bg-signal/20 text-signal border-signal/30">LIVE</Badge>
       </div>
-      <h3 className="editorial mt-3 text-xl leading-tight font-bold">
+      <h3 className="editorial hover:text-signal mt-3 text-xl leading-tight font-bold transition-colors">
         <SanitizedHtml as="span" html={article.title} />
       </h3>
-      <p className="mt-3 text-xs text-slate-400">Updated {article.publishedAt}</p>
+      <p className="mt-3 text-xs opacity-70">Updated {article.publishedAt}</p>
     </article>
   );
 }
 
 export function VideoCard({ article }: { article: Article }) {
-  const image = article.image;
-  const category = article.category;
-  const slug = article.slug;
-
   return (
-    <article className="group">
-      <Link href={"/news/" + slug} className="block">
-        <div className="bg-soft relative aspect-video overflow-hidden rounded-xl dark:bg-gray-900">
-          <CmsImage src={image} alt={article.title} sizes="(max-width: 768px) 100vw, 50vw" />
-          <span className="absolute inset-0 grid place-items-center">
-            <CirclePlay className="text-ink fill-white" size={45} />
+    <article className="group relative">
+      <Link
+        href={"/news/" + article.slug}
+        className="focus-visible:ring-signal block rounded-xl outline-none focus-visible:ring-4"
+        aria-label={`Watch video: ${article.title}`}
+      >
+        <div className="bg-soft relative aspect-video overflow-hidden rounded-xl">
+          <CmsImage src={article.image} alt="" sizes="(max-width: 768px) 100vw, 50vw" />
+          <span className="absolute inset-0 grid place-items-center bg-black/20 transition-colors group-hover:bg-black/10">
+            <CirclePlay
+              className="group-hover:fill-signal fill-black/50 text-white transition-colors"
+              size={48}
+              aria-hidden="true"
+            />
           </span>
         </div>
-        <p className="kicker mt-4">Video · {category}</p>
-        <h3 className="editorial text-ink mt-1 text-xl leading-tight font-bold dark:text-gray-100">
+        <p className="kicker text-muted mt-4">Video • {article.category}</p>
+        <h3 className="editorial text-ink group-hover:text-signal mt-1 text-xl leading-tight font-bold transition-colors">
           <SanitizedHtml as="span" html={article.title} />
         </h3>
       </Link>
@@ -132,14 +148,22 @@ export function VideoCard({ article }: { article: Article }) {
 
 export function OpinionCard({ article }: { article: Article }) {
   return (
-    <article className="border-signal border-l-2 pl-4">
-      <p className="kicker">Opinion</p>
-      <h3 className="editorial text-ink mt-2 text-2xl leading-tight font-bold dark:text-gray-100">
+    <article className="border-signal group relative border-l-4 pl-4">
+      <Link
+        href={"/news/" + article.slug}
+        className="focus-visible:ring-signal absolute inset-0 z-10 rounded-sm outline-none focus-visible:ring-4"
+      >
+        <span className="sr-only">
+          Read opinion by {article.author}: {article.title}
+        </span>
+      </Link>
+      <p className="kicker text-muted">Opinion</p>
+      <h3 className="editorial text-ink group-hover:text-signal mt-2 text-2xl leading-tight font-bold transition-colors">
         <SanitizedHtml as="span" html={article.title} />
       </h3>
       <div className="mt-4 flex items-center gap-2">
         <Avatar name={article.author} size="sm" />
-        <p className="text-xs font-bold">{article.author}</p>
+        <p className="text-muted text-xs font-bold">{article.author}</p>
       </div>
     </article>
   );
@@ -148,89 +172,35 @@ export function OpinionCard({ article }: { article: Article }) {
 export function LiveUpdateCard({ article }: { article: Article }) {
   return (
     <article className="border-line before:bg-signal relative border-l pl-5 before:absolute before:top-1 before:-left-1 before:h-2 before:w-2 before:rounded-full">
-      <p className="text-signal text-xs font-bold">LIVE · {article.publishedAt}</p>
-      <h3 className="editorial text-ink mt-1 text-lg font-bold dark:text-gray-100">
+      <p className="text-signal text-xs font-bold">LIVE • {article.publishedAt}</p>
+      <h3 className="editorial text-ink mt-1 text-lg font-bold">
         <SanitizedHtml as="span" html={article.title} />
       </h3>
     </article>
   );
 }
 
-export function GalleryCard({ article }: { article: Article }) {
-  return (
-    <article className="group bg-ink relative aspect-4/5 overflow-hidden rounded-xl">
-      <CmsImage
-        src={article.image}
-        alt={article.imageAlt || article.title}
-        sizes="(max-width: 768px) 100vw, 25vw"
-        className="opacity-80"
-      />
-      <div className="absolute inset-x-0 bottom-0 p-4 text-white">
-        <Camera size={17} />
-        <h3 className="editorial mt-2 text-xl leading-tight font-bold">
-          <SanitizedHtml as="span" html={article.title} />
-        </h3>
-      </div>
-    </article>
-  );
-}
-
-export function AuthorCard({ name, role }: { name: string; role: string }) {
-  return (
-    <article className="border-line flex items-center gap-3 rounded-xl border p-4 dark:border-gray-800">
-      <Avatar name={name} size="lg" />
-      <div>
-        <p className="font-bold">{name}</p>
-        <p className="text-muted text-xs">{role}</p>
-      </div>
-    </article>
-  );
-}
-
-export function CategoryCard({
-  name,
-  count,
-  image,
-  slug,
-}: {
-  name: string;
-  count: string;
-  image: string;
-  slug?: string;
-}) {
-  return (
-    <a
-      href={slug ? `/category/${encodeURIComponent(slug)}` : "/search"}
-      className="group bg-ink relative block aspect-3/2 overflow-hidden rounded-xl"
-    >
-      <CmsImage src={image} alt="" sizes="(max-width: 768px) 50vw, 20vw" className="opacity-65" />
-      <div className="absolute inset-0 flex flex-col justify-end p-4 text-white">
-        <p className="editorial text-xl font-bold">{name}</p>
-        <p className="text-xs text-slate-200">{count} stories</p>
-      </div>
-    </a>
-  );
-}
-
 export function TrendingCard({ rank, article }: { rank: number; article: Article }) {
   return (
-    <article className="border-line flex gap-3 border-b py-4 dark:border-gray-800">
-      <span className="editorial text-4xl font-bold text-slate-300">0{rank}</span>
-      <div>
-        <p className="kicker">{article.category}</p>
-        <h3 className="editorial text-ink mt-1 text-lg leading-tight font-bold dark:text-gray-100">
+    <article className="border-line group relative flex gap-3 border-b py-4">
+      <Link
+        href={"/news/" + article.slug}
+        className="focus-visible:ring-signal absolute inset-0 z-10 rounded-sm outline-none focus-visible:ring-4"
+      >
+        <span className="sr-only">
+          Read trending article number {rank}: {article.title}
+        </span>
+      </Link>
+      <div className="editorial text-muted text-4xl font-bold opacity-50">
+        <span className="sr-only">Rank {rank}</span>
+        <span aria-hidden="true">0{rank}</span>
+      </div>
+      <div className="pt-1">
+        <p className="kicker text-muted">{article.category}</p>
+        <h3 className="editorial text-ink group-hover:text-signal mt-1 text-lg leading-tight font-bold transition-colors">
           <SanitizedHtml as="span" html={article.title} />
         </h3>
       </div>
     </article>
-  );
-}
-
-export const RelatedCard = CompactCard;
-export function AdvertisementCard() {
-  return (
-    <div className="bg-soft text-muted grid min-h-52 place-items-center rounded-xl border border-dashed text-[10px] font-bold tracking-[.2em] uppercase">
-      Advertisement
-    </div>
   );
 }

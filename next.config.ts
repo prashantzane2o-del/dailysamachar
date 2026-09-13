@@ -55,6 +55,10 @@ const nextConfig: NextConfig = {
 
   images: {
     formats: ["image/avif", "image/webp"],
+    // Load CMS images directly in the browser. This prevents Next's
+    // server-side optimizer from turning a temporary CMS/TLS outage into
+    // repeated /_next/image 404/500 responses.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",

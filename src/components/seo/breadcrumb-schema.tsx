@@ -1,9 +1,13 @@
-interface BreadcrumbItem {
+// src/components/seo/breadcrumb-schema.tsx
+import React from "react";
+import { safeJson } from "@/shared/lib/safe-json";
+
+export interface BreadcrumbItem {
   name: string;
   url: string;
 }
 
-interface BreadcrumbSchemaProps {
+export interface BreadcrumbSchemaProps {
   items: BreadcrumbItem[];
 }
 
@@ -21,4 +25,3 @@ export function BreadcrumbSchema({ items }: BreadcrumbSchemaProps) {
 
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJson(schema) }} />;
 }
-import { safeJson } from "@/shared/lib/safe-json";

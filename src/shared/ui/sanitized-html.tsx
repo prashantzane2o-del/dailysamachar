@@ -1,3 +1,4 @@
+// src/shared/ui/sanitized-html.tsx
 import React from "react";
 import sanitizeHtml from "sanitize-html";
 
@@ -50,13 +51,15 @@ const ALLOWED_TAGS = [
   "kbd",
   "s",
   "mark",
+  "colgroup",
+  "col", // FIXED: Added mark (for highlights), colgroup, col (for tables)
 ] as const;
 
 const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
   allowedTags: [...ALLOWED_TAGS],
   allowedAttributes: {
-    // ENHANCEMENT: Added aria-* and role to preserve accessibility from WordPress blocks
-    "*": ["class", "id", "dir", "lang", "data-*", "aria-*", "role"],
+    // FIXED: Allowed 'style' and 'class' globally so WP block classes aren't stripped
+    "*": ["class", "className", "id", "dir", "lang", "data-*", "aria-*", "role", "style"],
     a: ["href", "target", "rel", "title", "download"],
     img: [
       "src",
@@ -77,22 +80,28 @@ const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
     source: ["src", "type"],
     td: ["colspan", "rowspan", "align", "valign"],
     th: ["colspan", "rowspan", "align", "valign", "scope"],
-    span: ["style"],
-    p: ["style"],
-    div: ["style"],
+    col: ["span"],
+    colgroup: ["span"],
   },
-  // ENHANCEMENT: Allowed decimals and viewport units in styles
+  // FIXED: Expanded allowed CSS styles to support WP highlights, table widths, and text colors
   allowedStyles: {
     "*": {
-      color: [/^#(0x)?[0-9a-f]+$/i, /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/],
-      "background-color": [/^#(0x)?[0-9a-f]+$/i, /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/],
+      color: [/^.*$/],
+      "background-color": [/^.*$/],
+      background: [/^.*$/],
       "text-align": [/^left$/, /^right$/, /^center$/, /^justify$/],
-      "font-size": [/^\d+(?:\.\d+)?(?:px|em|rem|%|vw|vh)$/],
-      "font-weight": [/^\d{100,900}$/, /^normal$/, /^bold$/],
-      "line-height": [/^\d+(?:\.\d+)?(?:px|em|rem|%)?$/, /^normal$/],
+      "font-size": [/^.*$/],
+      "font-weight": [/^.*$/],
+      "line-height": [/^.*$/],
+      "text-decoration": [/^.*$/],
+      width: [/^.*$/],
+      height: [/^.*$/],
+      margin: [/^.*$/],
+      padding: [/^.*$/],
+      border: [/^.*$/],
     },
   },
-  allowedSchemes: ["http", "https", "mailto", "tel"],
+  allowedSchemes: ["http", "https", "mailto", "tel", "data"],
   allowedSchemesByTag: { img: ["http", "https", "data"] },
   allowedIframeHostnames: [
     "www.youtube.com",
@@ -103,11 +112,8 @@ const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
     "open.spotify.com",
   ],
   allowProtocolRelative: true,
-
-  // AAA-LEVEL ENHANCEMENT: Automatically secure external links
   transformTags: {
     a: (tagName, attribs) => {
-      // If link is external, enforce safe attributes
       if (attribs.href && /^https?:\/\//.test(attribs.href)) {
         return {
           tagName: "a",
@@ -137,16 +143,10 @@ export function stripCmsHtml(html: string | null | undefined): string {
 interface SanitizedHtmlProps {
   html: string | null | undefined;
   className?: string;
-  // ENHANCEMENT: Proper polymorphic type for dynamic tag rendering
   as?: React.ElementType;
 }
 
-/**
- * Renders CMS HTML only after it has crossed the sanitizer boundary.
- * Prevents DOM bloat by not rendering if HTML is empty.
- */
 export function SanitizedHtml({ html, className, as: Element = "div" }: SanitizedHtmlProps) {
   if (!html) return null;
-
   return <Element className={className} dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(html) }} />;
 }

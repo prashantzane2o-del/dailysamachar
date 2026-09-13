@@ -1,3 +1,4 @@
+// src/features/markets/ui/market-dashboard.tsx
 "use client";
 
 import { motion } from "framer-motion";
@@ -13,7 +14,6 @@ const number = (locale: string, value: number) =>
 
 function MarketSkeleton() {
   const t = useTranslations("common");
-
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {symbols.map((symbol) => (
@@ -21,7 +21,7 @@ function MarketSkeleton() {
           aria-label={t("loading")}
           aria-busy="true"
           role="status"
-          className="bg-soft h-36 rounded-2xl motion-safe:animate-pulse"
+          className="bg-soft border-line h-36 rounded-2xl border motion-safe:animate-pulse"
           key={symbol}
         />
       ))}
@@ -35,8 +35,8 @@ function MarketCard({ quote, label }: { quote?: MarketItem; label: string }) {
 
   if (!quote || (quote.price === 0 && quote.change === 0 && !quote.isPositive)) {
     return (
-      <article className="bg-soft rounded-2xl border p-5">
-        <p className="text-sm font-bold">{label}</p>
+      <article className="bg-soft border-line rounded-2xl border p-5">
+        <p className="text-ink text-sm font-bold">{label}</p>
         <p className="text-muted mt-6 text-sm">{t("empty")}</p>
       </article>
     );
@@ -48,24 +48,24 @@ function MarketCard({ quote, label }: { quote?: MarketItem; label: string }) {
     <motion.article
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-paper rounded-2xl border p-5 shadow-sm"
+      className="bg-paper border-line rounded-2xl border p-5 shadow-sm transition-shadow hover:shadow-md"
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="text-sm font-bold">{label}</p>
+        <p className="text-ink text-sm font-bold">{label}</p>
         {quote.isPositive ? (
-          <TrendingUp size={18} className="text-emerald-800 dark:text-emerald-300" aria-hidden="true" />
+          <TrendingUp size={18} className="text-emerald-700 dark:text-emerald-400" aria-hidden="true" />
         ) : isDown ? (
-          <TrendingDown size={18} className="text-red-800 dark:text-red-300" aria-hidden="true" />
+          <TrendingDown size={18} className="text-red-700 dark:text-red-400" aria-hidden="true" />
         ) : null}
       </div>
-      <p className="mt-5 text-2xl font-bold tracking-tight">{number(locale, quote.price)}</p>
+      <p className="text-ink mt-5 text-2xl font-bold tracking-tight">{number(locale, quote.price)}</p>
       <p
         className={
           "mt-2 text-sm font-semibold " +
           (quote.isPositive
-            ? "text-emerald-800 dark:text-emerald-300"
+            ? "text-emerald-700 dark:text-emerald-400"
             : isDown
-              ? "text-red-800 dark:text-red-300"
+              ? "text-red-700 dark:text-red-400"
               : "text-muted")
         }
       >
@@ -83,8 +83,10 @@ export function MarketDashboard() {
   const common = useTranslations("common");
   const indicesQuery = useMarketData("indices");
   const commoditiesQuery = useMarketData("commodities");
+
   const isLoading = indicesQuery.isLoading || commoditiesQuery.isLoading;
   const isError = indicesQuery.isError || commoditiesQuery.isError;
+
   const labels = [
     t("sensex"),
     t("nifty50"),
@@ -100,7 +102,11 @@ export function MarketDashboard() {
 
   if (isError) {
     return (
-      <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-800">
+      <div
+        role="alert"
+        // FIXED: AAA accessibility contrast for Dark mode error states
+        className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-800 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-300"
+      >
         <p className="font-semibold">{t("error")}</p>
         <button
           type="button"
@@ -108,7 +114,7 @@ export function MarketDashboard() {
             void indicesQuery.refetch();
             void commoditiesQuery.refetch();
           }}
-          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-red-800 px-3 py-2 text-sm font-bold text-white"
+          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-red-800 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-red-900 focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 focus-visible:outline-none dark:bg-red-700 dark:hover:bg-red-600 dark:focus-visible:ring-offset-gray-900"
         >
           <RotateCcw size={15} aria-hidden="true" />
           {common("retry")}
@@ -134,9 +140,11 @@ export function MarketTicker() {
   const quote = query.data?.[0];
 
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold">
+    <div className="bg-paper border-line text-ink inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold shadow-sm">
       <span>{t("sensex")}</span>
-      <span>{quote ? quote.price : t("empty")}</span>
+      <span className={quote?.isPositive ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}>
+        {quote ? quote.price : t("empty")}
+      </span>
     </div>
   );
 }

@@ -123,14 +123,18 @@ export const PersistentVideoPlayer: React.FC<PersistentVideoPlayerProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsPip(!isPip)}
-              className="rounded-full bg-white/20 p-1.5 text-white backdrop-blur-md transition-colors hover:bg-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="rounded-full bg-white/20 p-1.5 text-white backdrop-blur-md transition-colors hover:bg-white/40 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
               aria-label={isPip ? t("maximize", { fallback: "Maximize" }) : t("minimize", { fallback: "Minimize" })}
             >
-              {isPip ? <Maximize2 className="h-4 w-4" aria-hidden="true" /> : <Minimize2 className="h-4 w-4" aria-hidden="true" />}
+              {isPip ? (
+                <Maximize2 className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Minimize2 className="h-4 w-4" aria-hidden="true" />
+              )}
             </button>
             <button
               onClick={onClose}
-              className="rounded-full bg-white/20 p-1.5 text-white backdrop-blur-md transition-colors hover:bg-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+              className="rounded-full bg-white/20 p-1.5 text-white backdrop-blur-md transition-colors hover:bg-white/40 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:outline-none"
               aria-label={t("close", { fallback: "Close video" })}
             >
               <X className="h-4 w-4" aria-hidden="true" />
@@ -167,17 +171,21 @@ export const PersistentVideoPlayer: React.FC<PersistentVideoPlayerProps> = ({
           <div className="flex items-center gap-4">
             <button
               onClick={togglePlay}
-              className="text-white transition-colors hover:text-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-full p-1"
+              className="rounded-full p-1 text-white transition-colors hover:text-blue-400 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
               aria-label={isPlaying ? t("pause", { fallback: "Pause" }) : t("play", { fallback: "Play" })}
             >
-              {isPlaying ? <Pause className="h-6 w-6 fill-current" aria-hidden="true" /> : <Play className="h-6 w-6 fill-current" aria-hidden="true" />}
+              {isPlaying ? (
+                <Pause className="h-6 w-6 fill-current" aria-hidden="true" />
+              ) : (
+                <Play className="h-6 w-6 fill-current" aria-hidden="true" />
+              )}
             </button>
 
             {/* AAA Accessibility: Progress Bar */}
-            <div 
-              role="progressbar" 
-              aria-valuemin={0} 
-              aria-valuemax={100} 
+            <div
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={100}
               aria-valuenow={Math.round(progress)}
               aria-label="Video progress"
               className="h-1.5 grow overflow-hidden rounded-full bg-white/20"
@@ -190,11 +198,15 @@ export const PersistentVideoPlayer: React.FC<PersistentVideoPlayerProps> = ({
 
             <button
               onClick={toggleMute}
-              className="text-white transition-colors hover:text-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-full p-1"
+              className="rounded-full p-1 text-white transition-colors hover:text-blue-400 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
               aria-label={isMuted ? t("unmute", { fallback: "Unmute" }) : t("mute", { fallback: "Mute" })}
               aria-pressed={isMuted}
             >
-              {isMuted ? <VolumeX className="h-5 w-5" aria-hidden="true" /> : <Volume2 className="h-5 w-5" aria-hidden="true" />}
+              {isMuted ? (
+                <VolumeX className="h-5 w-5" aria-hidden="true" />
+              ) : (
+                <Volume2 className="h-5 w-5" aria-hidden="true" />
+              )}
             </button>
           </div>
         </div>

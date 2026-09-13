@@ -1,10 +1,10 @@
+// src/shared/ui/primitives.tsx
 import React, { forwardRef } from "react";
 import { Loader2 } from "lucide-react";
 
 // ============================================================================
 // BUTTON PRIMITIVE
 // ============================================================================
-
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
   size?: "sm" | "md" | "lg" | "icon";
@@ -14,11 +14,12 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className = "", variant = "primary", size = "md", isLoading = false, disabled, children, ...props }, ref) => {
     // Tailwind classes based on variant and size
+    // FIXED: Added disabled:cursor-not-allowed for proper UX
     const baseStyles =
-      "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:focus-visible:ring-offset-slate-950";
+      "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed dark:focus-visible:ring-offset-slate-950";
 
     const variants = {
-      primary: "bg-signal text-white shadow-sm hover:bg-signal-dark",
+      primary: "bg-signal text-white shadow-sm hover:bg-red-800",
       secondary:
         "bg-slate-100 text-slate-900 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-50 dark:hover:bg-slate-700",
       outline:
@@ -56,7 +57,6 @@ Button.displayName = "Button";
 // ============================================================================
 // INPUT PRIMITIVE
 // ============================================================================
-
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }

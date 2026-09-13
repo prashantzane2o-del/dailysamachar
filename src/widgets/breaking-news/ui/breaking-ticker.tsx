@@ -1,3 +1,4 @@
+// src/widgets/breaking-news/ui/breaking-ticker.tsx
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
@@ -5,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, ChevronRight, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
+import { stripCmsHtml } from "@/shared/ui/sanitized-html";
 
 // --- Types ---
 export interface BreakingNewsNode {
@@ -34,7 +36,6 @@ export const BreakingTicker: React.FC<BreakingTickerProps> = ({
   displayDuration = 5000,
 }) => {
   const t = useTranslations("breakingNews");
-
   const [isVisible, setIsVisible] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -46,7 +47,6 @@ export const BreakingTicker: React.FC<BreakingTickerProps> = ({
   // Handle automatic cycling
   useEffect(() => {
     if (!isVisible || isPaused || articles.length <= 1) return;
-
     const timer = setInterval(nextHeadline, displayDuration);
     return () => clearInterval(timer);
   }, [isVisible, isPaused, articles.length, displayDuration, nextHeadline]);
@@ -54,6 +54,7 @@ export const BreakingTicker: React.FC<BreakingTickerProps> = ({
   if (!isVisible || articles.length === 0) return null;
 
   const currentArticle = articles[currentIndex];
+  if (!currentArticle) return null;
 
   return (
     <div
@@ -74,7 +75,7 @@ export const BreakingTicker: React.FC<BreakingTickerProps> = ({
               </span>
             </div>
 
-            {/* Animated Headline */}
+            {/* Animated Headline - FIXED: Removed absolute positioning that collapsed the height to 0 */}
             <div className="relative flex h-full grow items-center overflow-hidden">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -83,14 +84,14 @@ export const BreakingTicker: React.FC<BreakingTickerProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -15 }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="absolute inset-0 flex w-full items-center"
+                  className="flex w-full items-center"
                 >
                   <Link
                     href={`/news/${currentArticle.slug}`}
                     className="flex w-full items-center truncate rounded-sm text-sm font-medium hover:underline focus:ring-2 focus:ring-white focus:outline-none md:text-base"
-                    title={currentArticle.title}
+                    title={stripCmsHtml(currentArticle.title)}
                   >
-                    <span className="truncate">{currentArticle.title}</span>
+                    <span className="truncate">{stripCmsHtml(currentArticle.title)}</span>
                     <ChevronRight className="ml-2 h-4 w-4 shrink-0 opacity-70" />
                   </Link>
                 </motion.div>

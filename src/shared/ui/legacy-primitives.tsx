@@ -1,127 +1,104 @@
-"use client";
+// src/shared/ui/legacy-primitives.tsx
+import React from "react";
 
-import { ChevronDown, Search, X } from "lucide-react";
-import Image from "next/image";
-import { useState } from "react";
-import { Button, Input } from "@/shared/ui/primitives";
-import { cn } from "@/shared/lib/utils";
-
-export function Textarea({ className, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+export function Textarea({ className = "", ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
-      className={cn(
-        "bg-paper focus:border-signal focus-visible:ring-focus-ring min-h-28 w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus-visible:ring-4",
-        className,
-      )}
+      className={`bg-paper focus:border-signal focus-visible:ring-focus-ring min-h-28 w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus-visible:ring-4 ${className}`}
       {...props}
     />
   );
 }
 
-export function Badge({ children, className }: React.PropsWithChildren<{ className?: string }>) {
+export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  variant?: "default" | "error" | "success" | "warning" | "brand";
+  children: React.ReactNode;
+}
+
+export function Badge({ variant = "default", className = "", children, ...props }: BadgeProps) {
+  let variantClasses = "";
+  switch (variant) {
+    case "error":
+      variantClasses =
+        "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-900/50";
+      break;
+    case "success":
+      variantClasses =
+        "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/50";
+      break;
+    case "warning":
+      variantClasses =
+        "bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-900/50";
+      break;
+    case "brand":
+      variantClasses =
+        "bg-brand-primary text-white border-brand-primary dark:bg-brand-accent dark:text-black dark:border-brand-accent";
+      break;
+    case "default":
+    default:
+      variantClasses = "bg-soft text-ink border-line dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700";
+      break;
+  }
+
   return (
     <span
-      className={cn(
-        "text-signal inline-flex rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-extrabold tracking-wider",
-        className,
-      )}
+      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold tracking-wide uppercase ${variantClasses} ${className}`}
+      {...props}
     >
       {children}
     </span>
   );
 }
 
-export function Chip({
-  children,
-  active = false,
-  onClick,
-}: React.PropsWithChildren<{ active?: boolean; onClick?: () => void }>) {
+export interface ChipProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  active?: boolean;
+  children: React.ReactNode;
+}
+
+export function Chip({ active = false, className = "", children, ...props }: ChipProps) {
   return (
     <button
-      onClick={onClick}
-      className={cn(
-        "hover:border-signal hover:text-signal rounded-full border px-3 py-1.5 text-xs font-semibold transition",
-        active && "border-signal bg-signal text-white hover:text-white",
-      )}
+      type="button"
+      className={`focus-visible:ring-brand-accent dark:focus-visible:ring-offset-ink inline-flex items-center justify-center rounded-full border px-4 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
+        active
+          ? "border-brand-primary bg-brand-primary dark:text-ink text-white dark:border-white dark:bg-white"
+          : "border-line bg-paper text-ink hover:bg-soft hover:text-brand-primary dark:border-gray-700 dark:hover:text-white"
+      } ${className}`}
+      {...props}
     >
       {children}
     </button>
   );
 }
 
-export function Avatar({ name, src, size = "md" }: { name: string; src?: string; size?: "sm" | "md" | "lg" }) {
-  const dimensions = size === "sm" ? "h-7 w-7 text-[10px]" : size === "lg" ? "h-12 w-12 text-sm" : "h-9 w-9 text-xs";
-  return src ? (
-    <Image className={cn("rounded-full object-cover", dimensions)} src={src} alt="" width={48} height={48} />
-  ) : (
+export interface AvatarProps extends React.HTMLAttributes<HTMLSpanElement> {
+  name?: string;
+  size?: "sm" | "md" | "lg";
+}
+
+// FIXED: Added missing Avatar component
+export function Avatar({ name = "Desk", size = "md", className = "", ...props }: AvatarProps) {
+  // Generate initials (e.g., "Daily Samachar" -> "DS")
+  const initials = name
+    .split(" ")
+    .slice(0, 2)
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+
+  const sizeClasses = {
+    sm: "h-8 w-8 text-xs",
+    md: "h-10 w-10 text-sm",
+    lg: "h-14 w-14 text-base md:h-16 md:w-16 md:text-lg",
+  };
+
+  return (
     <span
-      aria-label={name}
-      className={cn("bg-ink grid place-items-center rounded-full font-bold text-white", dimensions)}
+      className={`bg-soft text-ink flex shrink-0 items-center justify-center rounded-full font-bold dark:bg-gray-800 dark:text-gray-100 ${sizeClasses[size]} ${className}`}
+      aria-hidden="true"
+      {...props}
     >
-      {name
-        .split(" ")
-        .map((word) => word[0])
-        .join("")}
+      {initials || "?"}
     </span>
-  );
-}
-
-export function Tooltip({ label, children }: React.PropsWithChildren<{ label: string }>) {
-  return (
-    <span className="group relative inline-flex">
-      {children}
-      <span
-        role="tooltip"
-        className="bg-ink pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded px-2 py-1 text-[10px] whitespace-nowrap text-white opacity-0 transition group-hover:opacity-100"
-      >
-        {label}
-      </span>
-    </span>
-  );
-}
-
-export function SearchBox({ onClose, defaultValue }: { onClose?: () => void; defaultValue?: string }) {
-  return (
-    <div className="bg-paper flex items-center gap-2 rounded-xl border px-3 py-2 shadow-sm">
-      <Search size={18} className="text-signal" />
-      <Input
-        name="q"
-        defaultValue={defaultValue}
-        aria-label="Search DailySamachar"
-        placeholder="Search stories, topics and people"
-        className="border-0 bg-transparent p-0 shadow-none focus:ring-0"
-      />
-      {onClose && (
-        <Button variant="ghost" size="sm" aria-label="Close search" onClick={onClose}>
-          <X size={17} />
-        </Button>
-      )}
-    </div>
-  );
-}
-
-export function Dropdown({ label, items }: { label: string; items: string[] }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="relative">
-      <Button variant="ghost" size="sm" onClick={() => setOpen(!open)} aria-expanded={open}>
-        {label}
-        <ChevronDown size={14} className="ml-1" />
-      </Button>
-      {open && (
-        <div className="bg-paper absolute top-full right-0 z-40 mt-2 w-44 rounded-xl border p-1 shadow-xl">
-          {items.map((item) => (
-            <button
-              type="button"
-              className="hover:bg-soft block w-full rounded-lg px-3 py-2 text-left text-sm"
-              onClick={() => setOpen(false)}
-              key={item}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
   );
 }

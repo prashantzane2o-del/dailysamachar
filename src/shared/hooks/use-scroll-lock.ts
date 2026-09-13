@@ -1,3 +1,4 @@
+// src/shared/hooks/use-scroll-lock.ts
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -7,37 +8,38 @@ import { useEffect, useRef } from "react";
  * Ensures clean cleanup on unmount and handles iOS Safari touch-action quirks.
  */
 export function useScrollLock(isLocked: boolean) {
-  // Original styles ko store karne ke liye ref taaki hum smoothly restore kar sakein
-  const originalOverflow = useRef<string | null>(null);
-  const originalTouchAction = useRef<string | null>(null);
+  // FIXED: Consolidated into a single ref object and added protection against capturing already-locked states
+  const originalStyle = useRef<{ overflow: string; touchAction: string } | null>(null);
 
   useEffect(() => {
-    // Agar lock false hai, toh kuch mat karo
+    // If not locked, do nothing
     if (!isLocked) return;
 
-    // Body ko DOM se access karte hain
     const body = document.body;
 
-    // Current styles save kar lo pehle
-    originalOverflow.current = window.getComputedStyle(body).overflow;
-    originalTouchAction.current = window.getComputedStyle(body).touchAction;
+    // FIXED: Only capture the original styles if we haven't already.
+    // This prevents capturing "hidden" as the original state during rapid double-clicks.
+    if (!originalStyle.current) {
+      originalStyle.current = {
+        overflow: window.getComputedStyle(body).overflow,
+        touchAction: window.getComputedStyle(body).touchAction,
+      };
+    }
 
-    // Scroll lock apply karo
+    // Apply scroll lock
     body.style.overflow = "hidden";
-    // Mobile browsers (iOS Safari) pe rubber-band scrolling prevent karne ke liye
-    body.style.touchAction = "none";
+    body.style.touchAction = "none"; // Prevents iOS Safari rubber-band scrolling
 
-    // Cleanup function: jab component unmount ho ya isLocked false ho jaye, toh wapas original state pe le aao
+    // Cleanup: restore original state when unmounted or when isLocked becomes false
     return () => {
-      if (originalOverflow.current !== null) {
-        body.style.overflow = originalOverflow.current;
+      if (originalStyle.current) {
+        body.style.overflow = originalStyle.current.overflow;
+        body.style.touchAction = originalStyle.current.touchAction;
+        // Reset the ref so the next lock cycle captures fresh styles
+        originalStyle.current = null;
       } else {
+        // Safe fallback
         body.style.overflow = "";
-      }
-
-      if (originalTouchAction.current !== null) {
-        body.style.touchAction = originalTouchAction.current;
-      } else {
         body.style.touchAction = "";
       }
     };

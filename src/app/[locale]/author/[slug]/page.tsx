@@ -15,10 +15,7 @@ export async function generateMetadata({ params }: AuthorRouteProps): Promise<Me
 
 export default async function AuthorRoute({ params }: AuthorRouteProps) {
   const { slug } = await params;
-  const [author, articles] = await Promise.all([
-    cmsApi.getAuthorBySlug(slug),
-    cmsApi.getArticlesByAuthor(slug),
-  ]);
+  const [author, articles] = await Promise.all([cmsApi.getAuthorBySlug(slug), cmsApi.getArticlesByAuthor(slug)]);
   if (!author) notFound();
   return <AuthorPage author={author} articles={articles} />;
 }
