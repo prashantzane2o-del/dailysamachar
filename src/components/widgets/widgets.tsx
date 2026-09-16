@@ -150,19 +150,19 @@ export function NewsletterCard() {
   const locale = useLocale();
   return (
     <section
-      className="bg-brand-primary rounded-2xl p-6 text-gray-100 shadow-md md:p-8"
+      className="bg-footer-background text-footer-foreground rounded-2xl p-6 shadow-md md:p-8"
       aria-labelledby="newsletter-heading"
     >
-      <p className="kicker text-brand-accent">The Daily Brief</p>
-      <h3 id="newsletter-heading" className="editorial mt-2 text-2xl font-bold text-white md:text-3xl">
+      <p className="kicker text-footer-accent">The Daily Brief</p>
+      <h3 id="newsletter-heading" className="editorial text-footer-foreground mt-2 text-2xl font-bold md:text-3xl">
         Make room for better news.
       </h3>
-      <p className="mt-3 max-w-md text-sm leading-6 text-gray-300">
+      <p className="text-footer-muted mt-3 max-w-md text-sm leading-6">
         A considered morning read, delivered daily to your inbox.
       </p>
       <Link
         href={getLocalizedPath(locale, "/newsletters")}
-        className="bg-brand-accent focus-visible:ring-offset-brand-primary mt-6 inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:outline-none"
+        className="bg-footer-accent focus-visible:ring-offset-footer-background hover:bg-footer-accent-hover mt-6 inline-flex min-h-11 items-center justify-center rounded-lg px-6 py-3 text-sm font-bold text-white shadow-sm transition focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:outline-none"
       >
         Join the Daily Brief
       </Link>

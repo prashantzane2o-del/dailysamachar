@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, ChevronRight, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { stripCmsHtml } from "@/shared/ui/sanitized-html";
+import { stripCmsHtml } from "@/shared/lib/cms-html";
 
 // --- Types ---
 export interface BreakingNewsNode {

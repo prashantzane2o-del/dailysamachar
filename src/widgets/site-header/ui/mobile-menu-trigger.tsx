@@ -5,6 +5,8 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { ThemeToggle } from "@/features/theme/ui/theme-toggle";
+import { LanguageSwitcher } from "@/features/i18n/ui/language-switcher";
 
 interface MobileMenuTriggerProps {
   links?: Array<{ title: string; href: string }>;
@@ -69,7 +71,7 @@ export function MobileMenuTrigger({ links = [], dropdownLinks = [] }: MobileMenu
           role="dialog"
           aria-modal="true"
           aria-label="Mobile Navigation Menu"
-          className="absolute top-full left-0 z-50 h-[calc(100vh-4rem)] w-full overflow-y-auto border-b border-slate-200 bg-white px-4 py-6 shadow-xl"
+          className="absolute top-full left-0 z-50 h-[calc(100vh-4rem)] w-full overflow-y-auto border-b border-slate-200 bg-white px-4 py-6 text-slate-900 shadow-xl"
         >
           <nav className="flex flex-col gap-2">
             {links.map((nav) => (
@@ -77,7 +79,7 @@ export function MobileMenuTrigger({ links = [], dropdownLinks = [] }: MobileMenu
                 key={nav.title}
                 href={nav.href}
                 onClick={() => setIsOpen(false)}
-                className="hover:text-signal block rounded-md px-4 py-3 text-lg font-bold text-slate-900 transition-colors hover:bg-slate-100"
+                className="hover:text-signal block rounded-md px-4 py-3 text-lg font-bold transition-colors hover:bg-slate-100"
               >
                 {nav.title}
               </Link>
@@ -86,7 +88,7 @@ export function MobileMenuTrigger({ links = [], dropdownLinks = [] }: MobileMenu
             {/* FIXED: Grouped Overflow Categories clearly in the mobile menu */}
             {dropdownLinks.length > 0 && (
               <div className="mt-4 border-t border-slate-200 pt-4">
-                <p className="mb-2 px-4 text-xs font-bold tracking-widest text-slate-500 uppercase">More Categories</p>
+                <p className="mb-2 px-4 text-xs font-bold tracking-widest text-slate-500 uppercase">Others</p>
                 <div className="flex flex-col gap-1">
                   {dropdownLinks.map((nav) => (
                     <Link
@@ -101,6 +103,11 @@ export function MobileMenuTrigger({ links = [], dropdownLinks = [] }: MobileMenu
                 </div>
               </div>
             )}
+
+            <div className="mt-4 flex items-center gap-3 border-t border-slate-200 px-4 pt-4">
+              <ThemeToggle />
+              <LanguageSwitcher />
+            </div>
           </nav>
         </div>
       )}

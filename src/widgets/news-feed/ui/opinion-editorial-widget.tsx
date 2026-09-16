@@ -7,7 +7,8 @@ import { ArrowRight, Quote } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import type { Article } from "@/types/news";
-import { SanitizedHtml, stripCmsHtml } from "@/shared/ui/sanitized-html";
+import { SanitizedHtml } from "@/shared/ui/sanitized-html";
+import { stripCmsHtml } from "@/shared/lib/cms-html";
 import { Avatar } from "@/shared/ui/legacy-primitives";
 
 interface OpinionEditorialWidgetProps {

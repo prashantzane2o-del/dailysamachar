@@ -1,4 +1,5 @@
 import { wpArticleSchema } from "@/shared/api/wordpress-schemas";
+import { stripCmsExcerpt } from "@/shared/lib/cms-html";
 
 /**
  * Utility to strip HTML tags and entities from plain text fields
@@ -31,20 +32,20 @@ export function mapWordPressPostToCMS(input: unknown) {
   return {
     id: String(wpPost.id),
     slug: wpPost.slug,
-    title: stripCmsHtml(wpPost.title?.rendered) || "Untitled",
-    excerpt: wpPost.excerpt?.rendered || "",
-    content: wpPost.content?.rendered || "",
+    title: stripCmsHtml(wpPost.title) || "Untitled",
+    excerpt: stripCmsExcerpt(wpPost.excerpt),
+    content: wpPost.content || "",
     publishedAt: wpPost.date,
     image: imageUrl,
     featuredImage: imageUrl
       ? {
           url: imageUrl,
-          alt: stripCmsHtml(featuredMedia?.alt_text || wpPost.title?.rendered || "News Image"),
+          alt: stripCmsHtml(featuredMedia?.alt_text || wpPost.title || "News Image"),
         }
       : undefined,
     author: stripCmsHtml(authorData?.name) || "DailySamachar Desk",
     category: stripCmsHtml(category?.name) || "News",
-    tags: tags.map((tag) => stripCmsHtml(tag.name)).filter(Boolean),
+    tags: tags.map((tag: { name?: string }) => stripCmsHtml(tag.name)).filter(Boolean),
   };
 }
 

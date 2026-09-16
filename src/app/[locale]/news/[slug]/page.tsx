@@ -5,7 +5,7 @@ import { ArticlePage as ArticlePageView } from "@/features/article/ui/article-pa
 import { getLocalizedPath } from "@/i18n/path";
 import { ArticleSchema } from "@/entities/article/ui/article-schema";
 import { cmsApi } from "@/shared/api/cms";
-import { stripCmsHtml } from "@/shared/ui/sanitized-html";
+import { stripCmsExcerpt, stripCmsHtml } from "@/shared/lib/cms-html";
 
 interface ArticleRouteProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -16,7 +16,7 @@ function siteOrigin(): string {
 }
 
 function descriptionFor(article: { excerpt?: string; title: string }): string {
-  const description = stripCmsHtml(article.excerpt).trim();
+  const description = stripCmsExcerpt(article.excerpt);
   return (description || stripCmsHtml(article.title) || "DailySamachar story").slice(0, 160);
 }
 

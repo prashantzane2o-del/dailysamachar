@@ -277,6 +277,9 @@
   },
   "articleToolbar": {
     "pauseAudio": "रोकें",
+    "resumeAudio": "फिर से चलाएं",
+    "audioUnavailable": "इस ब्राउज़र में ऑडियो उपलब्ध नहीं है।",
+    "translateArticle": "लेख का अनुवाद करें",
     "playAudio": "सुनें",
     "playing": "चल रहा है",
     "listen": "सुनें",

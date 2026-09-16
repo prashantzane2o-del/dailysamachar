@@ -8,28 +8,45 @@
   --font-devanagari: "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif;
 
   /* Brand Colors Derived from Logo */
-  --color-brand-blue: #0d1b2a; /* Deep Navy Blue */
+  --color-brand-blue: #0d1b2a;
   --color-brand-blue-light: #1b263b;
+
   /* Red adjusted slightly for AAA Contrast with White text */
   --color-brand-red: #b30000;
-  --color-brand-red-light: #d90429; /* Accent only, not for small white text */
+  --color-brand-red-light: #d90429;
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-accent: var(--brand-accent);
+
+  /* Footer is intentionally a stable dark surface in both themes. */
+  --color-footer-background: #0d1b2a;
+  --color-footer-foreground: #f8fafc;
+  --color-footer-muted: #cbd5e1;
+  --color-footer-field: #1b263b;
+  --color-footer-line: #475569;
+  --color-footer-accent: #d90429;
+  --color-footer-accent-hover: #ef233c;
 
   /* Surface & Text Colors */
   --color-surface-light: #ffffff;
-  --color-surface-dark: #0f172a; /* Slate 900 */
-  --color-text-light: #1e293b; /* Slate 800 */
-  --color-text-dark: #f8fafc; /* Slate 50 */
+  --color-surface-dark: #0f172a;
+  --color-text-light: #1e293b;
+  --color-text-dark: #f8fafc;
+  --color-muted-light: #475569;
+  --color-muted-dark: #cbd5e1;
 
   /* Map dynamic CSS variables to Tailwind utility classes */
   --color-ink: var(--ink);
   --color-paper: var(--paper);
   --color-soft: var(--soft);
   --color-line: var(--line);
-  --color-signal: var(--signal); /* FIXED: Resolves missing bg-signal and text-signal classes[cite: 2] */
+  --color-muted: var(--muted);
+  --color-text-muted: var(--muted);
+  --color-signal: var(--signal);
 }
 
 @layer base {
   :root {
+    color-scheme: light;
     --background: var(--color-surface-light);
     --foreground: var(--color-text-light);
     --brand-primary: var(--color-brand-blue);
@@ -41,9 +58,11 @@
     --paper: #ffffff;
     --soft: #f8fafc;
     --line: #e2e8f0;
+    --muted: var(--color-muted-light);
   }
 
   .dark {
+    color-scheme: dark;
     --background: var(--color-surface-dark);
     --foreground: var(--color-text-dark);
     --brand-primary: var(--color-surface-light);
@@ -55,6 +74,7 @@
     --paper: #0f172a;
     --soft: #1e293b;
     --line: #334155;
+    --muted: var(--color-muted-dark);
   }
 
   body {
@@ -63,6 +83,18 @@
     font-family: var(--font-sans), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Prevent horizontal scroll from unbroken content */
+    overflow-x: hidden;
+  }
+
+  /* AAA Polish: Brand consistent text selection */
+  ::selection {
+    background-color: var(--color-brand-red);
+    color: #ffffff;
+  }
+  .dark ::selection {
+    background-color: var(--color-brand-red-light);
+    color: #ffffff;
   }
 
   /* AAA Accessibility: Global Focus Rings */
@@ -77,12 +109,103 @@
   }
 }
 
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: 80rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .container-page {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container-page {
+      padding-inline: 2rem;
+    }
+  }
+}
+
+/* Mobile layout safety: flex/grid children must be allowed to shrink. */
+main,
+section,
+article,
+header,
+footer,
+aside,
+nav,
+figure {
+  min-width: 0;
+}
+
+@media (max-width: 639px) {
+  .prose-readable {
+    font-size: 1rem;
+  }
+
+  .prose-readable .alignleft,
+  .prose-readable .alignright {
+    float: none;
+    max-width: 100%;
+    margin-inline: 0;
+  }
+
+  .prose-readable .wp-block-gallery {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .prose-readable th,
+  .prose-readable td {
+    padding: 0.75rem;
+  }
+}
+
+/* Article chrome must remain readable even when CMS content contains its own colors. */
+.article-title,
+.article-primary-text,
+.article-related-link {
+  color: var(--ink) !important;
+}
+
+.article-related-link:hover {
+  color: var(--signal) !important;
+}
+
+/* Keep article copy tied to the active theme instead of browser/CMS inheritance. */
+.prose-readable {
+  color: var(--ink);
+}
+
+.prose-readable :where(p, li, dd, dt, td, th, figcaption, small, cite, q, blockquote) {
+  color: inherit;
+}
+
+.prose-readable :where(strong, b, em, i, del, ins, mark, code) {
+  color: inherit;
+}
+
 /* =========================================================
    WORDPRESS CMS CONTENT STYLING (.prose-readable)
 ========================================================= */
+
+.prose-readable {
+  /* AAA Readability: Prevent excessively long lines of text on wide screens */
+  max-width: 65ch;
+  margin-inline: auto;
+  /* Prevent unbreakable words (like long URLs) from breaking the layout */
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 /* Text & Paragraphs */
 .prose-readable p {
   margin-bottom: 1.5rem;
+  line-height: 1.75;
 }
 
 .prose-readable a {
@@ -91,35 +214,80 @@
   text-underline-offset: 4px;
   text-decoration-thickness: 2px;
   text-decoration-color: rgba(179, 0, 0, 0.3);
-  transition: text-decoration-color 0.2s;
+  transition: all 0.2s ease-in-out;
 }
 
 .prose-readable a:hover {
   text-decoration-color: var(--color-brand-red);
+  background-color: rgba(179, 0, 0, 0.05); /* Subtle highlight on hover */
 }
 
 .dark .prose-readable a {
   color: var(--color-brand-red-light);
   text-decoration-color: rgba(217, 4, 41, 0.4);
 }
+.dark .prose-readable a:hover {
+  background-color: rgba(217, 4, 41, 0.1);
+}
 
-/* Text Highlights (<mark> and WP background colors) */
-.prose-readable mark,
+/* --- THE INVISIBILITY BUG FIX (Gutenberg Color Reset) --- */
+.prose-readable .has-text-color,
+.prose-readable [style*="color:"] {
+  color: var(--ink) !important;
+}
+
+.dark .prose-readable .has-text-color,
+.dark .prose-readable [style*="color:"] {
+  color: var(--foreground) !important;
+}
+
 .prose-readable .has-background {
-  background-color: #fef08a; /* Yellow-200 */
-  color: #0f172a;
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.dark .prose-readable .has-background {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+/* Text Highlights (<mark>) */
+.prose-readable mark {
+  background-color: #fef08a;
+  color: #0f172a !important;
   padding: 0.125rem 0.25rem;
   border-radius: 0.125rem;
   font-weight: 500;
 }
 
-.dark .prose-readable mark,
-.dark .prose-readable .has-background {
-  background-color: #eab308; /* Yellow-500 */
-  color: #000000;
+.dark .prose-readable mark {
+  background-color: #eab308;
+  color: #000000 !important;
 }
 
-/* Headings */
+/* Typography & Alignment */
+.prose-readable .has-text-align-center {
+  text-align: center;
+}
+.prose-readable .has-text-align-right {
+  text-align: right;
+}
+.prose-readable .has-text-align-left {
+  text-align: left;
+}
+.prose-readable .has-drop-cap:not(:focus):first-letter {
+  float: left;
+  font-size: 4em;
+  line-height: 0.8;
+  margin-top: 0.1em;
+  margin-right: 0.15em;
+  font-weight: 900;
+  color: var(--signal);
+}
+
+/* Headings (Using clamp for Fluid Typography) */
 .prose-readable h1,
 .prose-readable h2,
 .prose-readable h3,
@@ -129,17 +297,17 @@
   color: var(--ink);
   margin-top: 2.5rem;
   margin-bottom: 1rem;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 .prose-readable h2 {
-  font-size: 1.875rem;
+  font-size: clamp(1.5rem, 3vw + 1rem, 2rem);
 }
 .prose-readable h3 {
-  font-size: 1.5rem;
+  font-size: clamp(1.25rem, 2vw + 1rem, 1.5rem);
 }
 .prose-readable h4 {
-  font-size: 1.25rem;
+  font-size: clamp(1.125rem, 1.5vw + 1rem, 1.25rem);
 }
 
 /* Lists */
@@ -159,35 +327,128 @@
 
 .prose-readable li {
   margin-bottom: 0.5rem;
+  padding-left: 0.5rem;
 }
 
-/* Blockquotes */
+.prose-readable ul ul,
+.prose-readable ol ol,
+.prose-readable ul ol,
+.prose-readable ol ul {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+  margin-left: 1.5rem;
+}
+
+/* FIX: Code & Pre Blocks Styling */
+.prose-readable pre {
+  background-color: var(--soft);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  margin: 1.5rem 0;
+}
+.prose-readable code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  color: var(--ink);
+}
+.dark .prose-readable code {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--foreground);
+}
+.prose-readable pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+}
+
+/* Gutenberg Blocks: Blockquotes, Pullquotes, Separators, Buttons */
 .prose-readable blockquote,
 .prose-readable .wp-block-quote {
   border-left: 4px solid var(--color-brand-red);
   padding-left: 1.25rem;
   margin: 2rem 0;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-family: var(--font-serif), serif;
   font-style: italic;
   color: var(--ink);
-  opacity: 0.9;
+  opacity: 0.85;
+}
+
+.prose-readable .wp-block-pullquote {
+  padding: 2rem 1rem;
+  margin: 2.5rem 0;
+  border-top: 2px solid var(--line);
+  border-bottom: 2px solid var(--line);
+  text-align: center;
+}
+
+.prose-readable .wp-block-pullquote p {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-family: var(--font-serif), serif;
+  font-weight: 700;
+  color: var(--signal);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.prose-readable .wp-block-separator {
+  border: none;
+  border-bottom: 2px solid var(--line);
+  margin: 2.5rem auto;
+  max-width: 60%;
+}
+
+.prose-readable .wp-block-button__link,
+.prose-readable .wp-block-file__button {
+  background-color: var(--color-brand-red);
+  color: #fff !important;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  font-weight: 700;
+  display: inline-block;
+  transition: background-color 0.2s;
+}
+
+.prose-readable .wp-block-button__link:hover,
+.prose-readable .wp-block-file__button:hover {
+  background-color: #990000;
+}
+
+/* Fallback: Force hide any remaining .more-link */
+.prose-readable .more-link {
+  display: none !important;
 }
 
 /* =========================================================
-   WORDPRESS IMAGES & GALLERIES
+   WORDPRESS IMAGES, GALLERIES & MEDIA
 ========================================================= */
+
 .prose-readable .wp-block-image,
 .prose-readable figure {
-  margin: 2rem 0;
+  margin: 2.5rem 0;
   border-radius: 0.75rem;
   overflow: hidden;
 }
 
 .prose-readable img {
-  width: 100%;
+  max-width: 100%;
+  width: max-content;
   height: auto;
   border-radius: 0.75rem;
+  display: block;
+  color: transparent;
+}
+
+/* FIX: Dark Mode Image Glare Bug */
+.dark .prose-readable img {
+  filter: brightness(0.85) contrast(1.1);
 }
 
 .prose-readable figcaption {
@@ -200,6 +461,56 @@
 
 .dark .prose-readable figcaption {
   color: #94a3b8;
+}
+
+.prose-readable .wp-block-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin: 2.5rem 0;
+  padding: 0;
+  list-style-type: none;
+}
+.prose-readable .wp-block-gallery .wp-block-image {
+  margin: 0;
+}
+
+/* Responsive embeds remain keyboard- and touch-friendly on small screens. */
+.prose-readable .wp-iframe-responsive-wrapper {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  margin: 2.5rem 0;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: var(--soft);
+}
+
+.prose-readable .wp-iframe-responsive-wrapper iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.prose-readable .wp-block-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin: 2.5rem 0;
+}
+.prose-readable .wp-block-column {
+  flex: 1;
+  min-width: 250px;
+}
+
+/* Native Video & Audio */
+.prose-readable .wp-block-video video,
+.prose-readable .wp-block-audio audio {
+  width: 100%;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
 }
 
 /* WP Alignments */
@@ -226,18 +537,23 @@
 /* =========================================================
    WORDPRESS TABLES (.wp-block-table)
 ========================================================= */
-.prose-readable .wp-block-table {
+
+.prose-readable .wp-table-responsive-wrapper {
   overflow-x: auto;
-  margin: 2rem 0;
+  -webkit-overflow-scrolling: touch;
+  margin: 2.5rem 0;
   border: 1px solid var(--line);
   border-radius: 0.5rem;
+  background-color: var(--paper);
 }
 
+.prose-readable .wp-block-table,
 .prose-readable table {
   width: 100%;
   text-align: left;
   border-collapse: collapse;
   font-size: 0.9375rem;
+  margin: 0;
 }
 
 .prose-readable th {
@@ -264,6 +580,33 @@
   background-color: var(--soft);
 }
 
+/* =========================================================
+   WORDPRESS IFRAMES & EMBEDS
+========================================================= */
+
+.prose-readable .wp-iframe-responsive-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 2.5rem 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background-color: var(--soft); /* Shows while iframe loads */
+}
+
+.prose-readable .wp-iframe-responsive-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* =========================================================
+   UTILITIES & SCROLLBAR
+========================================================= */
+
 @layer utilities {
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
@@ -271,5 +614,64 @@
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+}
+
+/* Custom Scrollbar for better UI Polish */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface-light);
+}
+.dark ::-webkit-scrollbar-track {
+  background: var(--color-surface-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 5px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* =========================================================
+   PRINT STYLES (AAA Publisher Requirement)
+========================================================= */
+@media print {
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+  header,
+  footer,
+  nav,
+  button,
+  .wp-block-button,
+  iframe {
+    display: none !important;
+  }
+  .prose-readable a::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    word-break: break-all;
+  }
+  .prose-readable a[href^="/"]::after {
+    content: " (dailysamachar.org" attr(href) ")";
+  }
+  figure,
+  img,
+  table,
+  blockquote {
+    page-break-inside: avoid;
+  }
+  h2,
+  h3,
+  h4 {
+    page-break-after: avoid;
   }
 }

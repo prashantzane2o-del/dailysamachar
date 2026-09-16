@@ -272,6 +272,9 @@
   },
   "articleToolbar": {
     "pauseAudio": "Pause audio",
+    "resumeAudio": "Resume audio",
+    "audioUnavailable": "Audio is not available in this browser.",
+    "translateArticle": "Translate article",
     "playAudio": "Listen to article",
     "playing": "Playing",
     "listen": "Listen",

@@ -4,21 +4,19 @@ import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { cmsApi } from "@/shared/api/cms";
 
-// UI Widgets (FSD)
+// UI Widgets
 import { BreakingTicker } from "@/widgets/breaking-news";
 import { MetalsTicker } from "@/widgets/market-ticker/ui/metals-ticker";
-import { WeatherWidget } from "@/widgets/weather/ui/weather-widget";
-import { NewsGridWidget } from "@/widgets/news-feed/ui/news-grid-widget";
+import { WeatherTicker } from "@/widgets/weather/ui/weather-ticker";
 import { HeroStoryWidget } from "@/widgets/news-feed/ui/hero-story-widget";
+import { NewsGridWidget } from "@/widgets/news-feed/ui/news-grid-widget";
+import { CategoryRowWidget } from "@/widgets/news-feed/ui/category-row-widget";
+import { WebStoriesSlider } from "@/widgets/news-feed/ui/web-stories-slider";
 import { OpinionEditorialWidget } from "@/widgets/news-feed/ui/opinion-editorial-widget";
 import { MultimediaGallery } from "@/widgets/media/ui/multimedia-gallery";
-import { CategoryRowWidget } from "@/widgets/news-feed/ui/category-row-widget";
 import { AdSlot } from "@/widgets/ads/ad-slot";
-
-import { TrendingCard } from "@/components/cards/card-system";
-import { NewsGridSkeleton, HeroStorySkeleton } from "@/widgets/shared/ui/skeleton-loaders";
+import { NewsGridSkeleton } from "@/widgets/shared/ui/skeleton-loaders";
 import { NewsletterCard } from "@/components/widgets/widgets";
-import type { Article } from "@/types/news";
 
 export interface HomePageProps {
   params: Promise<{ locale: string }>;
@@ -34,193 +32,109 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
   };
 }
 
-// 1. Hero Feed (Main Top Stories)
-async function HeroFeed() {
-  let featuredArticles: Article[] = [];
-  try {
-    featuredArticles = await cmsApi.getFeaturedArticles(5);
-  } catch (error) {
-    console.error("Failed to load featured articles", error);
-  }
-
-  if (featuredArticles.length === 0) return null;
-
-  return (
-    <HeroStoryWidget
-      mainStory={featuredArticles[0]}
-      sideStories={featuredArticles.slice(1, 5)}
-      sectionTitle="Top Stories"
-    />
-  );
-}
-
-// 2. Latest News Grid
-async function LatestNewsFeed({ locale }: { locale: string }) {
-  const t = await getTranslations({ locale, namespace: "home" });
-  let latestArticles: Article[] = [];
-
-  try {
-    latestArticles = await cmsApi.getLatestArticles(6);
-  } catch (error) {
-    console.error("Failed to load latest articles", error);
-  }
-
-  if (latestArticles.length === 0) {
-    return (
-      <div
-        role="status"
-        aria-live="polite"
-        className="text-muted bg-soft border-line col-span-full rounded-lg border border-dashed py-10 text-center"
-      >
-        {t("noNews", { fallback: "No news available at the moment." })}
-      </div>
-    );
-  }
-
-  return <NewsGridWidget title={t("title", { fallback: "Latest News" })} articles={latestArticles} />;
-}
-
-// 3. Opinion & Editorial Feed
+// 1. Opinion & Editorial Feed (Optimized: No fallbacks to avoid duplication loops)
 async function OpinionFeed() {
-  let opinionArticles: Article[] = [];
-  try {
-    opinionArticles = await cmsApi.getArticlesByCategory("opinion", 1, 3);
-    if (opinionArticles.length === 0) {
-      opinionArticles = await cmsApi.getLatestArticles(3);
-    }
-  } catch (error) {
-    console.error("Failed to load opinion articles", error);
-  }
-
+  const opinionArticles = await cmsApi.getArticlesByCategory("opinion", 1, 3).catch(() => []);
   if (opinionArticles.length === 0) return null;
-
   return <OpinionEditorialWidget sectionTitle="Opinion & Analysis" articles={opinionArticles} />;
 }
 
-// 4. Multimedia / Videos Feed
+// 2. Multimedia / Videos Feed (Optimized: No fallbacks)
 async function MultimediaFeed() {
-  let mediaArticles: Article[] = [];
-  try {
-    mediaArticles = await cmsApi.getArticlesByCategory("video", 1, 5);
-    if (mediaArticles.length === 0) {
-      mediaArticles = await cmsApi.getFeaturedArticles(5);
-    }
-  } catch (error) {
-    console.error("Failed to load media articles", error);
-  }
-
+  const mediaArticles = await cmsApi.getArticlesByCategory("video", 1, 5).catch(() => []);
   if (mediaArticles.length === 0) return null;
-
   return <MultimediaGallery sectionTitle="In Focus: Photos & Videos" articles={mediaArticles} />;
 }
 
 export default async function HomePage({ params }: HomePageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
-
   const t = await getTranslations({ locale, namespace: "home" });
 
-  const [trendingArticles, breakingArticles, allCategories] = await Promise.all([
-    cmsApi.getFeaturedArticles(5).catch(() => []),
-    cmsApi.getArticlesByCategory("breaking", 1, 3).catch(() => []),
+  // Keep one primary latest-news rail, then show category-specific rails below it.
+  const [breakingArticles, allCategories, latestArticles] = await Promise.all([
+    cmsApi.getArticlesByCategory("breaking", 1, 5).catch(() => []),
     cmsApi.getCategories().catch(() => []),
+    cmsApi.getLatestArticles(15).catch(() => []),
   ]);
 
+  const heroStories = latestArticles.slice(0, 5);
+  const latestRailArticles = latestArticles.slice(5);
+
+  // Robust Set for category exclusion to prevent matching errors
+  const excludedSlugs = new Set(["uncategorized", "web-stories", "webstories", "breaking", "breaking-news"]);
   const validCategories = allCategories
-    .filter((cat) => cat.slug && cat.slug.toLowerCase() !== "uncategorized")
-    .slice(0, 3); // Get the top 3 categories dynamically
+    .filter((cat) => cat.slug && !excludedSlugs.has(cat.slug.toLowerCase()))
+    .slice(0, 5);
 
   return (
-    <div className="flex flex-col gap-8 pb-12">
-      {/* Breaking News Ticker */}
-      <BreakingTicker articles={breakingArticles.length > 0 ? breakingArticles : trendingArticles.slice(0, 3)} />
+    <div className="flex w-full flex-col pb-12">
+      {/* Breaking News Ticker ONLY shows if actual breaking news exists */}
+      {breakingArticles.length > 0 && <BreakingTicker articles={breakingArticles} />}
 
-      {/* Top Utility Widgets (Exclusively Bullion & Weather) */}
+      {/* Top Utility Widgets */}
       <section
         aria-label="Live Market and Weather"
-        className="border-line container mx-auto mt-2 grid grid-cols-1 items-center gap-6 border-b px-4 pb-6 sm:px-6 md:grid-cols-2 lg:px-8"
+        className="border-line container mx-auto mt-2 flex flex-col justify-between gap-3 border-b px-4 pb-4 sm:px-6 sm:pb-6 md:flex-row lg:px-8"
       >
-        <div className="flex min-w-0 flex-col justify-center">
+        <div className="flex max-w-full min-w-0 md:flex-1">
           <MetalsTicker />
         </div>
-        <div className="hidden md:block">
-          <WeatherWidget city="New Delhi" />
+        <div className="flex max-w-full min-w-0 md:flex-1 md:justify-end">
+          <WeatherTicker city="New Delhi" />
         </div>
       </section>
 
       {/* Top Leaderboard Advertisement */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 pt-6 sm:px-6 lg:px-8">
         <AdSlot placement="top" className="my-2" />
       </div>
 
-      {/* Hero Section */}
-      <Suspense fallback={<HeroStorySkeleton />}>
-        <HeroFeed />
-      </Suspense>
+      <main className="flex w-full flex-col" role="main">
+        {/* Hidden H1 for SEO and Accessibility */}
+        <h1 className="sr-only">Daily Samachar - Top Headlines and Latest News</h1>
 
-      {/* Main Content Layout */}
-      <main className="container mx-auto grid grid-cols-1 gap-8 px-4 sm:px-6 lg:grid-cols-12 lg:px-8">
-        <div className="flex min-w-0 flex-col gap-6 lg:col-span-8">
-          <Suspense fallback={<NewsGridSkeleton count={6} />}>
-            <LatestNewsFeed locale={locale} />
-          </Suspense>
+        {/* Featured hero carousel using the same latest-news response */}
+        <HeroStoryWidget stories={heroStories} sectionTitle="Latest Headlines" />
 
-          {/* Inline Advertisement */}
-          <div className="w-full py-4">
-            <AdSlot placement="inline" />
-          </div>
+        {/* One primary horizontal latest-news rail */}
+        <NewsGridWidget
+          title={t("title", { fallback: "Latest News" })}
+          articles={latestRailArticles}
+          viewAllLink="/latest"
+          hideIfEmpty={false}
+        />
 
-          {/* DYNAMIC CATEGORY ROWS */}
-          {validCategories.map((cat, index) => (
-            <React.Fragment key={cat.id}>
-              <Suspense fallback={<NewsGridSkeleton count={4} />}>
-                <CategoryRowWidget categorySlug={cat.slug} title={cat.title} locale={locale} />
-              </Suspense>
-
-              {/* Insert Newsletter Card perfectly after the FIRST category row */}
-              {index === 0 && (
-                <div className="w-full py-6">
-                  <NewsletterCard />
+        {/* Category-specific horizontal rails */}
+        {validCategories.map((cat, index) => (
+          <React.Fragment key={cat.id}>
+            <Suspense fallback={<NewsGridSkeleton count={4} />}>
+              <CategoryRowWidget categorySlug={cat.slug} title={cat.title} locale={locale} />
+            </Suspense>
+            {/* Insert Newsletter & Ad Card perfectly after the FIRST category row */}
+            {index === 0 && (
+              <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8">
+                <NewsletterCard />
+                <div className="mt-8">
+                  <AdSlot placement="inline" />
                 </div>
-              )}
-            </React.Fragment>
-          ))}
-        </div>
+              </div>
+            )}
+          </React.Fragment>
+        ))}
 
-        {/* Sidebar / Trending */}
-        <aside aria-labelledby="trending-heading" className="space-y-8 pt-8 lg:col-span-4">
-          {/* Sidebar Advertisement */}
-          <AdSlot placement="sidebar" className="mb-8" />
-
-          <div className="border-line bg-soft rounded-xl border p-6 shadow-sm">
-            <h2
-              id="trending-heading"
-              className="text-ink mb-4 flex items-center gap-3 text-xl font-bold tracking-wide uppercase"
-            >
-              <span className="bg-signal inline-block h-5 w-2" aria-hidden="true"></span>
-              {t("moreLatest", { fallback: "Trending News" })}
-            </h2>
-            <div className="flex flex-col gap-4">
-              {trendingArticles.length > 0 ? (
-                trendingArticles.map((article, idx) => (
-                  <TrendingCard key={article.id} rank={idx + 1} article={article} />
-                ))
-              ) : (
-                <p className="text-muted text-sm" role="status">
-                  {t("temporaryUnavailable", { fallback: "Currently unavailable." })}
-                </p>
-              )}
-            </div>
-          </div>
-        </aside>
+        {/* Dedicated portrait Web Stories rail */}
+        <Suspense fallback={<div className="my-8 h-96 w-full animate-pulse bg-slate-900" />}>
+          <WebStoriesSlider locale={locale} />
+        </Suspense>
       </main>
 
-      {/* Multimedia Section */}
+      {/* Section 6: Multimedia Section */}
       <Suspense fallback={<div className="bg-soft h-96 w-full animate-pulse" />}>
         <MultimediaFeed />
       </Suspense>
 
-      {/* Opinion Section */}
+      {/* Section 7: Opinion Section */}
       <Suspense fallback={<div className="bg-soft h-64 w-full animate-pulse" />}>
         <OpinionFeed />
       </Suspense>

@@ -1,7 +1,7 @@
 import { cmsApi } from "@/shared/api/cms";
 import { getLocalizedPath } from "@/i18n/path";
 import { routing } from "@/i18n/routing";
-import { stripCmsHtml } from "@/shared/ui/sanitized-html";
+import { stripCmsHtml } from "@/shared/lib/cms-html";
 
 const XML_CONTENT_TYPE = "application/xml; charset=utf-8";
 

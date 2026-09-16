@@ -1,6 +1,6 @@
 import { getLocalizedPath } from "@/i18n/path";
 import { JsonLd } from "@/shared/ui/json-ld";
-import { stripCmsHtml } from "@/shared/ui/sanitized-html";
+import { stripCmsExcerpt, stripCmsHtml } from "@/shared/lib/cms-html";
 import type { Article } from "@/types/news";
 
 export interface ArticleSchemaProps {
@@ -14,7 +14,7 @@ function siteOrigin(): string {
 }
 
 function articleDescription(article: Article): string {
-  return (stripCmsHtml(article.excerpt) || stripCmsHtml(article.title) || "DailySamachar story").slice(0, 160);
+  return (stripCmsExcerpt(article.excerpt) || stripCmsHtml(article.title) || "DailySamachar story").slice(0, 160);
 }
 
 /**

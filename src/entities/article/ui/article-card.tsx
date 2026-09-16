@@ -2,7 +2,8 @@
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import type { Article } from "@/types/news";
-import { stripCmsHtml, SanitizedHtml } from "@/shared/ui/sanitized-html";
+import { SanitizedHtml } from "@/shared/ui/sanitized-html";
+import { stripCmsExcerpt, stripCmsHtml } from "@/shared/lib/cms-html";
 
 export interface ArticleCardProps {
   article: Article;
@@ -13,7 +14,7 @@ export function ArticleCard({ article, isHindi = true }: ArticleCardProps) {
   const displayTitle = article?.title || "Untitled";
 
   // FIXED: Removed raw HTML tags like <p> using stripCmsHtml
-  const displayExcerpt = stripCmsHtml(article?.excerpt || "");
+  const displayExcerpt = stripCmsExcerpt(article?.excerpt || "");
 
   const displayImageUrl = article?.image || article?.imageUrl || "";
   const displayCategory = article?.category || "News";

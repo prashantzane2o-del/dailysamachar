@@ -8,7 +8,7 @@ import { weatherApi } from "@/entities/weather/api/weather.api";
 export async function WeatherUtilityBar({ locale }: { locale: Locale }) {
   const t = await getTranslations("weather");
   const defaultCity = process.env.DEFAULT_WEATHER_CITY || "Meerut";
-  
+
   let queryParam = defaultCity;
 
   try {
@@ -16,7 +16,7 @@ export async function WeatherUtilityBar({ locale }: { locale: Locale }) {
     const headersList = await headers();
     const forwardedFor = headersList.get("x-forwarded-for");
     const realIp = headersList.get("x-real-ip");
-    
+
     // Extract the first IP if multiple exist
     const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : realIp;
 
@@ -24,7 +24,7 @@ export async function WeatherUtilityBar({ locale }: { locale: Locale }) {
     if (ip && ip !== "::1" && ip !== "127.0.0.1" && ip !== "localhost") {
       queryParam = ip;
     }
-  } catch (e) {
+  } catch {
     // Gracefully ignore header errors during static page generation
   }
 

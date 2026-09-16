@@ -11,7 +11,7 @@ export function BrandLogo({ className, noLink = false }: BrandLogoProps) {
   const wrapperClasses = cn(
     "relative flex items-center justify-center transition-transform duration-300",
     // FIXED: Removed "dark:bg-white dark:px-3 dark:py-2 dark:rounded-xl dark:shadow-md" to make it transparent
-    "h-16 sm:h-20 w-auto min-w-[140px] sm:min-w-[160px]",
+    "h-14 w-auto min-w-24 sm:h-20 sm:min-w-[160px]",
     className,
   );
 
