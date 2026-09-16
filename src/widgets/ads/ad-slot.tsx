@@ -7,6 +7,21 @@ import { useTranslations } from "next-intl";
 
 type Placement = "top" | "sidebar" | "inline" | "sticky" | "video";
 
+declare global {
+  interface Window {
+    adsbygoogle?: unknown[];
+  }
+}
+
+const ADSENSE_CLIENT = "ca-pub-4608193844622252";
+const ADSENSE_SLOTS: Record<Placement, string | undefined> = {
+  top: process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP,
+  sidebar: process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR,
+  inline: process.env.NEXT_PUBLIC_ADSENSE_SLOT_INLINE,
+  sticky: process.env.NEXT_PUBLIC_ADSENSE_SLOT_STICKY,
+  video: process.env.NEXT_PUBLIC_ADSENSE_SLOT_VIDEO,
+};
+
 // Ad size mapping to reserve space and prevent Cumulative Layout Shift (CLS)
 const AD_DIMENSIONS: Record<Placement, { width: string; height: string }> = {
   top: { width: "100%", height: "90px" }, // e.g., Leaderboard 728x90
@@ -43,6 +58,17 @@ export function AdSlot({ placement, className }: { placement: Placement; classNa
   }, []);
 
   const dimensions = AD_DIMENSIONS[placement];
+  const adSlot = ADSENSE_SLOTS[placement];
+
+  useEffect(() => {
+    if (!isLoaded || !adSlot || typeof window === "undefined") return;
+
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (error) {
+      console.warn("[AdSense] Could not request ad", error instanceof Error ? error.message : error);
+    }
+  }, [adSlot, isLoaded]);
 
   return (
     <div
@@ -57,8 +83,16 @@ export function AdSlot({ placement, className }: { placement: Placement; classNa
         className,
       )}
     >
-      {/* FIXED: Beautiful Patterned Background for Placeholder instead of a dead gray box */}
-      {!isLoaded && (
+      {adSlot && isLoaded ? (
+        <ins
+          className="adsbygoogle block min-h-full w-full"
+          style={{ display: "block" }}
+          data-ad-client={ADSENSE_CLIENT}
+          data-ad-slot={adSlot}
+          data-ad-format="auto"
+          data-full-width-responsive="true"
+        />
+      ) : !isLoaded ? (
         <>
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.04] dark:opacity-[0.06]"
@@ -73,6 +107,8 @@ export function AdSlot({ placement, className }: { placement: Placement; classNa
             {tCommon("advertisement")}
           </span>
         </>
+      ) : (
+        <span className="text-muted text-center text-xs">Advertisement</span>
       )}
     </div>
   );

@@ -67,7 +67,7 @@ export function ArticlePage({ article, author, related }: { article: Article; au
               fill
               priority
               sizes="(max-width: 1200px) 100vw, 1100px"
-              className="object-cover"
+              className="bg-black object-contain sm:object-cover"
             />
           </div>
           <p className="text-muted mt-2 text-xs">{article.caption}</p>

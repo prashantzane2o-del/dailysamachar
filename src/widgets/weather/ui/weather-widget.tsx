@@ -8,7 +8,7 @@ export interface WeatherWidgetProps {
   city?: string;
 }
 
-export function WeatherWidget({ city = "Meerut" }: WeatherWidgetProps) {
+export function WeatherWidget({ city }: WeatherWidgetProps) {
   const query = useWeather(city);
 
   if (query.isLoading) {

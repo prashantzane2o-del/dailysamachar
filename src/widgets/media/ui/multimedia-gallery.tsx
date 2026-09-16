@@ -103,7 +103,7 @@ export const MultimediaGallery: React.FC<MultimediaGalleryProps> = ({ sectionTit
                 alt={featuredItem.imageAlt || featuredItem.title}
                 fill
                 sizes="(max-width: 1024px) 100vw, 66vw"
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                className="bg-black object-contain transition-transform duration-700 ease-out sm:object-cover sm:group-hover:scale-105"
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center bg-gray-800 text-gray-500">
@@ -162,7 +162,7 @@ export const MultimediaGallery: React.FC<MultimediaGalleryProps> = ({ sectionTit
                     alt={item.imageAlt || item.title}
                     fill
                     sizes="(max-width: 1024px) 50vw, 33vw"
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                    className="bg-black object-contain transition-transform duration-700 ease-out sm:object-cover sm:group-hover:scale-110"
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center bg-gray-800 text-gray-500">

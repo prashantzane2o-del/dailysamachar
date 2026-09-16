@@ -8,6 +8,7 @@ import { getLocalizedPath } from "@/i18n/path";
 import { cmsApi } from "@/shared/api/cms";
 import { ArticleCard } from "@/entities/article/ui/article-card";
 import { Container, Section } from "@/components/layout/layout";
+import { AdSlot } from "@/widgets/ads/ad-slot";
 
 interface CategoryPageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -25,6 +26,13 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   return {
     title: `${category.name} News - Latest Updates | DailySamachar`,
     description: category.description || `Read the latest news, updates, and articles about ${category.name}.`,
+    alternates: {
+      canonical: `${getLocalizedPath(locale, `/category/${category.slug}`)}`,
+      languages: {
+        en: `/category/${category.slug}`,
+        hi: `/hi/category/${category.slug}`,
+      },
+    },
     openGraph: {
       title: `${category.name} News`,
       description: category.description || `Latest ${category.name} news.`,
@@ -86,6 +94,8 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                   <ArticleCard key={article.id} article={article} />
                 ))}
               </div>
+
+              <AdSlot placement="inline" className="mt-12" />
 
               {totalPages > 1 && (
                 <nav

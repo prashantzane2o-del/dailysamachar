@@ -7,6 +7,23 @@ const requestSchema = z.object({
   target: z.enum(["hi", "en"]),
 });
 
+async function translateWithMyMemory(texts: string[], source: "hi" | "en", target: "hi" | "en") {
+  const translated = await Promise.all(
+    texts.map(async (text) => {
+      const url = new URL("https://api.mymemory.translated.net/get");
+      url.searchParams.set("q", text);
+      url.searchParams.set("langpair", `${source}|${target}`);
+      const response = await fetch(url, { cache: "no-store" });
+      if (!response.ok) throw new Error(`Free translation returned ${response.status}`);
+      const result = (await response.json()) as { responseData?: { translatedText?: string } };
+      const value = result.responseData?.translatedText;
+      if (!value) throw new Error("Free translation returned empty text");
+      return value;
+    }),
+  );
+  return translated;
+}
+
 export async function POST(request: Request) {
   try {
     const input = requestSchema.parse(await request.json());
@@ -17,7 +34,8 @@ export async function POST(request: Request) {
 
     const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY;
     if (!apiKey || apiKey === "replace-with-google-translate-api-key") {
-      return NextResponse.json({ error: "Google Translate is not configured yet." }, { status: 503 });
+      const texts = await translateWithMyMemory(input.texts, input.source, input.target);
+      return NextResponse.json({ texts });
     }
 
     const endpoint = process.env.GOOGLE_TRANSLATE_API_URL || "https://translation.googleapis.com/language/translate/v2";

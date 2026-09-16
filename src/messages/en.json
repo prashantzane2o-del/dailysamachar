@@ -19,7 +19,13 @@
     "loading": "Loading",
     "language": "Change language",
     "switchToEnglish": "English",
-    "switchToHindi": "Hindi"
+    "switchToHindi": "Hindi",
+    "category": "Category",
+    "noArticlesFound": "No articles found.",
+    "previous": "Previous",
+    "page": "Page",
+    "of": "of",
+    "next": "Next"
   },
   "header": {
     "skipToContent": "Skip to main content",

@@ -3,17 +3,7 @@ import { z } from "zod";
 
 // Helper for safe fallbacks (never fails)
 const safeString = (fallback = "") =>
-  z.any().transform((v) => (typeof v === "string" ? v : fallback));
-
-const safeNumber = (fallback = 0) =>
-  z.any().transform((v) => {
-    if (typeof v === "number") return v;
-    if (typeof v === "string") {
-      const parsed = parseFloat(v);
-      return isNaN(parsed) ? fallback : parsed;
-    }
-    return fallback;
-  });
+  z.any().optional().transform((v) => (typeof v === "string" ? v : fallback));
 
 export const wpImageSchema = z.any().transform((v) => {
   if (v && typeof v === "object") return v;
@@ -49,14 +39,16 @@ export const wpCategorySchema = z.any().transform((v) => {
 // BULLETPROOF Article Schema: Extracts what it needs, ignores the rest, never crashes
 export const wpArticleSchema = z
   .object({
-    id: safeNumber(0),
+    // IDs and slugs are required identity fields. A post with either missing
+    // field is not safe to render or link, so the array schema skips it.
+    id: z.number().int().positive(),
+    slug: z.string().min(1),
     date: safeString(new Date().toISOString()),
     modified: safeString(new Date().toISOString()),
-    slug: safeString(""),
-    title: z.any().transform((v) => v?.rendered ?? "Untitled"),
-    content: z.any().transform((v) => v?.rendered ?? ""),
-    excerpt: z.any().transform((v) => v?.rendered ?? ""),
-    _embedded: z.any().transform((v) => v ?? {}),
+    title: z.any().optional().transform((v) => v?.rendered ?? "Untitled"),
+    content: z.any().optional().transform((v) => v?.rendered ?? ""),
+    excerpt: z.any().optional().transform((v) => v?.rendered ?? ""),
+    _embedded: z.any().optional().transform((v) => v ?? {}),
   })
   .passthrough();
 

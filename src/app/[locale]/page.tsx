@@ -29,6 +29,15 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
   return {
     title: t("title", { fallback: "DailySamachar | Latest News" }),
     description: t("description", { fallback: "Verified, independent news." }),
+    alternates: {
+      canonical: locale === "en" ? "/" : `/${locale}`,
+      languages: { en: "/", hi: "/hi" },
+    },
+    openGraph: {
+      type: "website",
+      locale: locale === "hi" ? "hi_IN" : "en_IN",
+      siteName: "DailySamachar",
+    },
   };
 }
 
@@ -61,11 +70,13 @@ export default async function HomePage({ params }: HomePageProps) {
   const heroStories = latestArticles.slice(0, 5);
   const latestRailArticles = latestArticles.slice(5);
 
-  // Robust Set for category exclusion to prevent matching errors
+  // Render every non-utility category returned by WordPress. The homepage used
+  // to slice this list to five items, which silently hid the remaining CMS
+  // categories even though the API returned them successfully.
   const excludedSlugs = new Set(["uncategorized", "web-stories", "webstories", "breaking", "breaking-news"]);
-  const validCategories = allCategories
-    .filter((cat) => cat.slug && !excludedSlugs.has(cat.slug.toLowerCase()))
-    .slice(0, 5);
+  const validCategories = allCategories.filter(
+    (cat) => cat.slug && !excludedSlugs.has(cat.slug.trim().toLowerCase()),
+  );
 
   return (
     <div className="flex w-full flex-col pb-12">
@@ -81,7 +92,7 @@ export default async function HomePage({ params }: HomePageProps) {
           <MetalsTicker />
         </div>
         <div className="flex max-w-full min-w-0 md:flex-1 md:justify-end">
-          <WeatherTicker city="New Delhi" />
+          <WeatherTicker />
         </div>
       </section>
 

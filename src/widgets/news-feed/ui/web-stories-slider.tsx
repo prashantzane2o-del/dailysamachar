@@ -70,7 +70,7 @@ export async function WebStoriesSlider({ locale }: WebStoriesSliderProps) {
                 alt={story.imageAlt || stripCmsHtml(story.title)}
                 fill
                 sizes="(max-width: 768px) 150px, 240px"
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                className="bg-black object-contain transition-transform duration-700 ease-out sm:object-cover sm:group-hover:scale-105"
               />
 
               {/* Dark Gradient Overlay for Text Readability */}

@@ -11,7 +11,13 @@ type CardSize = "sm" | "md" | "lg";
 
 function CmsImage({ src, alt, className, sizes }: { src?: string; alt: string; className?: string; sizes: string }) {
   return src ? (
-    <Image src={src} alt={alt} fill sizes={sizes} className={cn("image-zoom object-cover", className)} />
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      sizes={sizes}
+      className={cn("image-zoom bg-slate-100 object-contain sm:object-cover dark:bg-slate-900", className)}
+    />
   ) : (
     <div className="text-muted bg-soft grid h-full place-items-center">
       <span className="text-xs font-bold tracking-widest uppercase">DailySamachar</span>

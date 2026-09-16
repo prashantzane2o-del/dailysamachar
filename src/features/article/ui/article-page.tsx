@@ -94,7 +94,7 @@ export async function ArticlePage({ article, related, locale }: ArticlePageProps
                         fill
                         priority
                         sizes="(max-width: 768px) 100vw, 768px"
-                        className="object-cover"
+                        className="bg-black object-contain sm:object-cover"
                       />
                       {article.caption && (
                         <figcaption className="absolute inset-x-0 bottom-0 bg-black/65 px-4 py-3 text-sm text-white">

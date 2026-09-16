@@ -142,9 +142,15 @@ export const ReadingToolbar: React.FC<ReadingToolbarProps> = ({
     setIsAudioPaused(false);
 
     let completed = 0;
+    // Prefer a Hindi voice for both Hindi and English articles. Browser voice
+    // availability differs by device, so the language fallback remains active.
+    const hindiVoice = speech
+      .getVoices()
+      .find((voice) => voice.lang.toLowerCase() === "hi-in" || voice.lang.toLowerCase().startsWith("hi"));
     chunks.forEach((chunk) => {
       const utterance = new SpeechSynthesisUtterance(chunk);
       utterance.lang = currentSpeechLocale === "hi" ? "hi-IN" : "en-IN";
+      if (hindiVoice) utterance.voice = hindiVoice;
       utterance.rate = 0.95;
       utterance.onend = () => {
         completed += 1;

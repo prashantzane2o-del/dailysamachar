@@ -4,7 +4,7 @@
 import { CloudSun, Droplets, Wind, AlertCircle } from "lucide-react";
 import { useWeather } from "@/entities/weather/lib/use-weather";
 
-export function WeatherTicker({ city = "New Delhi" }: { city?: string }) {
+export function WeatherTicker({ city }: { city?: string }) {
   const query = useWeather(city);
 
   if (query.isLoading) {

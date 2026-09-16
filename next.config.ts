@@ -26,13 +26,13 @@ const contentSecurityPolicy = [
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' https://quge5.com https://n6wxm.com https://al5sm.com https://omg10.com https://pagead2.googlesyndication.com${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data:",
   // Added api.dailysamachar.org to allow WordPress media images
-  "img-src 'self' data: blob: https://dailysamachar.org https://api.dailysamachar.org https://images.unsplash.com https://secure.gravatar.com",
+  "img-src 'self' data: blob: https://dailysamachar.org https://api.dailysamachar.org https://images.unsplash.com https://secure.gravatar.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net",
   "media-src 'self' https://dailysamachar.org https://api.dailysamachar.org",
-  "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://twitter.com https://platform.twitter.com",
+  "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://twitter.com https://platform.twitter.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com",
   "worker-src 'self' blob:",
   [
     "connect-src 'self'",
@@ -40,7 +40,16 @@ const contentSecurityPolicy = [
     "https://api.dailysamachar.org",
     "https://api.open-meteo.com",
     "https://geocoding-api.open-meteo.com",
+    "https://ipwho.is",
+    "https://api.mymemory.translated.net",
     "https://www.goldapi.io",
+    "https://quge5.com",
+    "https://n6wxm.com",
+    "https://al5sm.com",
+    "https://omg10.com",
+    "https://pagead2.googlesyndication.com",
+    "https://googleads.g.doubleclick.net",
+    "https://tpc.googlesyndication.com",
     configuredWordPressOrigin,
     configuredPrivateWordPressOrigin,
     configuredMarketOrigin,
@@ -87,7 +96,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/Logo.svg",
-        headers: [{ key: "Content-Type", value: "image/png" }],
+        headers: [{ key: "Content-Type", value: "image/svg+xml" }],
       },
       {
         source: "/(.*)",

@@ -55,7 +55,7 @@ export function ArticleCard({ article, isHindi = true }: ArticleCardProps) {
               alt={`Cover image for ${stripCmsHtml(displayTitle)}`}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="bg-slate-100 object-contain transition-transform duration-500 sm:object-cover sm:group-hover:scale-105 dark:bg-slate-900"
             />
           ) : (
             <div className="text-muted bg-soft absolute inset-0 flex items-center justify-center font-medium">

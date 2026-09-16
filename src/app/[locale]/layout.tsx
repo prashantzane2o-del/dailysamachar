@@ -8,12 +8,21 @@ import { SiteFooter } from "@/widgets/site-footer";
 import { SiteHeader } from "@/widgets/site-header";
 import { AppProviders } from "../providers";
 import { DraftBanner } from "@/components/draft-banner";
+import { MonetagScripts } from "@/widgets/ads/monetag-scripts";
+import { GoogleAdSenseScript } from "@/widgets/ads/google-adsense-script";
 
 import "../globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://dailysamachar.org"),
   title: "DailySamachar.org",
   description: "Verified, independent news from India and around the world.",
+  alternates: {
+    languages: {
+      en: "/",
+      hi: "/hi",
+    },
+  },
   icons: {
     icon: "/Logo.svg",
     apple: "/Logo.svg",
@@ -61,6 +70,8 @@ export default async function LocaleLayout({
 
             <SiteFooter />
             <DraftBanner />
+            <MonetagScripts />
+            <GoogleAdSenseScript />
           </AppProviders>
         </NextIntlClientProvider>
       </body>

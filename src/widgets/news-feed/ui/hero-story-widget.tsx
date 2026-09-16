@@ -133,7 +133,7 @@ export function HeroStoryWidget({
                 fill
                 priority={activeIndex === 0}
                 sizes="(max-width: 768px) 100vw, 1200px"
-                className="object-cover"
+                className="bg-black object-contain sm:object-cover"
               />
             ) : (
               <div className="absolute inset-0 bg-slate-800" aria-hidden="true" />

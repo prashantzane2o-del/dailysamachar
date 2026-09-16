@@ -6,7 +6,7 @@ import { Cloud, CloudLightning, CloudRain, RotateCcw, Snowflake, Sun } from "luc
 import { useTranslations } from "next-intl";
 import { useWeather } from "@/entities/weather/lib/use-weather";
 
-export function WeatherPanel({ city = "New Delhi" }: { city?: string }) {
+export function WeatherPanel({ city }: { city?: string }) {
   const t = useTranslations("common");
 
   // Note: Ensure your useWeather hook returns these properties or adjust slightly if needed.

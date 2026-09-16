@@ -26,7 +26,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     MAX_PAGE_SIZE,
     parsePositiveInteger(request.nextUrl.searchParams.get("perPage"), DEFAULT_PAGE_SIZE),
   );
-  const category = getCategoryFilter(request.nextUrl.searchParams.get("categoryId"));
+  const category = getCategoryFilter(
+    request.nextUrl.searchParams.get("categoryId") ?? request.nextUrl.searchParams.get("categorySlug"),
+  );
 
   try {
     const data = await cmsApi.getArticles({ page, perPage, ...category });

@@ -313,6 +313,11 @@ export class WordPressAdapter {
           ...fetchOptions,
         });
 
+        if (!response.ok) {
+          console.error(`🚨 [WP API Error] HTTP ${response.status} from ${url.toString()}.`);
+          throw new WordPressHttpError(response.status, url);
+        }
+
         const textData = await response.text();
         let rawData: unknown;
         try {
@@ -320,11 +325,6 @@ export class WordPressAdapter {
         } catch {
           console.error(`🚨 [WP API Error] Invalid JSON from ${url.toString()}. Snippet:`, textData.slice(0, 200));
           throw new Error(`WP returned invalid JSON.`);
-        }
-
-        if (!response.ok) {
-          console.error(`🚨 [WP API Error] HTTP ${response.status} from ${url.toString()}.`);
-          throw new WordPressHttpError(response.status, url);
         }
 
         const parsed = schema.safeParse(rawData);
@@ -336,6 +336,10 @@ export class WordPressAdapter {
         this.unavailableUntil = 0;
         return { data: parsed.data, response };
       } catch (error) {
+        const isPermanentHttpError = error instanceof WordPressHttpError && error.status >= 400 && error.status < 500;
+        if (isPermanentHttpError) {
+          throw error;
+        }
         if (attempt === retries) {
           this.unavailableUntil = Date.now() + UNAVAILABLE_BACKEND_COOLDOWN_MS;
           // FIX: Pass the error object to console.error so it is visible in the terminal

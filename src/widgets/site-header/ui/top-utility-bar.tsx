@@ -25,7 +25,6 @@ export function TopUtilityBar() {
   }, [locale]);
 
   return (
-    // FIXED: Changed to light background (bg-slate-50) and black text (text-slate-900) to match the white header perfectly
     <div className="border-b border-slate-200 bg-slate-50 py-1.5 text-[11px] font-bold tracking-wide text-slate-900 sm:text-[13px]">
       <div className="container mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left Side: Live Indicator, Date & Clock */}

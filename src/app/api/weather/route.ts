@@ -1,48 +1,54 @@
-// src/app/api/weather/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { weatherApi } from "@/entities/weather/api/weather.api";
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
-  const defaultCity = process.env.DEFAULT_WEATHER_CITY || "Meerut";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-  // 1. Check if a specific city was requested via URL
-  let queryParam = request.nextUrl.searchParams.get("city")?.trim().slice(0, 80);
+function getClientIp(request: NextRequest): string | null {
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  const candidate =
+    request.headers.get("cf-connecting-ip") ||
+    request.headers.get("x-real-ip") ||
+    forwardedFor?.split(",")[0]?.trim();
 
-  // 2. If no city provided, detect user's IP Address
-  if (!queryParam) {
-    const forwardedFor = request.headers.get("x-forwarded-for");
-    const realIp = request.headers.get("x-real-ip");
-    
-    // Extract the first IP if multiple exist (request.ip removed to fix TS error)
-    const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : realIp;
+  if (!candidate || candidate === "::1" || candidate === "127.0.0.1" || candidate === "localhost") return null;
+  if (candidate.startsWith("10.") || candidate.startsWith("192.168.") || candidate.startsWith("172.16.")) return null;
+  return candidate;
+}
 
-    // WeatherAPI accepts public IP addresses. 
-    // If it's a local IP (development), fallback to default city.
-    if (ip && ip !== "::1" && ip !== "127.0.0.1" && ip !== "localhost") {
-      queryParam = ip;
-    } else {
-      queryParam = defaultCity;
-    }
-  }
-
-  // FIXED: Ensure finalQuery is strictly a string to resolve the TS type error
-  const finalQuery = queryParam || defaultCity;
+async function getCityFromIp(ip: string | null): Promise<string | null> {
+  if (!ip) return null;
 
   try {
-    const weather = await weatherApi.getWeatherByCity(finalQuery);
-    
+    const response = await fetch(`https://ipwho.is/${encodeURIComponent(ip)}?fields=success,city`, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(3_000),
+    });
+    if (!response.ok) return null;
+    const result = (await response.json()) as { success?: boolean; city?: string };
+    return result.success && result.city?.trim() ? result.city.trim() : null;
+  } catch (error) {
+    console.warn("[Weather] IP geolocation unavailable", error instanceof Error ? error.message : error);
+    return null;
+  }
+}
+
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  const defaultCity = process.env.DEFAULT_WEATHER_CITY || "Meerut";
+  const requestedCity = request.nextUrl.searchParams.get("city")?.trim().slice(0, 80);
+  const detectedCity = requestedCity || (await getCityFromIp(getClientIp(request)));
+  const finalCity = detectedCity || defaultCity;
+
+  try {
+    const weather = await weatherApi.getWeatherByCity(finalCity);
     return NextResponse.json(weather, {
-      // Dynamic IP data shouldn't be cached globally for too long
-      headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120" },
+      headers: { "Cache-Control": "private, no-store" },
     });
   } catch (error) {
     console.error("Weather API error", error);
     return NextResponse.json(
       { error: "Weather unavailable" },
-      {
-        status: 502,
-        headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" },
-      },
+      { status: 502, headers: { "Cache-Control": "private, no-store" } },
     );
   }
 }
