@@ -48,7 +48,7 @@ const MAX_SITEMAP_PAGES = 500;
 const UNAVAILABLE_BACKEND_COOLDOWN_MS = 5_000;
 
 export const DEFAULT_WORDPRESS_API_URL = "https://api.dailysamachar.org";
-export const DEFAULT_ARTICLE_IMAGE = "/Logo.svg";
+export const DEFAULT_ARTICLE_IMAGE = "/Logo.png";
 
 // --- AAA Utility Functions ---
 

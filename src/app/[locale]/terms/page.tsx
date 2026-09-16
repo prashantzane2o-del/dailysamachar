@@ -1,23 +1,19 @@
-import type { Metadata } from "next";
 import { StaticPage } from "@/features/home/components/static-page";
+import { getStaticPageMetadata } from "@/shared/lib/page-metadata";
+import type { Locale } from "@/i18n/routing";
 
 // 1. ADDED: SEO Metadata for static policy pages (Architecture SEO Standards)
-export const metadata: Metadata = {
-  title: "Terms of Use | DailySamachar",
-  description: "Terms of use and copyright information for DailySamachar content and reporting.",
-  alternates: {
-    canonical: "/terms",
-  },
-  openGraph: {
-    title: "Terms of Use | DailySamachar",
-    description: "Terms of use and copyright information for DailySamachar.",
-    type: "website",
-  },
-};
+const description = "Terms of use, copyright information and service expectations for DailySamachar readers.";
 
-export default function TermsPage() {
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
+  const { locale } = await params;
+  return getStaticPageMetadata({ locale, path: "/terms", title: "Terms of Use | DailySamachar", description });
+}
+
+export default async function TermsPage({ params }: { params: Promise<{ locale: Locale }> }) {
+  const { locale } = await params;
   return (
-    <StaticPage eyebrow="Legal" title="Terms of use.">
+    <StaticPage locale={locale} path="/terms" description={description} eyebrow="Legal" title="Terms of use.">
       {/* 2. Added proper text styles and semantic spacing for readability */}
       <div className="prose prose-slate text-muted max-w-none" aria-label="Terms and conditions">
         <p className="text-lg leading-relaxed">

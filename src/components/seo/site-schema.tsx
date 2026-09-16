@@ -13,14 +13,22 @@ export function SiteSchema({ locale }: SiteSchemaProps) {
     {
       "@context": "https://schema.org",
       "@type": "Organization",
+      "@id": `${baseUrl}/#organization`,
       name: "DailySamachar",
       url: `${baseUrl}${sitePath}`,
-      logo: `${baseUrl}/Logo.svg`,
+      logo: `${baseUrl}/Logo.png`,
       description: "Verified, independent news from India and around the world.",
+      email: "news@dailysamachar.org",
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "newsroom",
+        email: "news@dailysamachar.org",
+      },
     },
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
+      "@id": `${baseUrl}/#website`,
       name: "DailySamachar",
       url: `${baseUrl}${sitePath}`,
       inLanguage: locale,

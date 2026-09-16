@@ -66,7 +66,7 @@ export async function WebStoriesSlider({ locale }: WebStoriesSliderProps) {
             >
               {/* Portrait Image */}
               <Image
-                src={story.image || "/Logo.svg"}
+                src={story.image || "/Logo.png"}
                 alt={story.imageAlt || stripCmsHtml(story.title)}
                 fill
                 sizes="(max-width: 768px) 150px, 240px"

@@ -18,7 +18,7 @@ export function BrandLogo({ className, noLink = false }: BrandLogoProps) {
   const LogoContent = (
     <div className={wrapperClasses}>
       <Image
-        src="/Logo.svg"
+        src="/Logo.png"
         alt="Daily Samachar Official Logo"
         width={240}
         height={90}

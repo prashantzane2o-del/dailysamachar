@@ -52,7 +52,7 @@ export function ArticleSchema({ article, url, locale }: ArticleSchemaProps) {
       url: origin,
       logo: {
         "@type": "ImageObject",
-        url: `${origin}/Logo.svg`,
+        url: `${origin}/Logo.png`,
       },
     },
     description: articleDescription(article),

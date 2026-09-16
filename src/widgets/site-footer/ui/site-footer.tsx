@@ -47,6 +47,9 @@ export async function SiteFooter() {
               (DailySamachar.org) - Verified, independent news from India and around the world. We bring you the stories
               that shape our times.
             </p>
+            <a className="text-footer-foreground text-sm font-semibold underline underline-offset-4" href="mailto:news@dailysamachar.org">
+              news@dailysamachar.org
+            </a>
           </div>
 
           {/* Column 2: Top Categories (Now 100% Dynamic) */}

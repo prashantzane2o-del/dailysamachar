@@ -26,13 +26,13 @@ const contentSecurityPolicy = [
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  `script-src 'self' 'unsafe-inline' https://quge5.com https://n6wxm.com https://al5sm.com https://omg10.com https://pagead2.googlesyndication.com${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' https://quge5.com https://n6wxm.com https://al5sm.com https://nap5k.com https://5gvci.com https://omg10.com https://6opo.com https://pagead2.googlesyndication.com https://fundingchoicesmessages.google.com${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data:",
   // Added api.dailysamachar.org to allow WordPress media images
-  "img-src 'self' data: blob: https://dailysamachar.org https://api.dailysamachar.org https://images.unsplash.com https://secure.gravatar.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net",
+  "img-src 'self' data: blob: https://dailysamachar.org https://api.dailysamachar.org https://images.unsplash.com https://secure.gravatar.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://*.googlesyndication.com",
   "media-src 'self' https://dailysamachar.org https://api.dailysamachar.org",
-  "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://twitter.com https://platform.twitter.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com",
+  "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://twitter.com https://platform.twitter.com https://googleads.g.doubleclick.net https://securepubads.g.doubleclick.net https://tpc.googlesyndication.com https://*.googlesyndication.com",
   "worker-src 'self' blob:",
   [
     "connect-src 'self'",
@@ -47,9 +47,18 @@ const contentSecurityPolicy = [
     "https://n6wxm.com",
     "https://al5sm.com",
     "https://omg10.com",
+    "https://6opo.com",
+    "https://5gvci.com",
+    "https://nap5k.com",
     "https://pagead2.googlesyndication.com",
     "https://googleads.g.doubleclick.net",
+    "https://securepubads.g.doubleclick.net",
     "https://tpc.googlesyndication.com",
+    "https://fundingchoicesmessages.google.com",
+    "https://adservice.google.com",
+    "https://www.google.com",
+    "https://www.googleadservices.com",
+    "https://*.googlesyndication.com",
     configuredWordPressOrigin,
     configuredPrivateWordPressOrigin,
     configuredMarketOrigin,
@@ -95,8 +104,8 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/Logo.svg",
-        headers: [{ key: "Content-Type", value: "image/svg+xml" }],
+        source: "/Logo.png",
+        headers: [{ key: "Content-Type", value: "image/png" }],
       },
       {
         source: "/(.*)",

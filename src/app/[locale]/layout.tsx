@@ -10,6 +10,7 @@ import { AppProviders } from "../providers";
 import { DraftBanner } from "@/components/draft-banner";
 import { MonetagScripts } from "@/widgets/ads/monetag-scripts";
 import { GoogleAdSenseScript } from "@/widgets/ads/google-adsense-script";
+import { SiteSchema } from "@/components/seo/site-schema";
 
 import "../globals.css";
 
@@ -24,8 +25,8 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/Logo.svg",
-    apple: "/Logo.svg",
+    icon: "/Logo.png",
+    apple: "/Logo.png",
   },
 };
 
@@ -51,10 +52,14 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} dir={locale === "ur" || locale === "ar" ? "rtl" : "ltr"} suppressHydrationWarning>
+      <head>
+        <GoogleAdSenseScript />
+      </head>
       {/* FIXED: Removed conflicting dark:bg-ink and let CSS variables handle the theme automatically */}
       <body className="bg-background text-foreground selection:bg-brand-accent flex min-h-screen flex-col font-sans antialiased selection:text-white">
         <NextIntlClientProvider messages={messages}>
           <AppProviders>
+            <SiteSchema locale={locale} />
             <a
               href="#main-content"
               className="focus:bg-brand-primary focus:ring-brand-accent sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:px-4 focus:py-2 focus:text-white focus:ring-4 focus:outline-none"
@@ -71,7 +76,6 @@ export default async function LocaleLayout({
             <SiteFooter />
             <DraftBanner />
             <MonetagScripts />
-            <GoogleAdSenseScript />
           </AppProviders>
         </NextIntlClientProvider>
       </body>
