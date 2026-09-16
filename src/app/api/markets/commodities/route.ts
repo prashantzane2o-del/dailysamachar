@@ -3,9 +3,14 @@ import { NextResponse } from "next/server";
 import { MarketDataSchema } from "@/entities/market/model/types";
 
 const CURRENCY = "INR";
-// Removed the hardcoded API key for security
-const API_KEY = process.env.GOLD_API_KEY; 
 const API_URL = "https://www.goldapi.io/api/price";
+
+// Read the secret at request time so serverless deployments use the current
+// runtime environment. Aliases keep older deployments compatible without
+// exposing a provider key to the browser.
+function getApiKey() {
+  return process.env.GOLD_API_KEY?.trim() || process.env.GOLDAPI_API_KEY?.trim() || process.env.GOLD_API_TOKEN?.trim();
+}
 
 type GoldApiResponse = {
   price?: number;
@@ -22,7 +27,7 @@ type GoldApiResponse = {
 
 async function getCommodity(symbol: "GOLD" | "SILVER", token: string | undefined) {
   if (!token) {
-    throw new Error("GOLD_API_KEY is not defined in the environment variables");
+    throw new Error("GoldAPI server secret is not configured");
   }
 
   const endpoint = `${API_URL}/${symbol === "GOLD" ? "XAU" : "XAG"}/${CURRENCY}`;
@@ -76,9 +81,10 @@ async function getCommodity(symbol: "GOLD" | "SILVER", token: string | undefined
 
 export async function GET(): Promise<NextResponse> {
   try {
+    const apiKey = getApiKey();
     const data = await Promise.all([
-      getCommodity("GOLD", API_KEY),
-      getCommodity("SILVER", API_KEY),
+      getCommodity("GOLD", apiKey),
+      getCommodity("SILVER", apiKey),
     ]);
 
     return NextResponse.json(MarketDataSchema.parse(data), {
