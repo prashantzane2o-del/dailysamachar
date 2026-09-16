@@ -3,6 +3,20 @@ import { cmsApi } from "@/shared/api/cms";
 import { ArticleCard } from "@/entities/article/ui/article-card";
 import { Link } from "@/i18n/navigation";
 import { ArrowRight } from "lucide-react";
+import { BookOpenText, BriefcaseBusiness, Cpu, Film, Globe2, HeartPulse, Landmark, Newspaper, Sparkles, Trophy, Utensils } from "lucide-react";
+
+const categoryIcons = {
+  business: BriefcaseBusiness,
+  entertainment: Film,
+  lifestyle: Sparkles,
+  sports: Trophy,
+  technology: Cpu,
+  health: HeartPulse,
+  world: Globe2,
+  national: Landmark,
+  food: Utensils,
+  opinion: BookOpenText,
+} as const;
 
 export interface CategoryRowWidgetProps {
   categorySlug: string;
@@ -14,6 +28,7 @@ export async function CategoryRowWidget({ categorySlug, title, locale }: Categor
   // Fetch slightly more articles (e.g., 6) so the slider has enough items to scroll
   const articles = await cmsApi.getArticlesByCategory(categorySlug, 1, 6).catch(() => []);
   const headingId = `category-heading-${categorySlug}`;
+  const CategoryIcon = categoryIcons[categorySlug.trim().toLowerCase() as keyof typeof categoryIcons] || Newspaper;
 
   if (articles.length === 0) {
     return null; // Don't show empty category rows on the homepage to keep it clean
@@ -26,9 +41,11 @@ export async function CategoryRowWidget({ categorySlug, title, locale }: Categor
         <div className="border-line mb-6 flex items-end justify-between border-b-2 pb-3">
           <h2
             id={headingId}
-            className="text-ink flex items-center gap-3 text-2xl font-black tracking-wide uppercase md:text-3xl"
+            className="brand-section-heading text-ink flex items-center gap-3 text-2xl font-black tracking-wide uppercase md:text-3xl"
           >
-            <span className="bg-signal inline-block h-6 w-3" aria-hidden="true"></span>
+            <span className="bg-signal text-white inline-flex h-9 w-9 items-center justify-center rounded-xl shadow-sm" aria-hidden="true">
+              <CategoryIcon className="h-4 w-4" />
+            </span>
             {title}
           </h2>
 

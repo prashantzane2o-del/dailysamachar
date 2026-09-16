@@ -13,7 +13,8 @@ declare global {
   }
 }
 
-const ADSENSE_CLIENT = "ca-pub-4608193844622252";
+const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-4608193844622252";
+const isConfiguredSlot = (slot: string | undefined): slot is string => Boolean(slot && /^\d+$/.test(slot));
 const ADSENSE_SLOTS: Record<Placement, string | undefined> = {
   top: process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP,
   sidebar: process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR,
@@ -58,7 +59,7 @@ export function AdSlot({ placement, className }: { placement: Placement; classNa
   }, []);
 
   const dimensions = AD_DIMENSIONS[placement];
-  const adSlot = ADSENSE_SLOTS[placement];
+  const adSlot = isConfiguredSlot(ADSENSE_SLOTS[placement]) ? ADSENSE_SLOTS[placement] : undefined;
 
   useEffect(() => {
     if (!isLoaded || !adSlot || typeof window === "undefined") return;

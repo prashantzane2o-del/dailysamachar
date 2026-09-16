@@ -57,7 +57,7 @@ export function MobileMenuTrigger({ links = [], dropdownLinks = [] }: MobileMenu
     <div className="lg:hidden" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="hover:text-signal focus-visible:ring-signal flex h-10 w-10 items-center justify-center rounded-md text-slate-900 transition-colors hover:bg-slate-100 focus:outline-none focus-visible:ring-2"
+        className="hover:text-signal focus-visible:ring-signal flex h-10 w-10 items-center justify-center rounded-xl text-slate-900 transition-colors hover:bg-slate-100 focus:outline-none focus-visible:ring-2"
         aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
         aria-expanded={isOpen}
         aria-controls="mobile-navigation"
@@ -71,7 +71,7 @@ export function MobileMenuTrigger({ links = [], dropdownLinks = [] }: MobileMenu
           role="dialog"
           aria-modal="true"
           aria-label="Mobile Navigation Menu"
-          className="absolute top-full left-0 z-50 h-[calc(100vh-4rem)] w-full overflow-y-auto border-b border-slate-200 bg-white px-4 py-6 text-slate-900 shadow-xl"
+          className="absolute top-full left-0 z-50 h-[calc(100vh-4rem)] w-full overflow-y-auto border-b border-slate-200 bg-white px-4 py-6 text-slate-900 shadow-xl dark:border-slate-200 dark:bg-white dark:text-slate-900"
         >
           <nav className="flex flex-col gap-2">
             {links.map((nav) => (
@@ -79,7 +79,7 @@ export function MobileMenuTrigger({ links = [], dropdownLinks = [] }: MobileMenu
                 key={nav.title}
                 href={nav.href}
                 onClick={() => setIsOpen(false)}
-                className="hover:text-signal block rounded-md px-4 py-3 text-lg font-bold transition-colors hover:bg-slate-100"
+                className="hover:text-signal block rounded-xl px-4 py-3 text-lg font-bold transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
               >
                 {nav.title}
               </Link>
@@ -95,7 +95,7 @@ export function MobileMenuTrigger({ links = [], dropdownLinks = [] }: MobileMenu
                       key={nav.title}
                       href={nav.href}
                       onClick={() => setIsOpen(false)}
-                      className="hover:text-signal block rounded-md px-4 py-2.5 text-base font-semibold text-slate-700 transition-colors hover:bg-slate-100"
+                      className="hover:text-signal block rounded-xl px-4 py-2.5 text-base font-semibold text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
                     >
                       {nav.title}
                     </Link>

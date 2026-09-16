@@ -25,7 +25,7 @@ export function TopUtilityBar() {
   }, [locale]);
 
   return (
-    <div className="border-b border-slate-200 bg-slate-50 py-1.5 text-[11px] font-bold tracking-wide text-slate-900 sm:text-[13px]">
+    <div className="border-b border-slate-200 bg-slate-50 py-1.5 text-[11px] font-bold tracking-wide text-slate-900 dark:border-slate-200 dark:bg-slate-50 dark:text-slate-900 sm:text-[13px]">
       <div className="container mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left Side: Live Indicator, Date & Clock */}
         <div className="flex items-center gap-2 sm:gap-3">

@@ -19,7 +19,7 @@ export function MonetagScripts() {
         strategy="afterInteractive"
       />
       <Script id="monetag-tag-zone-11196220" strategy="afterInteractive">
-        {`(function(s){s.dataset.zone='11196220';s.src='https://al5sm.com/tag.min.js'})([document.documentElement,document.body].filter(Boolean).pop().appendChild(document.createElement('script')))}`}
+        {`(function(s){s.dataset.zone='11196220';s.src='https://al5sm.com/tag.min.js'})([document.documentElement,document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
       </Script>
       <Script
         id="monetag-tag-zone-11196222"
@@ -28,10 +28,10 @@ export function MonetagScripts() {
         strategy="afterInteractive"
       />
       <Script id="monetag-tag-zone-11196223" strategy="afterInteractive">
-        {`(function(s){s.dataset.zone='11196223';s.src='https://nap5k.com/tag.min.js'})([document.documentElement,document.body].filter(Boolean).pop().appendChild(document.createElement('script')))}`}
+        {`(function(s){s.dataset.zone='11196223';s.src='https://nap5k.com/tag.min.js'})([document.documentElement,document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
       </Script>
       <Script id="monetag-vignette-primary" strategy="afterInteractive">
-        {`(function(s){s.dataset.zone='11196225';s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement,document.body].filter(Boolean).pop().appendChild(document.createElement('script')))}`}
+        {`(function(s){s.dataset.zone='11196225';s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement,document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
       </Script>
       <Script
         id="monetag-tag-zone-253184"

@@ -11,6 +11,7 @@ import { DraftBanner } from "@/components/draft-banner";
 import { MonetagScripts } from "@/widgets/ads/monetag-scripts";
 import { GoogleAdSenseScript } from "@/widgets/ads/google-adsense-script";
 import { SiteSchema } from "@/components/seo/site-schema";
+import { AdSlot } from "@/widgets/ads/ad-slot";
 
 import "../globals.css";
 
@@ -18,6 +19,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://dailysamachar.org"),
   title: "DailySamachar.org",
   description: "Verified, independent news from India and around the world.",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+  },
   alternates: {
     languages: {
       en: "/",
@@ -69,9 +75,11 @@ export default async function LocaleLayout({
 
             <SiteHeader />
 
-            <main id="main-content" className="w-full flex-1" role="main">
+            <AdSlot placement="top" className="container mx-auto my-3 min-h-[90px] px-4 sm:px-6 lg:px-8" />
+
+            <div id="main-content" className="w-full flex-1">
               {children}
-            </main>
+            </div>
 
             <SiteFooter />
             <DraftBanner />

@@ -33,6 +33,14 @@ WORDPRESS_API_URL=https://your-wordpress-site.example
 
 Keep TLS verification enabled. Never use `NODE_TLS_REJECT_UNAUTHORIZED=0`; fix the CMS certificate or its hostname instead. To use a local WordPress instance, point both URL variables to it only after that service is listening (for example, `http://127.0.0.1:8000`).
 
+### WordPress content freshness
+
+The frontend polls WordPress-backed data with a 60-second safety TTL and also supports instant on-demand invalidation. Configure your WordPress webhook/plugin to send a `POST` request to:
+
+`https://dailysamachar.org/api/revalidate`
+
+Send the value of `REVALIDATION_SECRET_TOKEN` as either the `x-revalidation-secret` header or `Authorization: Bearer <secret>`. The body may contain `post_type`, `post_name`/`slug`, `action`, or a nested `post` object. Publish, update, and delete events should all be sent. This clears the homepage, localized pages, article pages, listings, and WordPress data cache.
+
 Verify the configured CMS before starting the frontend:
 
 ```bash

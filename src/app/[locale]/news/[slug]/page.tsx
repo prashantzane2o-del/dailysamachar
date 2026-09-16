@@ -77,7 +77,6 @@ export default async function ArticleRoute({ params }: ArticleRouteProps) {
   return (
     <>
       <ArticleSchema article={article} locale={locale} url={articleUrl} />
-      <AdSlot placement="top" className="container mx-auto my-4 px-4 sm:px-6 lg:px-8" />
       <ArticlePageView article={article} related={related} locale={locale} />
       <AdSlot placement="inline" className="container mx-auto my-8 px-4 sm:px-6 lg:px-8" />
     </>

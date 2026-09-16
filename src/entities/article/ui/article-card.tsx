@@ -10,7 +10,7 @@ export interface ArticleCardProps {
   isHindi?: boolean;
 }
 
-export function ArticleCard({ article, isHindi = true }: ArticleCardProps) {
+export function ArticleCard({ article, isHindi = false }: ArticleCardProps) {
   const displayTitle = article?.title || "Untitled";
 
   // FIXED: Removed raw HTML tags like <p> using stripCmsHtml
@@ -40,7 +40,7 @@ export function ArticleCard({ article, isHindi = true }: ArticleCardProps) {
 
   return (
     <article
-      className="group bg-paper border-line flex flex-col overflow-hidden rounded-md border shadow-sm transition-shadow duration-300 hover:shadow-md"
+      className="group bg-paper border-line flex flex-col overflow-hidden rounded-2xl border shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-red-200 hover:shadow-xl dark:hover:border-red-900"
       aria-labelledby={`article-title-${safeIdStr}`}
       dir={textDir}
     >
@@ -64,7 +64,7 @@ export function ArticleCard({ article, isHindi = true }: ArticleCardProps) {
           )}
 
           <div className="absolute top-0 left-0 z-10 m-3">
-            <span className="bg-signal rounded-sm px-2.5 py-1 text-xs font-bold tracking-wider text-white uppercase shadow-sm">
+            <span className="bg-signal rounded-full px-3 py-1 text-[10px] font-black tracking-[0.12em] text-white uppercase shadow-sm">
               {displayCategory}
             </span>
           </div>

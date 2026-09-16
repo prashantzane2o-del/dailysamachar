@@ -127,7 +127,7 @@ export function MainNavigation({ links = [], dropdownLinks = [] }: MainNavigatio
                 id={othersMenuId}
                 role="menu"
                 aria-label="Other categories"
-                className="absolute top-full right-0 z-50 mt-2 flex max-h-[min(70vh,28rem)] w-64 flex-col overflow-y-auto rounded-xl border border-slate-200 bg-white py-2 text-slate-900 shadow-xl"
+                className="absolute top-full right-0 z-50 mt-2 flex max-h-[min(70vh,28rem)] w-64 flex-col overflow-y-auto rounded-xl border border-slate-200 bg-white py-2 text-slate-900 shadow-xl dark:border-slate-200 dark:bg-white dark:text-slate-900"
               >
                 {dropdownLinks.map((link, index) => {
                   const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);

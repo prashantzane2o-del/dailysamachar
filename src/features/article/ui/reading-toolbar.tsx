@@ -2,10 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Share2, Bookmark, BookmarkCheck, Volume2, VolumeX, MessageSquare, Type } from "lucide-react";
+import { Share2, Volume2, VolumeX } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useLocalStorage } from "@/shared/hooks/use-local-storage";
-import { BOOKMARKS_STORAGE_KEY, parseBookmarks, type StoredBookmark } from "@/shared/types/bookmark";
 
 // --- Types ---
 interface ReadingToolbarProps {
@@ -37,27 +35,17 @@ function splitSpeechText(text: string, maxLength = 220) {
 
 export const ReadingToolbar: React.FC<ReadingToolbarProps> = ({
   articleId,
-  articleSlug,
-  articleTitle,
-  category,
-  articleText = articleTitle,
-  locale = "en",
-  commentCount = 0,
+  articleText = "",
 }) => {
   const t = useTranslations("articleToolbar");
 
   const [isVisible, setIsVisible] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
-  const [bookmarks, setBookmarks] = useLocalStorage<StoredBookmark[]>(BOOKMARKS_STORAGE_KEY, [], {
-    deserializer: parseBookmarks,
-  });
-  const isBookmarked = bookmarks.some((bookmark) => bookmark.id === articleId);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [isAudioPaused, setIsAudioPaused] = useState(false);
   const [audioError, setAudioError] = useState(false);
   const [isLinkCopied, setIsLinkCopied] = useState(false);
   const [currentSpeechText, setCurrentSpeechText] = useState(articleText);
-  const [currentSpeechLocale, setCurrentSpeechLocale] = useState(locale);
 
   // Scroll listener for visibility and progress bar
   useEffect(() => {
@@ -86,26 +74,12 @@ export const ReadingToolbar: React.FC<ReadingToolbarProps> = ({
     const handleLanguageChange = (event: Event) => {
       const customEvent = event as CustomEvent<{ text?: string; locale?: string }>;
       if (customEvent.detail?.text) setCurrentSpeechText(customEvent.detail.text);
-      if (customEvent.detail?.locale) setCurrentSpeechLocale(customEvent.detail.locale);
       stopAudio();
     };
 
     window.addEventListener("article-language-change", handleLanguageChange);
     return () => window.removeEventListener("article-language-change", handleLanguageChange);
   }, []);
-
-  const toggleBookmark = () => {
-    setBookmarks((current) => {
-      if (current.some((bookmark) => bookmark.id === articleId)) {
-        return current.filter((bookmark) => bookmark.id !== articleId);
-      }
-
-      return [
-        ...current,
-        { id: articleId, slug: articleSlug, title: articleTitle, category, savedAt: new Date().toISOString() },
-      ].slice(-200);
-    });
-  };
 
   const stopAudio = () => {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
@@ -142,15 +116,22 @@ export const ReadingToolbar: React.FC<ReadingToolbarProps> = ({
     setIsAudioPaused(false);
 
     let completed = 0;
-    // Prefer a Hindi voice for both Hindi and English articles. Browser voice
-    // availability differs by device, so the language fallback remains active.
+    // Hindi-only policy: never fall back to an English/default voice.
     const hindiVoice = speech
       .getVoices()
-      .find((voice) => voice.lang.toLowerCase() === "hi-in" || voice.lang.toLowerCase().startsWith("hi"));
+      .find((voice) => voice.lang.toLowerCase() === "hi-in" || voice.lang.toLowerCase().startsWith("hi-"));
+
+    if (!hindiVoice) {
+      setAudioError(true);
+      setIsPlayingAudio(false);
+      setIsAudioPaused(false);
+      return;
+    }
+
     chunks.forEach((chunk) => {
       const utterance = new SpeechSynthesisUtterance(chunk);
-      utterance.lang = currentSpeechLocale === "hi" ? "hi-IN" : "en-IN";
-      if (hindiVoice) utterance.voice = hindiVoice;
+      utterance.lang = "hi-IN";
+      utterance.voice = hindiVoice;
       utterance.rate = 0.95;
       utterance.onend = () => {
         completed += 1;
@@ -251,45 +232,6 @@ export const ReadingToolbar: React.FC<ReadingToolbarProps> = ({
               )}
 
               <div className="mx-1 h-4 w-px bg-gray-300 dark:bg-gray-700" />
-
-              <button
-                type="button"
-                className="focus:ring-signal rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-100 focus:ring-2 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-800"
-                aria-label={t("textSize", { fallback: "Adjust Text Size" })}
-              >
-                <Type className="h-4 w-4" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  const commentsSection = document.getElementById("comments-section");
-                  commentsSection?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="focus:ring-signal relative rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-100 focus:ring-2 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-800"
-                aria-label={t("jumpToComments", { fallback: "Jump to Comments" })}
-              >
-                <MessageSquare className="h-4 w-4" />
-                {commentCount > 0 && (
-                  <span className="bg-signal absolute top-0 right-0 -mt-1 -mr-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold text-white">
-                    {commentCount > 99 ? "99+" : commentCount}
-                  </span>
-                )}
-              </button>
-
-              <button
-                type="button"
-                onClick={toggleBookmark}
-                aria-pressed={isBookmarked}
-                className="focus:ring-signal rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-100 focus:ring-2 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-800"
-                aria-label={
-                  isBookmarked
-                    ? t("removeBookmark", { fallback: "Remove Bookmark" })
-                    : t("saveArticle", { fallback: "Save Article" })
-                }
-              >
-                {isBookmarked ? <BookmarkCheck className="text-signal h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
-              </button>
 
               <button
                 type="button"

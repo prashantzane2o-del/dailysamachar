@@ -41,7 +41,9 @@ type FetchJsonResult<T> = {
 const DEFAULT_PAGE_SIZE = 12;
 const MAX_PAGE_SIZE = 100;
 const REQUEST_TIMEOUT_MS = 15_000;
-const REVALIDATE_SECONDS = 3600;
+// Webhooks provide immediate invalidation; this shorter TTL is a safety net
+// when a WordPress webhook is delayed or unavailable.
+const REVALIDATE_SECONDS = 60;
 const MAX_RETRIES = 1;
 const RETRY_DELAY_MS = 800;
 const MAX_SITEMAP_PAGES = 500;

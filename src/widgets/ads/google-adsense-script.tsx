@@ -1,4 +1,4 @@
-const ADSENSE_CLIENT = "ca-pub-4608193844622252";
+const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-4608193844622252";
 
 export function GoogleAdSenseScript() {
   // AdSense requires a native head tag. next/script adds data-nscript,

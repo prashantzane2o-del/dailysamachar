@@ -5,6 +5,7 @@ import type { Article } from "@/types/news";
 import { stripCmsHtml } from "@/shared/lib/cms-html";
 import { ReadingToolbar } from "@/features/article/ui/reading-toolbar";
 import { ArticleTranslator } from "@/features/article/ui/article-translator";
+import { ArticleComments } from "@/features/article/ui/article-comments";
 
 export interface ArticlePageProps {
   article: Article;
@@ -127,6 +128,7 @@ export async function ArticlePage({ article, related, locale }: ArticlePageProps
           </aside>
         </div>
       </article>
+      <ArticleComments articleId={article.id} locale={locale} />
     </main>
   );
 }

@@ -6,14 +6,15 @@
   --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-roboto: Arial, "Segoe UI", sans-serif;
   --font-devanagari: "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif;
+  --font-serif: Georgia, "Times New Roman", serif;
 
   /* Brand Colors Derived from Logo */
-  --color-brand-blue: #0d1b2a;
-  --color-brand-blue-light: #1b263b;
+  --color-brand-blue: #071827;
+  --color-brand-blue-light: #102a43;
 
   /* Red adjusted slightly for AAA Contrast with White text */
-  --color-brand-red: #b30000;
-  --color-brand-red-light: #d90429;
+  --color-brand-red: #b00012;
+  --color-brand-red-light: #ff4052;
   --color-brand-primary: var(--brand-primary);
   --color-brand-accent: var(--brand-accent);
 
@@ -47,23 +48,23 @@
 @layer base {
   :root {
     color-scheme: light;
-    --background: var(--color-surface-light);
-    --foreground: var(--color-text-light);
+    --background: #f5f7fb;
+    --foreground: #142235;
     --brand-primary: var(--color-brand-blue);
     --brand-accent: var(--color-brand-red);
     --signal: var(--color-brand-red);
 
     /* Light Mode Equivalents */
-    --ink: #1e293b;
+    --ink: #142235;
     --paper: #ffffff;
-    --soft: #f8fafc;
-    --line: #e2e8f0;
+    --soft: #f1f5f9;
+    --line: #d8e0ea;
     --muted: var(--color-muted-light);
   }
 
   .dark {
     color-scheme: dark;
-    --background: var(--color-surface-dark);
+    --background: #07111f;
     --foreground: var(--color-text-dark);
     --brand-primary: var(--color-surface-light);
     --brand-accent: var(--color-brand-red-light);
@@ -71,9 +72,9 @@
 
     /* Dark Mode Equivalents */
     --ink: #f8fafc;
-    --paper: #0f172a;
-    --soft: #1e293b;
-    --line: #334155;
+    --paper: #0c1a2b;
+    --soft: #13263a;
+    --line: #294158;
     --muted: var(--color-muted-dark);
   }
 
@@ -85,6 +86,11 @@
     -moz-osx-font-smoothing: grayscale;
     /* Prevent horizontal scroll from unbroken content */
     overflow-x: hidden;
+    background-image: radial-gradient(circle at 8% 0%, rgba(176, 0, 18, 0.045), transparent 28rem);
+  }
+
+  .dark body {
+    background-image: radial-gradient(circle at 8% 0%, rgba(255, 64, 82, 0.08), transparent 28rem);
   }
 
   /* AAA Polish: Brand consistent text selection */
@@ -127,6 +133,27 @@
     .container-page {
       padding-inline: 2rem;
     }
+  }
+
+  .editorial {
+    font-family: var(--font-serif), Georgia, serif;
+    letter-spacing: -0.025em;
+  }
+
+  .brand-section-heading {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .brand-section-heading::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: -0.2rem;
+    left: 0;
+    z-index: -1;
+    height: 0.45rem;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--signal) 18%, transparent), transparent 72%);
   }
 }
 

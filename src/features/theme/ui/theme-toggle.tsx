@@ -36,7 +36,7 @@ export function ThemeToggle() {
       onClick={() => setTheme(isDark ? "light" : "dark")}
       aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
       title={usesSystemTheme ? `Using device ${isDark ? "dark" : "light"} theme` : isDark ? "Switch to light theme" : "Switch to dark theme"}
-      className="hover:text-signal focus-visible:ring-signal flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition-colors hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+      className="border-line hover:text-signal focus-visible:ring-signal flex h-10 w-10 items-center justify-center rounded-xl border bg-white text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
     >
       {isDark ? <Sun className="h-5 w-5" aria-hidden="true" /> : <Moon className="h-5 w-5" aria-hidden="true" />}
     </button>

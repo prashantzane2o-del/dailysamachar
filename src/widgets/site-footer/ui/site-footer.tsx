@@ -96,21 +96,12 @@ export async function SiteFooter() {
               Stay Updated
             </h3>
             <p className="text-footer-muted mb-4 text-sm">Get the latest news alerts directly in your inbox.</p>
-            <form className="flex flex-col gap-2 sm:flex-row sm:gap-0" aria-label="Newsletter signup">
-              <input
-                type="email"
-                placeholder="Email address"
-                required
-                aria-label="Email address for newsletter"
-                className="bg-footer-field focus:ring-footer-accent placeholder:text-footer-muted border-footer-line text-footer-foreground w-full min-w-0 rounded-md border px-4 py-3 focus:border-transparent focus:ring-2 focus:outline-none sm:rounded-r-none"
-              />
-              <button
-                type="submit"
-                className="bg-footer-accent hover:bg-footer-accent-hover focus:ring-offset-footer-background min-h-11 shrink-0 rounded-md px-4 py-3 font-bold text-white transition-colors focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none sm:rounded-l-none"
-              >
-                Subscribe
-              </button>
-            </form>
+            <Link
+              href="/newsletters"
+              className="bg-footer-accent hover:bg-footer-accent-hover focus:ring-offset-footer-background inline-flex min-h-11 items-center justify-center rounded-md px-5 py-3 font-bold text-white transition-colors focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none"
+            >
+              Join the Daily Brief
+            </Link>
           </div>
         </div>
       </div>

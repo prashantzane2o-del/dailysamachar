@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { checkRateLimit, clientKey } from "@/shared/lib/rate-limit";
 
 const requestSchema = z.object({
   texts: z.array(z.string().max(40_000)).min(1).max(4),
@@ -26,6 +27,10 @@ async function translateWithMyMemory(texts: string[], source: "hi" | "en", targe
 
 export async function POST(request: Request) {
   try {
+    const rate = checkRateLimit(clientKey(request, "translation"), 20, 60_000);
+    if (!rate.allowed) {
+      return NextResponse.json({ error: "Too many translation requests. Please try again shortly." }, { status: 429 });
+    }
     const input = requestSchema.parse(await request.json());
 
     if (input.source === input.target) {

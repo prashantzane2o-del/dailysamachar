@@ -77,6 +77,7 @@ export default async function HomePage({ params }: HomePageProps) {
   const validCategories = allCategories.filter(
     (cat) => cat.slug && !excludedSlugs.has(cat.slug.trim().toLowerCase()),
   );
+  const hasLifestyleCategory = validCategories.some((cat) => cat.slug.trim().toLowerCase() === "lifestyle");
 
   return (
     <div className="flex w-full flex-col pb-12">
@@ -95,11 +96,6 @@ export default async function HomePage({ params }: HomePageProps) {
           <WeatherTicker />
         </div>
       </section>
-
-      {/* Top Leaderboard Advertisement */}
-      <div className="container mx-auto px-4 pt-6 sm:px-6 lg:px-8">
-        <AdSlot placement="top" className="my-2" />
-      </div>
 
       <main className="flex w-full flex-col" role="main">
         {/* Hidden H1 for SEO and Accessibility */}
@@ -122,6 +118,12 @@ export default async function HomePage({ params }: HomePageProps) {
             <Suspense fallback={<NewsGridSkeleton count={4} />}>
               <CategoryRowWidget categorySlug={cat.slug} title={cat.title} locale={locale} />
             </Suspense>
+            {/* Keep Web Stories directly below the Lifestyle rail when that category exists. */}
+            {cat.slug.trim().toLowerCase() === "lifestyle" && (
+              <Suspense fallback={<div className="bg-soft mx-auto my-6 h-96 w-full animate-pulse" />}>
+                <WebStoriesSlider locale={locale} />
+              </Suspense>
+            )}
             {/* Insert Newsletter & Ad Card perfectly after the FIRST category row */}
             {index === 0 && (
               <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8">
@@ -134,10 +136,12 @@ export default async function HomePage({ params }: HomePageProps) {
           </React.Fragment>
         ))}
 
-        {/* Dedicated portrait Web Stories rail */}
-        <Suspense fallback={<div className="my-8 h-96 w-full animate-pulse bg-slate-900" />}>
-          <WebStoriesSlider locale={locale} />
-        </Suspense>
+        {/* Fallback for installations where the Lifestyle category is not configured yet. */}
+        {!hasLifestyleCategory && (
+          <Suspense fallback={<div className="bg-soft mx-auto my-6 h-96 w-full animate-pulse" />}>
+            <WebStoriesSlider locale={locale} />
+          </Suspense>
+        )}
       </main>
 
       {/* Section 6: Multimedia Section */}

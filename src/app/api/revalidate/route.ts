@@ -3,6 +3,7 @@ import { timingSafeEqual } from "node:crypto";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { checkRateLimit, clientKey } from "@/shared/lib/rate-limit";
 
 const WORDPRESS_POSTS_TAG = "wordpress-posts";
 const LEGACY_WORDPRESS_TAG = "wordpress";
@@ -17,10 +18,21 @@ const safeSlugSchema = z
 
 const webhookPayloadSchema = z
   .object({
+    action: z.string().trim().max(40).optional(),
     post_type: z.string().trim().max(40).optional(),
     type: z.string().trim().max(40).optional(),
+    post_id: z.union([z.string(), z.number()]).optional(),
+    id: z.union([z.string(), z.number()]).optional(),
     post_name: safeSlugSchema.optional(),
     slug: safeSlugSchema.optional(),
+    post: z
+      .object({
+        id: z.union([z.string(), z.number()]).optional(),
+        post_name: safeSlugSchema.optional(),
+        slug: safeSlugSchema.optional(),
+        post_type: z.string().trim().max(40).optional(),
+      })
+      .optional(),
   })
   .passthrough();
 
@@ -55,8 +67,8 @@ function secretsMatch(provided: string | null, expected: string | undefined): bo
 // Invalidate main feeds and cache tags
 function invalidateGlobalContent(): void {
   revalidatePath("/");
-  revalidatePath("/en");
-  revalidatePath("/hi");
+  revalidatePath("/en", "layout");
+  revalidatePath("/hi", "layout");
   revalidateTag(WORDPRESS_POSTS_TAG);
   revalidateTag(LEGACY_WORDPRESS_TAG);
 }
@@ -76,6 +88,8 @@ function invalidatePost(slug: string): void {
  */
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
+    const rate = checkRateLimit(clientKey(request, "revalidation"), 30, 60_000);
+    if (!rate.allowed) return NextResponse.json({ revalidated: false, message: "Too many requests." }, { status: 429 });
     const expectedSecret = process.env.REVALIDATION_SECRET_TOKEN ?? process.env.REVALIDATION_SECRET;
 
     // 1. Verify Secret Token
@@ -99,8 +113,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ revalidated: false, message: "Invalid WordPress webhook payload." }, { status: 400 });
     }
 
-    const postType = parsedBody.data.post_type ?? parsedBody.data.type ?? "post";
-    const slug = parsedBody.data.post_name ?? parsedBody.data.slug;
+    const nestedPost = parsedBody.data.post;
+    const postType = parsedBody.data.post_type ?? parsedBody.data.type ?? nestedPost?.post_type ?? "post";
+    const slug = parsedBody.data.post_name ?? parsedBody.data.slug ?? nestedPost?.post_name ?? nestedPost?.slug;
 
     // 3. Clear Cache based on Payload
     if (postType === "post" && slug) {
