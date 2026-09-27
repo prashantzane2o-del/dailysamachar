@@ -42,13 +42,13 @@ export async function SiteHeader() {
 
   return (
     <header
-      className="border-brand-accent sticky top-0 z-40 w-full border-b-4 bg-white text-slate-900 shadow-sm backdrop-blur transition-colors duration-300 supports-backdrop-filter:bg-white/95 dark:bg-white dark:text-slate-900"
+      className="border-line sticky top-0 z-40 w-full border-b bg-white/95 text-slate-900 shadow-[0_4px_18px_rgba(20,34,53,0.06)] backdrop-blur-xl transition-colors duration-300 supports-backdrop-filter:bg-white/85 dark:bg-white/95 dark:text-slate-900"
       aria-label="Main Site Header"
     >
       <TopUtilityBar />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-18 items-center justify-between md:h-20">
+        <div className="flex h-[4.5rem] items-center justify-between md:h-[5.25rem]">
           <div className="flex shrink-0 items-center gap-3 md:gap-6">
             <div className="block lg:hidden">
               <MobileMenuTrigger links={finalNavigationLinks} dropdownLinks={moreCategories} />

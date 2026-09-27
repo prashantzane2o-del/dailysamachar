@@ -7,6 +7,7 @@ import { Container, Section } from "@/components/layout/layout";
 export const metadata: Metadata = {
   title: "Trending News | DailySamachar",
   description: "Read the most trending and popular news stories today.",
+  robots: { index: false, follow: true },
 };
 
 export default async function TrendingNewsPage() {

@@ -31,12 +31,12 @@ export function NewsGridWidget({
     <section className={cn(className)} aria-labelledby={`grid-heading-${title.replace(/\s+/g, "-").toLowerCase()}`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Heading with View All */}
-        <div className="border-line mb-6 flex items-end justify-between border-b-2 pb-3">
+        <div className="border-line mb-6 flex items-center justify-between border-b pb-3">
           <h2
             id={`grid-heading-${title.replace(/\s+/g, "-").toLowerCase()}`}
-            className="text-ink flex items-center gap-3 text-2xl font-black tracking-wide uppercase md:text-3xl"
+            className="editorial text-ink flex items-center gap-3 text-2xl font-bold tracking-tight md:text-3xl"
           >
-            <span className="bg-signal inline-block h-6 w-3" aria-hidden="true"></span>
+            <span className="bg-signal inline-block h-5 w-1.5" aria-hidden="true"></span>
             {title}
           </h2>
 

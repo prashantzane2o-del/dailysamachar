@@ -40,7 +40,7 @@ export function ArticleCard({ article, isHindi = false }: ArticleCardProps) {
 
   return (
     <article
-      className="group bg-paper border-line flex flex-col overflow-hidden rounded-2xl border shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-red-200 hover:shadow-xl dark:hover:border-red-900"
+      className="group bg-paper border-line flex flex-col overflow-hidden rounded-xl border shadow-[0_8px_24px_rgba(20,34,53,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-red-200 hover:shadow-[0_14px_30px_rgba(20,34,53,0.10)] dark:hover:border-red-900"
       aria-labelledby={`article-title-${safeIdStr}`}
       dir={textDir}
     >
@@ -55,7 +55,7 @@ export function ArticleCard({ article, isHindi = false }: ArticleCardProps) {
               alt={`Cover image for ${stripCmsHtml(displayTitle)}`}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="bg-slate-100 object-contain transition-transform duration-500 sm:object-cover sm:group-hover:scale-105 dark:bg-slate-900"
+              className="bg-slate-100 object-cover transition-transform duration-500 group-hover:scale-[1.03] dark:bg-slate-900"
             />
           ) : (
             <div className="text-muted bg-soft absolute inset-0 flex items-center justify-center font-medium">
@@ -64,7 +64,7 @@ export function ArticleCard({ article, isHindi = false }: ArticleCardProps) {
           )}
 
           <div className="absolute top-0 left-0 z-10 m-3">
-            <span className="bg-signal rounded-full px-3 py-1 text-[10px] font-black tracking-[0.12em] text-white uppercase shadow-sm">
+            <span className="bg-signal rounded-md px-2.5 py-1 text-[10px] font-black tracking-[0.12em] text-white uppercase shadow-sm">
               {displayCategory}
             </span>
           </div>

@@ -43,14 +43,16 @@ export const weatherApi = {
   async getWeatherByCity(city: string): Promise<WeatherData> {
     try {
       const locationResponse = await fetch(
-        `${GEOCODING_URL}?name=${encodeURIComponent(city)}&count=1&language=en&format=json`,
+        `${GEOCODING_URL}?name=${encodeURIComponent(city)}&count=10&language=en&countryCode=IN&format=json`,
         { next: { revalidate: 86_400 } },
       );
       if (!locationResponse.ok) throw new Error(`Weather geocoding returned ${locationResponse.status}`);
       const locationData = (await locationResponse.json()) as {
-        results?: Array<{ name?: string; latitude?: number; longitude?: number }>;
+        results?: Array<{ name?: string; latitude?: number; longitude?: number; country_code?: string }>;
       };
-      const location = locationData.results?.[0];
+      const location = locationData.results?.find(
+        (result) => result.country_code?.toUpperCase() === "IN" && typeof result.latitude === "number" && typeof result.longitude === "number",
+      );
       if (!location || typeof location.latitude !== "number" || typeof location.longitude !== "number") {
         throw new Error("Weather location was not found");
       }
@@ -88,21 +90,7 @@ export const weatherApi = {
       };
     } catch (error) {
       console.error("[Weather API Error]:", error instanceof Error ? error.message : error);
-      return getFallbackWeather(city);
+      throw error;
     }
   },
 };
-
-// Fallback function to keep the UI beautiful even if the API fails
-function getFallbackWeather(city: string): WeatherData {
-  return {
-    city: city || "New Delhi",
-    temp: 32,
-    condition: "Sunny",
-    humidity: 45,
-    windSpeed: 12,
-    description: "Clear skies",
-    tempMin: 28,
-    tempMax: 35,
-  };
-}

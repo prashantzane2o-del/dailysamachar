@@ -37,14 +37,14 @@ export function SiteHeaderClient({ brand, signIn, subscribe, categories }: SiteH
             aria-controls={menuId}
             aria-label={menuOpen ? tHeader("closeMenu") : tHeader("openMenu")}
             onClick={() => setMenuOpen((open) => !open)}
-            className="text-ink hover:bg-soft focus-visible:ring-focus inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors focus-visible:ring-2 md:hidden dark:text-gray-100 dark:hover:bg-gray-800"
+            className="text-slate-900 hover:bg-slate-100 focus-visible:ring-focus inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors focus-visible:ring-2 md:hidden dark:text-slate-900 dark:hover:bg-slate-100"
           >
             {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
           </button>
           <NextLink
             href={getLocalizedPath(locale, "/search")}
             aria-label={tHeader("searchStories")}
-            className="text-ink hover:bg-soft focus-visible:ring-focus inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors focus-visible:ring-2 dark:text-gray-100 dark:hover:bg-gray-800"
+            className="text-slate-900 hover:bg-slate-100 focus-visible:ring-focus inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors focus-visible:ring-2 dark:text-slate-900 dark:hover:bg-slate-100"
           >
             <Search aria-hidden="true" />
           </NextLink>
@@ -61,13 +61,13 @@ export function SiteHeaderClient({ brand, signIn, subscribe, categories }: SiteH
           <LanguageSwitcher />
           <NextLink
             href={getLocalizedPath(locale, "/login")}
-            className="text-ink hover:text-signal focus-visible:ring-focus hidden rounded-md px-2 py-2 text-sm font-bold focus-visible:ring-2 lg:block dark:text-gray-100"
+            className="text-slate-900 hover:text-signal focus-visible:ring-focus hidden rounded-md px-2 py-2 text-sm font-bold focus-visible:ring-2 lg:block dark:text-slate-900"
           >
             {signIn}
           </NextLink>
           <NextLink
             href={getLocalizedPath(locale, "/signup")}
-            className="bg-ink text-paper focus-visible:ring-focus hidden rounded-full px-4 py-2.5 text-xs font-bold tracking-wider uppercase transition-transform hover:scale-[1.03] focus-visible:ring-2 md:block dark:bg-gray-100 dark:text-gray-900"
+            className="bg-slate-900 text-white focus-visible:ring-focus hidden rounded-full px-4 py-2.5 text-xs font-bold tracking-wider uppercase transition-transform hover:scale-[1.03] focus-visible:ring-2 md:block dark:bg-slate-900 dark:text-white"
           >
             {subscribe}
           </NextLink>
@@ -80,7 +80,7 @@ export function SiteHeaderClient({ brand, signIn, subscribe, categories }: SiteH
         <div className="container-page flex items-center gap-5 overflow-x-auto py-3">
           <NextLink
             href={getLocalizedPath(locale, "/")}
-            className="text-ink hover:text-signal shrink-0 text-xs font-bold dark:text-gray-100"
+            className="text-slate-900 hover:text-signal shrink-0 text-xs font-bold dark:text-slate-900"
           >
             Home
           </NextLink>
@@ -88,7 +88,7 @@ export function SiteHeaderClient({ brand, signIn, subscribe, categories }: SiteH
             <NextLink
               key={category.id}
               href={getLocalizedPath(locale, `/category/${category.slug}`)}
-              className="text-muted hover:text-signal shrink-0 text-xs font-bold dark:text-gray-300"
+              className="text-slate-600 hover:text-signal shrink-0 text-xs font-bold dark:text-slate-600"
             >
               {category.title}
             </NextLink>
@@ -99,13 +99,13 @@ export function SiteHeaderClient({ brand, signIn, subscribe, categories }: SiteH
         <nav
           id={menuId}
           aria-label={tNavigation("mainNavigation")}
-          className="border-line bg-paper border-t md:hidden dark:border-gray-800 dark:bg-gray-950"
+          className="border-line bg-white border-t md:hidden dark:border-gray-800 dark:bg-white"
         >
           <div className="container-page grid gap-1 py-3">
             <NextLink
               href={getLocalizedPath(locale, "/")}
               onClick={closeMenu}
-              className="text-ink hover:bg-soft rounded-md px-3 py-3 text-sm font-bold dark:text-gray-100 dark:hover:bg-gray-800"
+              className="text-slate-900 hover:bg-slate-100 rounded-md px-3 py-3 text-sm font-bold dark:text-slate-900 dark:hover:bg-slate-100"
             >
               Home
             </NextLink>
@@ -114,7 +114,7 @@ export function SiteHeaderClient({ brand, signIn, subscribe, categories }: SiteH
                 key={category.id}
                 href={getLocalizedPath(locale, `/category/${category.slug}`)}
                 onClick={closeMenu}
-                className="text-ink hover:bg-soft rounded-md px-3 py-3 text-sm font-semibold dark:text-gray-100 dark:hover:bg-gray-800"
+                className="text-slate-900 hover:bg-slate-100 rounded-md px-3 py-3 text-sm font-semibold dark:text-slate-900 dark:hover:bg-slate-100"
               >
                 {category.title}
               </NextLink>
@@ -122,7 +122,7 @@ export function SiteHeaderClient({ brand, signIn, subscribe, categories }: SiteH
             <NextLink
               href={getLocalizedPath(locale, "/search")}
               onClick={closeMenu}
-              className="text-ink hover:bg-soft rounded-md px-3 py-3 text-sm font-semibold dark:text-gray-100 dark:hover:bg-gray-800"
+              className="text-slate-900 hover:bg-slate-100 rounded-md px-3 py-3 text-sm font-semibold dark:text-slate-900 dark:hover:bg-slate-100"
             >
               {tHeader("searchStories")}
             </NextLink>

@@ -2,80 +2,89 @@
 import { NextResponse } from "next/server";
 import { MarketDataSchema } from "@/entities/market/model/types";
 
-const GOLD_API_BASE_URL = process.env.GOLD_API_URL?.trim() || "https://api.gold-api.com";
-const USD_INR_API_URL = process.env.USD_INR_API_URL?.trim() || "https://open.er-api.com/v6/latest/USD";
+const METALPRICE_API_URL = process.env.METALPRICE_API_URL?.trim() || "https://api.metalpriceapi.com/v1/latest";
 const TROY_OUNCE_IN_GRAMS = 31.1034768;
 
-type GoldApiResponse = { price?: number };
-type ExchangeRateResponse = { rates?: { INR?: number } };
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-function getApiKey() {
-  return process.env.GOLD_API_KEY?.trim() || process.env.GOLDAPI_API_KEY?.trim() || process.env.GOLD_API_TOKEN?.trim();
-}
+type MetalPriceResponse = {
+  success?: boolean;
+  timestamp?: number;
+  rates?: { INR?: number; XAU?: number; XAG?: number };
+  error?: { code?: number; info?: string };
+};
+type SpotPrice = { price: number; updatedAt?: string };
 
-async function getUsdInrRate() {
-  const response = await fetch(USD_INR_API_URL, {
-    headers: { Accept: "application/json" },
-    next: { revalidate: 300, tags: ["usd-inr-rate"] },
+async function getMetalPriceRates() {
+  const apiKey = process.env.METALPRICE_API_KEY?.trim();
+  if (!apiKey) throw new Error("METALPRICE_API_KEY is not configured");
+
+  const url = new URL(METALPRICE_API_URL);
+  url.searchParams.set("base", "USD");
+  url.searchParams.set("currencies", "INR,XAU,XAG");
+
+  const response = await fetch(url, {
+    headers: { Accept: "application/json", "X-API-KEY": apiKey },
+    cache: "no-store",
   });
+  if (!response.ok) throw new Error(`MetalpriceAPI returned status: ${response.status}`);
 
-  if (!response.ok) throw new Error(`USD/INR provider returned status: ${response.status}`);
+  const data = (await response.json()) as MetalPriceResponse;
+  if (data.success === false) throw new Error(data.error?.info || "MetalpriceAPI returned an error");
 
-  const data = (await response.json()) as ExchangeRateResponse;
-  const rate = data.rates?.INR;
-  if (typeof rate !== "number" || !Number.isFinite(rate) || rate <= 0) {
-    throw new Error("USD/INR provider returned an invalid rate");
+  const inrPerUsd = data.rates?.INR;
+  const goldOuncesPerUsd = data.rates?.XAU;
+  const silverOuncesPerUsd = data.rates?.XAG;
+  if (
+    typeof inrPerUsd !== "number" ||
+    !Number.isFinite(inrPerUsd) ||
+    inrPerUsd <= 0 ||
+    typeof goldOuncesPerUsd !== "number" ||
+    !Number.isFinite(goldOuncesPerUsd) ||
+    goldOuncesPerUsd <= 0 ||
+    typeof silverOuncesPerUsd !== "number" ||
+    !Number.isFinite(silverOuncesPerUsd) ||
+    silverOuncesPerUsd <= 0
+  ) {
+    throw new Error("MetalpriceAPI returned incomplete INR, XAU, or XAG rates");
   }
-  return rate;
-}
 
-async function getUsdSpotPrice(symbol: "XAU" | "XAG", apiKey: string | undefined) {
-  const headers: HeadersInit = { Accept: "application/json" };
-  // gold-api.com is currently keyless, but preserve support for account plans that require a key.
-  if (apiKey) headers["x-api-key"] = apiKey;
-
-  const response = await fetch(`${GOLD_API_BASE_URL}/price/${symbol}`, {
-    headers,
-    next: { revalidate: 300, tags: [`gold-api:${symbol}`] },
-  });
-  if (!response.ok) throw new Error(`Gold API returned status: ${response.status}`);
-
-  const data = (await response.json()) as GoldApiResponse;
-  if (typeof data.price !== "number" || !Number.isFinite(data.price) || data.price <= 0) {
-    throw new Error(`Gold API returned an invalid ${symbol} price`);
-  }
-  return data.price;
+  const updatedAt = typeof data.timestamp === "number" ? new Date(data.timestamp * 1000).toISOString() : undefined;
+  return {
+    usdInr: inrPerUsd,
+    goldUsdPerOz: { price: 1 / goldOuncesPerUsd, updatedAt } satisfies SpotPrice,
+    silverUsdPerOz: { price: 1 / silverOuncesPerUsd, updatedAt } satisfies SpotPrice,
+  };
 }
 
 export async function GET(): Promise<NextResponse> {
   try {
-    const [goldUsdPerOz, silverUsdPerOz, usdInr] = await Promise.all([
-      getUsdSpotPrice("XAU", getApiKey()),
-      getUsdSpotPrice("XAG", getApiKey()),
-      getUsdInrRate(),
-    ]);
+    const { usdInr, goldUsdPerOz, silverUsdPerOz } = await getMetalPriceRates();
 
     const data = [
-      {
+      goldUsdPerOz && {
         symbol: "GOLD",
         name: "Gold (10g)",
-        price: goldUsdPerOz * usdInr * (10 / TROY_OUNCE_IN_GRAMS),
+        price: goldUsdPerOz.price * usdInr * (10 / TROY_OUNCE_IN_GRAMS),
         change: 0,
         percentChange: 0,
         isPositive: true,
+        updatedAt: goldUsdPerOz.updatedAt,
       },
-      {
+      silverUsdPerOz && {
         symbol: "SILVER",
         name: "Silver (1kg)",
-        price: silverUsdPerOz * usdInr * (1000 / TROY_OUNCE_IN_GRAMS),
+        price: silverUsdPerOz.price * usdInr * (1000 / TROY_OUNCE_IN_GRAMS),
         change: 0,
         percentChange: 0,
         isPositive: true,
+        updatedAt: silverUsdPerOz.updatedAt,
       },
     ];
 
     return NextResponse.json(MarketDataSchema.parse(data), {
-      headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" },
+      headers: { "Cache-Control": "no-store, max-age=0, must-revalidate" },
     });
   } catch (error) {
     console.error("[Commodities API Error]:", error instanceof Error ? error.message : error);

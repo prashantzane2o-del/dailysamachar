@@ -7,6 +7,7 @@ export const MarketItemSchema = z.object({
   change: z.number(),
   percentChange: z.number(),
   isPositive: z.boolean(),
+  updatedAt: z.string().optional(),
 });
 
 export const MarketDataSchema = z.array(MarketItemSchema);

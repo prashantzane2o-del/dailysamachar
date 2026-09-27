@@ -97,6 +97,8 @@ export default async function HomePage({ params }: HomePageProps) {
         </div>
       </section>
 
+      <AdSlot placement="top" className="container mx-auto my-3 min-h-[90px] px-4 sm:px-6 lg:px-8" />
+
       <main className="flex w-full flex-col" role="main">
         {/* Hidden H1 for SEO and Accessibility */}
         <h1 className="sr-only">Daily Samachar - Top Headlines and Latest News</h1>

@@ -17,7 +17,7 @@ export function MainLayout({ children, header, footer, utility, sidebar }: MainL
       <div id="main-content" className="flex flex-1 flex-col">
         <RouteTransition>
           {sidebar ? (
-            <div className="container-page grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
+            <div className="container-page grid gap-10 py-8 sm:py-10 lg:grid-cols-[minmax(0,1fr)_19rem]">
               <main>{children}</main>
               <aside aria-label="Related information" className="space-y-6 lg:sticky lg:top-28 lg:self-start">
                 {sidebar}

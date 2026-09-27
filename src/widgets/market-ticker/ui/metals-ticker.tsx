@@ -48,7 +48,7 @@ export function MetalsTicker() {
 
   return (
     <div
-      className="bg-paper border-line scrollbar-hide flex items-center overflow-x-auto rounded-lg border text-sm whitespace-nowrap shadow-sm"
+      className="bg-paper border-line scrollbar-hide flex items-center overflow-x-auto rounded-md border text-sm whitespace-nowrap shadow-[0_4px_14px_rgba(20,34,53,0.04)]"
       role="region"
       aria-live="polite"
       aria-label={t("tickerLabel")}
@@ -66,21 +66,25 @@ export function MetalsTicker() {
             <span className="text-ink font-bold">{quote.name}</span>
             <span className="text-muted font-medium tracking-wide">₹{formatter.format(quote.price)}</span>
 
-            {/* AAA: High Contrast Trend Indicator */}
-            <span
-              className={`flex items-center text-xs font-bold ${
-                quote.isPositive ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"
-              }`}
-              aria-label={quote.isPositive ? t("trendUp") : t("trendDown")}
-            >
-              {quote.isPositive ? (
-                <ArrowUpRight className="mr-0.5 h-4 w-4" aria-hidden="true" />
-              ) : (
-                <ArrowDownRight className="mr-0.5 h-4 w-4" aria-hidden="true" />
-              )}
-              {/* Show absolute change value to avoid double negative signs (e.g., - -400) */}
-              {formatter.format(Math.abs(quote.change))}
-            </span>
+            {quote.change === 0 ? (
+              <span className="text-emerald-700 dark:text-emerald-400" title={quote.updatedAt || undefined}>
+                {t("live")}
+              </span>
+            ) : (
+              <span
+                className={`flex items-center text-xs font-bold ${
+                  quote.isPositive ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"
+                }`}
+                aria-label={quote.isPositive ? t("trendUp") : t("trendDown")}
+              >
+                {quote.isPositive ? (
+                  <ArrowUpRight className="mr-0.5 h-4 w-4" aria-hidden="true" />
+                ) : (
+                  <ArrowDownRight className="mr-0.5 h-4 w-4" aria-hidden="true" />
+                )}
+                {formatter.format(Math.abs(quote.change))}
+              </span>
+            )}
           </div>
         ))}
       </div>

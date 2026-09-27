@@ -6,7 +6,7 @@ export const marketApi = {
       const endpoint = type === "commodities" ? "/api/markets/commodities" : "/api/markets";
 
       const response = await fetch(endpoint, {
-        next: { revalidate: 300 },
+        cache: "no-store",
         headers: {
           "Content-Type": "application/json",
         },

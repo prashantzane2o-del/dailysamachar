@@ -19,6 +19,11 @@ export function SiteSchema({ locale }: SiteSchemaProps) {
       logo: `${baseUrl}/Logo.png`,
       description: "Verified, independent news from India and around the world.",
       email: "news@dailysamachar.org",
+      sameAs: [
+        "https://t.me/Dailysamachar56",
+        "https://www.facebook.com/profile.php?id=61590137490131",
+        "https://x.com/Dailysamachar56",
+      ],
       contactPoint: {
         "@type": "ContactPoint",
         contactType: "newsroom",

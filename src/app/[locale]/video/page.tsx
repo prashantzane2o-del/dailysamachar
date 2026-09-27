@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 export default async function VideoPage() {
   // 2. FIXED: Fetching via Service Layer instead of direct array import
   // (Passing "en" as a fallback locale for now)
-  const videos = await cmsApi.getFeaturedArticles();
+  const videos = await cmsApi.getArticlesByCategory("video", 1, 12);
 
   return (
     <Section>
@@ -37,13 +37,19 @@ export default async function VideoPage() {
         <Tabs tabs={["Featured", "Explainers", "India", "World", "Culture"]} />
 
         {/* 3. ADDED: Semantic ARIA roles for list accessibility */}
-        <div className="mt-8 grid gap-7 md:grid-cols-3" role="list" aria-label="Latest video reports">
-          {videos.slice(0, 6).map((article) => (
-            <div role="listitem" key={article.id}>
-              <VideoCard article={article} />
-            </div>
-          ))}
-        </div>
+        {videos.length > 0 ? (
+          <div className="mt-8 grid gap-7 md:grid-cols-3" role="list" aria-label="Latest video reports">
+            {videos.slice(0, 9).map((article) => (
+              <div role="listitem" key={article.id}>
+                <VideoCard article={article} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted mt-8 rounded-xl border border-dashed p-10 text-center">
+            Video reports are being prepared by our newsroom. Please check back soon.
+          </p>
+        )}
       </Container>
     </Section>
   );

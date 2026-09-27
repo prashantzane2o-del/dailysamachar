@@ -30,14 +30,14 @@ export async function SiteFooter() {
 
   return (
     <footer
-      className="border-footer-accent bg-footer-background text-footer-foreground mt-auto border-t-4"
+      className="border-footer-accent bg-footer-background text-footer-foreground mt-auto border-t-2"
       aria-labelledby="footer-heading"
     >
       <h2 id="footer-heading" className="sr-only">
         Site Footer
       </h2>
-      <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
+      <div className="container mx-auto px-4 py-14 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-14">
           {/* Column 1: Brand & About */}
           <div className="space-y-6">
             <div className="inline-block rounded-md bg-white/95 px-3 py-2 shadow-sm">

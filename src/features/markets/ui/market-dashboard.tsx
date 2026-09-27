@@ -52,27 +52,31 @@ function MarketCard({ quote, label }: { quote?: MarketItem; label: string }) {
     >
       <div className="flex items-start justify-between gap-2">
         <p className="text-ink text-sm font-bold">{label}</p>
-        {quote.isPositive ? (
+        {quote.change > 0 && quote.isPositive ? (
           <TrendingUp size={18} className="text-emerald-700 dark:text-emerald-400" aria-hidden="true" />
-        ) : isDown ? (
+        ) : quote.change < 0 && isDown ? (
           <TrendingDown size={18} className="text-red-700 dark:text-red-400" aria-hidden="true" />
         ) : null}
       </div>
       <p className="text-ink mt-5 text-2xl font-bold tracking-tight">{number(locale, quote.price)}</p>
-      <p
-        className={
-          "mt-2 text-sm font-semibold " +
-          (quote.isPositive
-            ? "text-emerald-700 dark:text-emerald-400"
-            : isDown
-              ? "text-red-700 dark:text-red-400"
-              : "text-muted")
-        }
-      >
-        {quote.change > 0 ? "+" : ""}
-        {number(locale, quote.change)} ({quote.percentChange > 0 ? "+" : ""}
-        {number(locale, quote.percentChange)}%)
-      </p>
+      {quote.change === 0 ? (
+        <p className="mt-2 text-sm font-semibold text-emerald-700 dark:text-emerald-400">{t("live")}</p>
+      ) : (
+        <p
+          className={
+            "mt-2 text-sm font-semibold " +
+            (quote.isPositive
+              ? "text-emerald-700 dark:text-emerald-400"
+              : isDown
+                ? "text-red-700 dark:text-red-400"
+                : "text-muted")
+          }
+        >
+          {quote.change > 0 ? "+" : ""}
+          {number(locale, quote.change)} ({quote.percentChange > 0 ? "+" : ""}
+          {number(locale, quote.percentChange)}%)
+        </p>
+      )}
       <p className="text-muted mt-4 text-xs">{t("futureChart")}</p>
     </motion.article>
   );

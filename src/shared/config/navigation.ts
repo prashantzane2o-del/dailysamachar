@@ -41,8 +41,8 @@ export const FOOTER_NAVIGATION: FooterNavGroups = {
     { title: "Fact Check", href: "/fact-check" },
   ],
   social: [
-    { title: "Twitter", href: "https://twitter.com/dailysamachar", isExternal: true },
-    { title: "YouTube", href: "https://youtube.com/dailysamachar", isExternal: true },
-    { title: "Facebook", href: "https://facebook.com/dailysamachar", isExternal: true },
+    { title: "Telegram", href: "https://t.me/Dailysamachar56", isExternal: true },
+    { title: "Facebook", href: "https://www.facebook.com/profile.php?id=61590137490131", isExternal: true },
+    { title: "X", href: "https://x.com/Dailysamachar56", isExternal: true },
   ],
 };

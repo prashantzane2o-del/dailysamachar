@@ -8,12 +8,13 @@ import { SiteFooter } from "@/widgets/site-footer";
 import { SiteHeader } from "@/widgets/site-header";
 import { AppProviders } from "../providers";
 import { DraftBanner } from "@/components/draft-banner";
-import { MonetagScripts } from "@/widgets/ads/monetag-scripts";
 import { GoogleAdSenseScript } from "@/widgets/ads/google-adsense-script";
 import { SiteSchema } from "@/components/seo/site-schema";
-import { AdSlot } from "@/widgets/ads/ad-slot";
+import { FloatingSocialLinks } from "@/widgets/social-links/ui/floating-social-links";
 
 import "../globals.css";
+
+const googleSiteVerification = process.env.GOOGLE_SITE_VERIFICATION?.trim();
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://dailysamachar.org"),
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
+  ...(googleSiteVerification ? { verification: { google: googleSiteVerification } } : {}),
   alternates: {
     languages: {
       en: "/",
@@ -74,8 +76,7 @@ export default async function LocaleLayout({
             </a>
 
             <SiteHeader />
-
-            <AdSlot placement="top" className="container mx-auto my-3 min-h-[90px] px-4 sm:px-6 lg:px-8" />
+            <FloatingSocialLinks />
 
             <div id="main-content" className="w-full flex-1">
               {children}
@@ -83,7 +84,6 @@ export default async function LocaleLayout({
 
             <SiteFooter />
             <DraftBanner />
-            <MonetagScripts />
           </AppProviders>
         </NextIntlClientProvider>
       </body>

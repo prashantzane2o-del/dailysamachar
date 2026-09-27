@@ -25,7 +25,7 @@ export function WeatherTicker({ city }: { city?: string }) {
   const weather = query.data;
 
   return (
-    <div className="bg-paper border-line scrollbar-hide flex h-12 items-center overflow-x-auto rounded-lg border text-sm shadow-sm whitespace-nowrap">
+      <div className="bg-paper border-line scrollbar-hide flex h-12 items-center overflow-x-auto rounded-md border text-sm shadow-[0_4px_14px_rgba(20,34,53,0.04)] whitespace-nowrap">
       
       {/* Brand/Label Section */}
       <div className="bg-soft border-line flex shrink-0 items-center gap-2 border-r px-4 py-3 font-bold text-sky-600 dark:text-sky-400">

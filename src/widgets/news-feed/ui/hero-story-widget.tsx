@@ -81,12 +81,12 @@ export function HeroStoryWidget({
       aria-describedby={`${headingId}-description`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="border-line mb-6 flex items-center justify-between border-b-2 pb-2">
+        <div className="border-line mb-6 flex items-center justify-between border-b pb-3">
           <h2
             id={headingId}
-            className="text-ink flex min-w-0 items-center gap-3 text-2xl font-bold tracking-wide uppercase"
+            className="editorial text-ink flex min-w-0 items-center gap-3 text-2xl font-bold tracking-tight"
           >
-            <span className="bg-signal inline-block h-6 w-3 shrink-0" aria-hidden="true" />
+            <span className="bg-signal inline-block h-5 w-1.5 shrink-0" aria-hidden="true" />
             <span>{headingLabel}</span>
           </h2>
           <Link
@@ -103,7 +103,7 @@ export function HeroStoryWidget({
         </p>
 
         <div
-          className="border-line bg-paper relative overflow-hidden rounded-2xl border shadow-xl"
+          className="border-line bg-paper relative overflow-hidden rounded-xl border shadow-[0_14px_35px_rgba(20,34,53,0.10)]"
           role="region"
           aria-roledescription="carousel"
           aria-label={`${headingLabel} carousel`}
@@ -133,7 +133,7 @@ export function HeroStoryWidget({
                 fill
                 priority={activeIndex === 0}
                 sizes="(max-width: 768px) 100vw, 1200px"
-                className="bg-black object-contain sm:object-cover"
+                className="bg-black object-cover"
               />
             ) : (
               <div className="absolute inset-0 bg-slate-800" aria-hidden="true" />

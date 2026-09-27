@@ -79,7 +79,7 @@ export function AdSlot({ placement, className }: { placement: Placement; classNa
       // Reserving strict dimensions to prevent layout shift (CLS)
       style={{ minHeight: dimensions.height, width: "100%", maxWidth: dimensions.width }}
       className={cn(
-        "relative mx-auto flex items-center justify-center overflow-hidden rounded-lg transition-colors",
+        "relative mx-auto flex items-center justify-center overflow-hidden rounded-md transition-colors",
         !isLoaded ? "bg-soft border-line border" : "bg-transparent",
         className,
       )}
@@ -104,7 +104,7 @@ export function AdSlot({ placement, className }: { placement: Placement; classNa
               backgroundSize: "20px 20px",
             }}
           />
-          <span className="bg-paper/90 border-line text-muted z-10 rounded-full border px-4 py-1.5 text-[10px] font-bold tracking-widest uppercase shadow-sm backdrop-blur-sm">
+          <span className="bg-paper/90 border-line text-muted z-10 rounded-md border px-4 py-1.5 text-[10px] font-bold tracking-widest uppercase shadow-sm backdrop-blur-sm">
             {tCommon("advertisement")}
           </span>
         </>

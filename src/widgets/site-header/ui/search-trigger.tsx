@@ -27,7 +27,7 @@ export function SearchTrigger() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={t("searchPlaceholder")}
-        className="focus:border-signal focus:ring-signal w-10 rounded-full border border-slate-300 bg-slate-100 py-2 pr-9 pl-3 text-sm text-transparent placeholder-transparent transition-all duration-300 outline-none focus:w-44 focus:bg-white focus:text-slate-900 focus:placeholder-slate-500 focus:ring-2 sm:w-36 sm:pl-4 sm:text-slate-900 sm:placeholder-slate-500 md:w-44 md:focus:w-56 lg:w-56 lg:focus:w-72"
+        className="focus:border-signal focus:ring-signal w-10 rounded-lg border border-slate-200 bg-slate-50 py-2 pr-9 pl-3 text-sm text-transparent placeholder-transparent transition-all duration-300 outline-none focus:w-44 focus:bg-white focus:text-slate-900 focus:placeholder-slate-500 focus:ring-2 sm:w-36 sm:pl-4 sm:text-slate-900 sm:placeholder-slate-500 md:w-44 md:focus:w-56 lg:w-56 lg:focus:w-72"
         aria-label={t("searchStories")}
       />
       <button

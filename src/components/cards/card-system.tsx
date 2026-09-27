@@ -16,7 +16,7 @@ function CmsImage({ src, alt, className, sizes }: { src?: string; alt: string; c
       alt={alt}
       fill
       sizes={sizes}
-      className={cn("image-zoom bg-slate-100 object-contain sm:object-cover dark:bg-slate-900", className)}
+      className={cn("image-zoom bg-slate-100 object-cover dark:bg-slate-900", className)}
     />
   ) : (
     <div className="text-muted bg-soft grid h-full place-items-center">
@@ -34,7 +34,7 @@ export function FeatureCard({ article, size = "md" }: { article: Article; size?:
         aria-label={`Read article: ${article.title}`}
       >
         <div
-          className={cn("bg-soft relative overflow-hidden rounded-xl", size === "lg" ? "aspect-16/10" : "aspect-4/3")}
+          className={cn("bg-soft relative overflow-hidden rounded-lg", size === "lg" ? "aspect-16/10" : "aspect-4/3")}
         >
           <CmsImage
             src={article.image}
@@ -46,7 +46,7 @@ export function FeatureCard({ article, size = "md" }: { article: Article; size?:
           <p className="kicker text-muted">{article.category}</p>
           <h3
             className={cn(
-              "editorial text-ink group-hover:text-signal mt-2 leading-tight font-bold tracking-tight transition-colors",
+              "editorial text-ink group-hover:text-signal mt-2 leading-[1.12] font-bold tracking-tight transition-colors",
               size === "lg" ? "text-3xl" : "text-xl",
             )}
           >

@@ -21,8 +21,8 @@ export function useWeather(city?: string) {
     },
     // Always enable, if city is undefined the backend handles the default city
     enabled: true, 
-    staleTime: 5 * 60 * 1000,
-    refetchInterval: 5 * 60 * 1000,
+    staleTime: 10 * 60 * 1000,
+    refetchInterval: 10 * 60 * 1000,
     refetchOnWindowFocus: true,
     retry: 1,
   });

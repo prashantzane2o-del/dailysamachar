@@ -10,10 +10,12 @@ export function SectionHeading({
   href?: string;
 }) {
   return (
-    <div className="border-ink mb-6 flex items-baseline justify-between border-t-2 pt-3">
-      <h2 className="editorial text-2xl font-bold tracking-tight">{title}</h2>
-      <Link href={href} className="text-signal text-xs font-bold hover:underline">
-        {link} →
+    <div className="border-line mb-6 flex items-center justify-between border-b pb-3">
+      <h2 className="editorial flex items-center gap-3 text-2xl font-bold tracking-tight">
+        <span className="bg-signal h-5 w-1.5" aria-hidden="true" />{title}
+      </h2>
+      <Link href={href} className="text-signal hover:text-ink inline-flex items-center gap-1 text-xs font-bold uppercase transition-colors">
+        {link} <span aria-hidden="true">→</span>
       </Link>
     </div>
   );
