@@ -7,8 +7,10 @@ import {
   wpAuthorSchema,
   wpCategorySchema,
   wpPostSitemapArraySchema,
+  wpWebStoryArraySchema,
   type WpCategory,
   type WpArticle,
+  type WpWebStory,
 } from "@/shared/api/wordpress-schemas";
 import { stripCmsExcerpt, stripCmsHtml } from "@/shared/lib/cms-html";
 
@@ -41,8 +43,6 @@ type FetchJsonResult<T> = {
 const DEFAULT_PAGE_SIZE = 12;
 const MAX_PAGE_SIZE = 100;
 const REQUEST_TIMEOUT_MS = 15_000;
-// Webhooks provide immediate invalidation; this shorter TTL is a safety net
-// when a WordPress webhook is delayed or unavailable.
 const REVALIDATE_SECONDS = 60;
 const MAX_RETRIES = 1;
 const RETRY_DELAY_MS = 800;
@@ -77,7 +77,6 @@ function cleanText(text: string | null | undefined): string {
 
 function toIsoDate(value: string | undefined | null): string {
   if (!value) return new Date(0).toISOString();
-  // FIX: Explicitly append 'Z' to treat timezone-less WP dates as UTC, preventing timezone offset bugs
   const dateStr = value.endsWith("Z") || value.includes("+") ? value : `${value}Z`;
   const date = new Date(dateStr);
   return Number.isNaN(date.getTime()) ? new Date(0).toISOString() : date.toISOString();
@@ -168,8 +167,8 @@ export class WordPressAdapter {
     let processed = html;
 
     processed = processed.replace(/<a[^>]*class="[^"]*more-link[^"]*"[^>]*>.*?<\/a>/gi, "");
-    processed = processed.replace(/<a[^>]*href="[^"]*"[^>]*>\s*\[&hellip;\]\s*<\/a>/gi, "");
-    processed = processed.replace(/\[&hellip;\]/g, "...");
+    processed = processed.replace(/<a[^>]*href="[^"]*"[^>]*>\s*[&hellip;]\s*<\/a>/gi, "");
+    processed = processed.replace(/[&hellip;]/g, "...");
 
     const rawDomain = this.backendDomain.replace(/^https?:\/\//, "");
     const domainRegex = new RegExp(`href=["']https?://${rawDomain}/([^"']*)["']`, "gi");
@@ -196,7 +195,6 @@ export class WordPressAdapter {
       `$1="${this.backendDomain}$2"`,
     );
 
-    // FIX: Inject loading="lazy" decoding="async" into all images and iframes to prevent Core Web Vitals penalties
     processed = processed.replace(
       /<img(?!.*loading=["']lazy["'])([^>]*)>/gi,
       '<img loading="lazy" decoding="async"$1>',
@@ -316,7 +314,10 @@ export class WordPressAdapter {
         });
 
         if (!response.ok) {
-          console.error(`🚨 [WP API Error] HTTP ${response.status} from ${url.toString()}.`);
+          // NAYA: 404 (Not Found) errors ko ignore karega bina heavy console error phenke
+          if (response.status !== 404) {
+             console.error(`🚨 [WP API Error] HTTP ${response.status} from ${url.toString()}.`);
+          }
           throw new WordPressHttpError(response.status, url);
         }
 
@@ -344,7 +345,6 @@ export class WordPressAdapter {
         }
         if (attempt === retries) {
           this.unavailableUntil = Date.now() + UNAVAILABLE_BACKEND_COOLDOWN_MS;
-          // FIX: Pass the error object to console.error so it is visible in the terminal
           console.error(`🚨 [WP Adapter Final Failure] Could not fetch ${url.pathname}. Reason:`, error);
           throw new Error("WordPress request failed.", { cause: error });
         }
@@ -382,7 +382,6 @@ export class WordPressAdapter {
       finalImageUrl = featuredMedia.media_details.sizes.medium_large.source_url;
     }
 
-    // FIX: Extract SEO Metadata from Yoast or RankMath if available
     let seoExcerpt = stripCmsExcerpt(article.excerpt);
     const seoMetadata = article as WpArticle & {
       yoast_head_json?: { description?: string };
@@ -434,7 +433,6 @@ export class WordPressAdapter {
     ]);
 
     if (params.categorySlug && !category) {
-      console.warn(`⚠️ [WP Adapter] Category slug '${params.categorySlug}' not found.`);
       return { data: [], totalPages: 0 };
     }
 
@@ -457,7 +455,7 @@ export class WordPressAdapter {
         totalPages,
       };
     } catch (error) {
-      // FIX: Added error payload to console.error
+      if (error instanceof WordPressHttpError && error.status === 404) return { data: [], totalPages: 0 };
       console.error(`🚨 [getPosts API Failed] URL: ${url.toString()}`, error);
       return { data: [], totalPages: 0 };
     }
@@ -476,7 +474,7 @@ export class WordPressAdapter {
       const article = result.data[0];
       return article ? this.mapArticle(article) : null;
     } catch (error) {
-      // FIX: Added error payload to console.error
+      if (error instanceof WordPressHttpError && error.status === 404) return null;
       console.error(`🚨 [getPostBySlug Failed] slug: ${slug}`, error);
       return null;
     }
@@ -493,7 +491,7 @@ export class WordPressAdapter {
       const result = await this.fetchJson(url, z.array(wpCategorySchema), ["categories"]);
       return result.data.map(toDomainCategory);
     } catch (error) {
-      // FIX: Added error payload to console.error
+      if (error instanceof WordPressHttpError && error.status === 404) return [];
       console.error(`🚨 [getCategories Failed]`, error);
       return [];
     }
@@ -508,7 +506,7 @@ export class WordPressAdapter {
       const category = result.data[0];
       return category ? toDomainCategory(category) : null;
     } catch (error) {
-      // FIX: Added error payload to console.error
+      if (error instanceof WordPressHttpError && error.status === 404) return null;
       console.error(`🚨 [getCategoryBySlug Failed] slug: ${slug}`, error);
       return null;
     }
@@ -544,7 +542,7 @@ export class WordPressAdapter {
         avatar: author.avatar_urls?.["96"] || "",
       };
     } catch (error) {
-      // FIX: Added error payload to console.error
+      if (error instanceof WordPressHttpError && error.status === 404) return null;
       console.error(`🚨 [getAuthorBySlug Failed] slug: ${slug}`, error);
       return null;
     }
@@ -559,7 +557,7 @@ export class WordPressAdapter {
       const tag = result.data[0];
       return tag ? toDomainTag(tag) : null;
     } catch (error) {
-      // FIX: Added error payload to console.error
+      if (error instanceof WordPressHttpError && error.status === 404) return null;
       console.error(`🚨 [getTagBySlug Failed] slug: ${slug}`, error);
       return null;
     }
@@ -598,7 +596,7 @@ export class WordPressAdapter {
         totalPages,
       };
     } catch (error) {
-      // FIX: Added error payload to console.error
+      if (error instanceof WordPressHttpError && error.status === 404) return { data: [], totalPages: 0 };
       console.error(`🚨 [searchPosts Failed] query: ${query}`, error);
       return { data: [], totalPages: 0 };
     }
@@ -636,8 +634,28 @@ export class WordPressAdapter {
 
       return entries;
     } catch (error) {
-      // FIX: Added error payload to console.error
       console.error(`🚨 [getPostSitemapEntries Failed]`, error);
+      return [];
+    }
+  }
+
+  // ==========================================
+  // WEB STORIES FETCH METHOD
+  // ==========================================
+  async getWebStories(limit: number = 8): Promise<WpWebStory[]> {
+    const url = new URL(`${this.baseUrl}/web-story`);
+    url.searchParams.set("_embed", "true");
+    url.searchParams.set("per_page", String(limit));
+
+    try {
+      const result = await this.fetchJson(url, wpWebStoryArraySchema, ["web-stories"]);
+      return result.data as WpWebStory[];
+    } catch (error) {
+      // NAYA: 404 errors will be completely silent now.
+      if (error instanceof WordPressHttpError && error.status === 404) {
+        return [];
+      }
+      console.error(`🚨 [getWebStories Failed] URL: ${url.toString()}`, error);
       return [];
     }
   }

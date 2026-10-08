@@ -23,6 +23,7 @@ export function HeroStoryWidget({
 }: HeroStoryWidgetProps) {
   const headingId = useId();
   const headingLabel = sectionTitle.trim() || "Latest Headlines";
+
   const fallbackStories = [mainStory, ...(Array.isArray(sideStories) ? sideStories : [])];
   const visibleStories = (stories.length > 0 ? stories : fallbackStories)
     .filter((story): story is Article => Boolean(story?.id && story.slug))
@@ -64,8 +65,10 @@ export function HeroStoryWidget({
     if (pointerStartX.current === null) return;
     const distance = event.clientX - pointerStartX.current;
     pointerStartX.current = null;
+
     if (Math.abs(distance) < 44 || visibleStories.length < 2) return;
     setIsPaused(true);
+
     if (distance < 0) showNext();
     else showPrevious();
   };
@@ -94,9 +97,10 @@ export function HeroStoryWidget({
             className="text-signal hover:text-ink focus-visible:ring-signal focus-visible:ring-offset-paper ml-4 min-h-11 shrink-0 rounded-sm px-2 py-2 text-sm font-bold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2 motion-reduce:transition-none"
             aria-label={`View all ${headingLabel.toLowerCase()} stories`}
           >
-            <span aria-hidden="true">View all »</span>
+            <span aria-hidden="true">View all  </span>
           </Link>
         </div>
+
         <p id={`${headingId}-description`} className="sr-only">
           One featured story is shown at a time and changes automatically every six seconds. Use the controls to browse
           stories.
@@ -115,7 +119,7 @@ export function HeroStoryWidget({
           }}
         >
           <div
-            className="relative aspect-4/3 min-h-0 w-full touch-pan-y sm:aspect-16/8"
+            className="relative aspect-4/3 min-h-0 w-full touch-pan-y sm:aspect-16/8 bg-black"
             role="group"
             aria-roledescription="slide"
             aria-label={`Story ${activeIndex + 1} of ${visibleStories.length}`}
@@ -133,27 +137,31 @@ export function HeroStoryWidget({
                 fill
                 priority={activeIndex === 0}
                 sizes="(max-width: 768px) 100vw, 1200px"
-                className="bg-black object-cover"
+                // NAYA: object-contain add kiya hai taaki image kate nahi aur proper fix hoke dikhe
+                className="object-contain"
               />
             ) : (
               <div className="absolute inset-0 bg-slate-800" aria-hidden="true" />
             )}
+            
+            {/* Gradient ko thoda adjust kiya gaya hai taaki text visible rahe */}
             <div
-              className="pointer-events-none absolute inset-0 hidden bg-linear-to-t from-black via-black/35 to-black/5 sm:block"
+              className="pointer-events-none absolute inset-0 hidden bg-gradient-to-t from-black via-black/40 to-transparent sm:block"
               aria-hidden="true"
             />
           </div>
 
-          <div className="bg-paper text-ink p-4 sm:absolute sm:inset-x-0 sm:bottom-0 sm:bg-black/70 sm:p-8 sm:pb-20 lg:p-10 lg:pb-20">
-            <p className="text-signal mb-2 text-xs font-bold tracking-[0.2em] uppercase sm:text-white/80">
+          <div className="bg-paper text-ink p-4 sm:absolute sm:inset-x-0 sm:bottom-0 sm:bg-transparent sm:p-8 sm:pb-20 lg:p-10 lg:pb-20">
+            <p className="text-signal mb-2 text-xs font-bold tracking-[0.2em] uppercase sm:text-white sm:drop-shadow-md">
               {activeStory.category || "Latest News"}
             </p>
-            <h3 className="text-ink max-w-4xl text-xl leading-tight font-black sm:text-3xl sm:text-white lg:text-5xl">
+            <h3 className="text-ink max-w-4xl text-xl leading-tight font-black sm:text-3xl sm:text-white lg:text-5xl sm:drop-shadow-lg">
               {stripCmsHtml(activeStory.title)}
             </h3>
+            
             <Link
               href={`/news/${activeStory.slug}`}
-              className="focus-visible:ring-signal bg-signal hover:bg-brand-red-light focus-visible:ring-offset-paper sm:hover:bg-signal mt-4 inline-flex min-h-11 items-center rounded-md px-4 py-2 text-sm font-bold text-white transition-colors focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:outline-none motion-reduce:transition-none sm:mt-5 sm:bg-white sm:text-slate-900 sm:hover:text-white sm:focus-visible:ring-offset-black"
+              className="focus-visible:ring-signal bg-signal hover:bg-brand-red-light focus-visible:ring-offset-paper sm:hover:bg-signal mt-4 inline-flex min-h-11 items-center rounded-md px-4 py-2 text-sm font-bold text-white transition-colors focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:outline-none motion-reduce:transition-none sm:mt-5 sm:bg-white sm:text-slate-900 sm:hover:text-white sm:focus-visible:ring-offset-black shadow-md"
             >
               Read story
             </Link>
@@ -165,7 +173,7 @@ export function HeroStoryWidget({
                 <button
                   type="button"
                   onClick={showPrevious}
-                  className="focus-visible:ring-signal flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/70 bg-black/65 text-white outline-none hover:bg-black/90 focus-visible:ring-4"
+                  className="focus-visible:ring-signal flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/70 bg-black/65 text-white outline-none hover:bg-black/90 focus-visible:ring-4 backdrop-blur-sm"
                   aria-label="Show previous story"
                 >
                   <ChevronLeft aria-hidden="true" />
@@ -173,12 +181,13 @@ export function HeroStoryWidget({
                 <button
                   type="button"
                   onClick={showNext}
-                  className="focus-visible:ring-signal flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/70 bg-black/65 text-white outline-none hover:bg-black/90 focus-visible:ring-4"
+                  className="focus-visible:ring-signal flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/70 bg-black/65 text-white outline-none hover:bg-black/90 focus-visible:ring-4 backdrop-blur-sm"
                   aria-label="Show next story"
                 >
                   <ChevronRight aria-hidden="true" />
                 </button>
               </div>
+
               <div className="flex items-center gap-2" role="tablist" aria-label="Choose featured story">
                 {visibleStories.map((story, index) => (
                   <button
@@ -191,15 +200,16 @@ export function HeroStoryWidget({
                     className={`focus-visible:ring-signal focus-visible:ring-offset-paper h-3 min-h-3 w-3 min-w-3 rounded-full border border-slate-500 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2 motion-reduce:transition-none sm:border-white sm:focus-visible:ring-white sm:focus-visible:ring-offset-black ${
                       index === activeIndex
                         ? "bg-signal sm:bg-white"
-                        : "hover:bg-signal/30 bg-transparent sm:hover:bg-white/60"
+                        : "hover:bg-signal/30 bg-transparent sm:hover:bg-white/60 sm:bg-white/30"
                     }`}
                   />
                 ))}
               </div>
+
               <button
                 type="button"
                 onClick={() => setIsPaused((paused) => !paused)}
-                className="focus-visible:ring-signal text-ink border-line bg-paper hover:bg-soft flex min-h-11 min-w-11 items-center justify-center rounded-full border outline-none focus-visible:ring-4 sm:border-white/70 sm:bg-black/65 sm:text-white sm:hover:bg-black/90"
+                className="focus-visible:ring-signal text-ink border-line bg-paper hover:bg-soft flex min-h-11 min-w-11 items-center justify-center rounded-full border outline-none focus-visible:ring-4 sm:border-white/70 sm:bg-black/65 sm:text-white sm:hover:bg-black/90 backdrop-blur-sm"
                 aria-label={isPaused ? "Play featured stories" : "Pause featured stories"}
               >
                 {isPaused ? <Play size={16} aria-hidden="true" /> : <Pause size={16} aria-hidden="true" />}

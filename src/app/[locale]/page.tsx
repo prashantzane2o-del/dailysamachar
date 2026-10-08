@@ -58,9 +58,10 @@ async function MultimediaFeed() {
 export default async function HomePage({ params }: HomePageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+
   const t = await getTranslations({ locale, namespace: "home" });
 
-  // Keep one primary latest-news rail, then show category-specific rails below it.
+  // Parallel data fetching for performance
   const [breakingArticles, allCategories, latestArticles] = await Promise.all([
     cmsApi.getArticlesByCategory("breaking", 1, 5).catch(() => []),
     cmsApi.getCategories().catch(() => []),
@@ -70,14 +71,10 @@ export default async function HomePage({ params }: HomePageProps) {
   const heroStories = latestArticles.slice(0, 5);
   const latestRailArticles = latestArticles.slice(5);
 
-  // Render every non-utility category returned by WordPress. The homepage used
-  // to slice this list to five items, which silently hid the remaining CMS
-  // categories even though the API returned them successfully.
   const excludedSlugs = new Set(["uncategorized", "web-stories", "webstories", "breaking", "breaking-news"]);
   const validCategories = allCategories.filter(
     (cat) => cat.slug && !excludedSlugs.has(cat.slug.trim().toLowerCase()),
   );
-  const hasLifestyleCategory = validCategories.some((cat) => cat.slug.trim().toLowerCase() === "lifestyle");
 
   return (
     <div className="flex w-full flex-col pb-12">
@@ -103,7 +100,7 @@ export default async function HomePage({ params }: HomePageProps) {
         {/* Hidden H1 for SEO and Accessibility */}
         <h1 className="sr-only">Daily Samachar - Top Headlines and Latest News</h1>
 
-        {/* Featured hero carousel using the same latest-news response */}
+        {/* Featured hero carousel */}
         <HeroStoryWidget stories={heroStories} sectionTitle="Latest Headlines" />
 
         {/* One primary horizontal latest-news rail */}
@@ -114,18 +111,20 @@ export default async function HomePage({ params }: HomePageProps) {
           hideIfEmpty={false}
         />
 
+        {/* ==========================================
+            NAYA: Web Stories exactly below Latest News 
+            ========================================== */}
+        <Suspense fallback={<div className="bg-soft mx-auto my-6 h-80 w-full animate-pulse rounded-xl" />}>
+          <WebStoriesSlider locale={locale} />
+        </Suspense>
+
         {/* Category-specific horizontal rails */}
         {validCategories.map((cat, index) => (
           <React.Fragment key={cat.id}>
             <Suspense fallback={<NewsGridSkeleton count={4} />}>
               <CategoryRowWidget categorySlug={cat.slug} title={cat.title} locale={locale} />
             </Suspense>
-            {/* Keep Web Stories directly below the Lifestyle rail when that category exists. */}
-            {cat.slug.trim().toLowerCase() === "lifestyle" && (
-              <Suspense fallback={<div className="bg-soft mx-auto my-6 h-96 w-full animate-pulse" />}>
-                <WebStoriesSlider locale={locale} />
-              </Suspense>
-            )}
+
             {/* Insert Newsletter & Ad Card perfectly after the FIRST category row */}
             {index === 0 && (
               <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8">
@@ -137,13 +136,6 @@ export default async function HomePage({ params }: HomePageProps) {
             )}
           </React.Fragment>
         ))}
-
-        {/* Fallback for installations where the Lifestyle category is not configured yet. */}
-        {!hasLifestyleCategory && (
-          <Suspense fallback={<div className="bg-soft mx-auto my-6 h-96 w-full animate-pulse" />}>
-            <WebStoriesSlider locale={locale} />
-          </Suspense>
-        )}
       </main>
 
       {/* Section 6: Multimedia Section */}

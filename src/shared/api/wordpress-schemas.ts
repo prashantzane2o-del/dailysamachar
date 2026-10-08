@@ -69,6 +69,37 @@ export const wpArticleArraySchema = z.any().transform((arr) => {
   }, []);
 });
 
+// BULLETPROOF Web Story Schema (New)
+export const wpWebStorySchema = z
+  .object({
+    id: z.number().int().positive(),
+    slug: z.string().min(1),
+    date: safeString(new Date().toISOString()),
+    modified: safeString(new Date().toISOString()),
+    link: safeString("#"), // Web Stories have a direct link we need to use
+    title: z.any().optional().transform((v) => v?.rendered ?? "Untitled"),
+    poster_image_url: z.any().optional().transform((v) => (typeof v === "string" ? v : null)),
+    _embedded: z.any().optional().transform((v) => v ?? {}),
+  })
+  .passthrough();
+
+// Advanced Array Schema for Web Stories (New)
+export const wpWebStoryArraySchema = z.any().transform((arr) => {
+  if (!Array.isArray(arr)) {
+    console.error("🚨 [WP Schema Error] Web Stories API did not return an array. Received:", typeof arr, arr);
+    return [];
+  }
+  return arr.reduce<z.infer<typeof wpWebStorySchema>[]>((validStories, item) => {
+    const parsed = wpWebStorySchema.safeParse(item);
+    if (parsed.success) {
+      validStories.push(parsed.data);
+    } else {
+      console.warn("🚨 [WP Schema Warning] Skipped a malformed Web Story:", parsed.error.format());
+    }
+    return validStories;
+  }, []);
+});
+
 // Sitemap Schema
 export const wpPostSitemapArraySchema = z.any().transform((arr) => {
   if (!Array.isArray(arr)) return [];
@@ -89,3 +120,5 @@ export const wpPostSitemapArraySchema = z.any().transform((arr) => {
 export type WpArticle = z.infer<typeof wpArticleSchema>;
 export type WpCategory = ReturnType<typeof wpCategorySchema.parse>;
 export type WpPostSitemapEntry = ReturnType<typeof wpPostSitemapArraySchema.parse>[number];
+// Web Story Type Export (New)
+export type WpWebStory = z.infer<typeof wpWebStorySchema>;
