@@ -1,124 +1,174 @@
 // src/shared/api/wordpress-schemas.ts
 import { z } from "zod";
 
-// Helper for safe fallbacks (never fails)
-const safeString = (fallback = "") =>
-  z.any().optional().transform((v) => (typeof v === "string" ? v : fallback));
+// ============================================================================
+// SHARED WORDPRESS SCHEMAS (Rendered & Embedded)
+// ============================================================================
 
-export const wpImageSchema = z.any().transform((v) => {
-  if (v && typeof v === "object") return v;
-  return { source_url: "", alt_text: "" };
+const wpRenderedStringSchema = z.object({
+  rendered: z.string().optional().catch(""),
 });
 
-export const wpAuthorSchema = z.any().transform((v) => {
-  if (v && typeof v === "object") {
-    return {
-      id: Number(v.id) || 0,
-      name: String(v.name || "DailySamachar Desk"),
-      slug: String(v.slug || ""),
-      description: String(v.description || ""),
-      avatar_urls: v.avatar_urls || {},
-    };
-  }
-  return { id: 0, name: "DailySamachar Desk", slug: "", description: "", avatar_urls: {} };
+const wpMediaDetailsSchema = z.object({
+  sizes: z
+    .record(
+      z.string(),
+      z.object({
+        source_url: z.string().url().optional().catch(undefined),
+        width: z.number().optional().catch(undefined),
+        height: z.number().optional().catch(undefined),
+      })
+    )
+    .optional()
+    .catch(undefined),
+}).optional().catch(undefined);
+
+const wpFeaturedMediaSchema = z.object({
+  id: z.number().optional().catch(undefined),
+  source_url: z.string().url().optional().catch(undefined),
+  alt_text: z.string().optional().catch(""),
+  caption: wpRenderedStringSchema.optional().catch(undefined),
+  media_details: wpMediaDetailsSchema,
 });
 
-export const wpCategorySchema = z.any().transform((v) => {
-  if (v && typeof v === "object") {
-    return {
-      id: Number(v.id) || 0,
-      name: String(v.name || "News"),
-      slug: String(v.slug || "news"),
-      description: String(v.description || ""),
-      count: Number(v.count) || 0,
-    };
-  }
-  return { id: 0, name: "News", slug: "news", description: "", count: 0 };
+const wpTermSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  slug: z.string(),
+  taxonomy: z.string(),
 });
 
-// BULLETPROOF Article Schema: Extracts what it needs, ignores the rest, never crashes
-export const wpArticleSchema = z
-  .object({
-    // IDs and slugs are required identity fields. A post with either missing
-    // field is not safe to render or link, so the array schema skips it.
-    id: z.number().int().positive(),
-    slug: z.string().min(1),
-    date: safeString(new Date().toISOString()),
-    modified: safeString(new Date().toISOString()),
-    title: z.any().optional().transform((v) => v?.rendered ?? "Untitled"),
-    content: z.any().optional().transform((v) => v?.rendered ?? ""),
-    excerpt: z.any().optional().transform((v) => v?.rendered ?? ""),
-    _embedded: z.any().optional().transform((v) => v ?? {}),
-  })
-  .passthrough();
+const wpEmbeddedAuthorSchema = z.object({
+  id: z.number().optional().catch(undefined),
+  name: z.string().optional().catch(""),
+  slug: z.string().optional().catch(""),
+  description: z.string().optional().catch(""),
+  avatar_urls: z.record(z.string(), z.string().url()).optional().catch(undefined),
+});
 
-// Advanced Array Schema: Loudly warns in console instead of hiding errors
+const wpEmbeddedSchema = z.object({
+  author: z.array(wpEmbeddedAuthorSchema).optional().catch(undefined),
+  "wp:featuredmedia": z.array(wpFeaturedMediaSchema).optional().catch(undefined),
+  "wp:term": z.array(z.array(wpTermSchema)).optional().catch(undefined),
+});
+
+// ============================================================================
+// STANDARD POST & ARTICLE SCHEMAS
+// ============================================================================
+
+export const wpArticleSchema = z.object({
+  id: z.number(),
+  date: z.string().optional().catch(""),
+  date_gmt: z.string().optional().catch(""),
+  modified: z.string().optional().catch(""),
+  modified_gmt: z.string().optional().catch(""),
+  slug: z.string(),
+  status: z.string().optional().catch(""),
+  type: z.string().optional().catch(""),
+  link: z.string().url().optional().catch(""),
+  title: wpRenderedStringSchema.optional().catch({ rendered: "" }),
+  content: wpRenderedStringSchema.optional().catch({ rendered: "" }),
+  excerpt: wpRenderedStringSchema.optional().catch({ rendered: "" }),
+  _embedded: wpEmbeddedSchema.optional().catch(undefined),
+  yoast_head_json: z.object({ description: z.string().optional().catch("") }).optional().catch(undefined),
+  rank_math_seo: z.object({ description: z.string().optional().catch("") }).optional().catch(undefined),
+});
+
+// SAFE PARSING: Prevent entire array crash on single item failure
 export const wpArticleArraySchema = z.any().transform((arr) => {
-  if (!Array.isArray(arr)) {
-    console.error("🚨 [WP Schema Error] API did not return an array. Received:", typeof arr, arr);
-    return [];
-  }
-  return arr.reduce<z.infer<typeof wpArticleSchema>[]>((validPosts, item) => {
-    const parsed = wpArticleSchema.safeParse(item);
-    if (parsed.success) {
-      validPosts.push(parsed.data);
-    } else {
-      console.warn("🚨 [WP Schema Warning] Skipped a malformed post:", parsed.error.format());
-    }
-    return validPosts;
-  }, []);
-});
-
-// BULLETPROOF Web Story Schema (New)
-export const wpWebStorySchema = z
-  .object({
-    id: z.number().int().positive(),
-    slug: z.string().min(1),
-    date: safeString(new Date().toISOString()),
-    modified: safeString(new Date().toISOString()),
-    link: safeString("#"), // Web Stories have a direct link we need to use
-    title: z.any().optional().transform((v) => v?.rendered ?? "Untitled"),
-    poster_image_url: z.any().optional().transform((v) => (typeof v === "string" ? v : null)),
-    _embedded: z.any().optional().transform((v) => v ?? {}),
-  })
-  .passthrough();
-
-// Advanced Array Schema for Web Stories (New)
-export const wpWebStoryArraySchema = z.any().transform((arr) => {
-  if (!Array.isArray(arr)) {
-    console.error("🚨 [WP Schema Error] Web Stories API did not return an array. Received:", typeof arr, arr);
-    return [];
-  }
-  return arr.reduce<z.infer<typeof wpWebStorySchema>[]>((validStories, item) => {
-    const parsed = wpWebStorySchema.safeParse(item);
-    if (parsed.success) {
-      validStories.push(parsed.data);
-    } else {
-      console.warn("🚨 [WP Schema Warning] Skipped a malformed Web Story:", parsed.error.format());
-    }
-    return validStories;
-  }, []);
-});
-
-// Sitemap Schema
-export const wpPostSitemapArraySchema = z.any().transform((arr) => {
   if (!Array.isArray(arr)) return [];
-  return arr.reduce<Array<{ id: number; slug: string; date: string; modified: string }>>((valid, item) => {
-    if (item && typeof item === "object" && item !== null && "id" in item && "slug" in item) {
-      const record = item as Record<string, unknown>;
-      valid.push({
-        id: Number(record.id) || 0,
-        slug: String(record.slug || ""),
-        date: String(record.date || new Date().toISOString()),
-        modified: String(record.modified || new Date().toISOString()),
-      });
-    }
-    return valid;
+  return arr.reduce((acc: WpArticle[], item) => {
+    const parsed = wpArticleSchema.safeParse(item);
+    if (parsed.success) acc.push(parsed.data);
+    else console.warn("[Zod] Dropped an invalid WordPress post");
+    return acc;
   }, []);
 });
 
 export type WpArticle = z.infer<typeof wpArticleSchema>;
-export type WpCategory = ReturnType<typeof wpCategorySchema.parse>;
-export type WpPostSitemapEntry = ReturnType<typeof wpPostSitemapArraySchema.parse>[number];
-// Web Story Type Export (New)
+
+// ============================================================================
+// CATEGORY & AUTHOR SCHEMAS
+// ============================================================================
+
+export const wpCategorySchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  slug: z.string(),
+  description: z.string().optional().catch(""),
+  count: z.number().optional().catch(0),
+});
+
+export type WpCategory = z.infer<typeof wpCategorySchema>;
+
+export const wpAuthorSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  slug: z.string(),
+  description: z.string().optional().catch(""),
+  avatar_urls: z.record(z.string(), z.string().url()).optional().catch(undefined),
+});
+
+// ============================================================================
+// SITEMAP SCHEMAS
+// ============================================================================
+
+export const wpPostSitemapSchema = z.object({
+  id: z.number().optional().catch(undefined),
+  slug: z.string(),
+  date: z.string().optional().catch(""),
+  date_gmt: z.string().optional().catch(""),
+  modified: z.string().optional().catch(""),
+  modified_gmt: z.string().optional().catch(""),
+});
+
+export const wpPostSitemapArraySchema = z.any().transform((arr) => {
+  if (!Array.isArray(arr)) return [];
+  return arr.reduce((acc: z.infer<typeof wpPostSitemapSchema>[], item) => {
+    const parsed = wpPostSitemapSchema.safeParse(item);
+    if (parsed.success) acc.push(parsed.data);
+    return acc;
+  }, []);
+});
+
+// ============================================================================
+// WEB STORIES SCHEMAS (BULLETPROOF FIX)
+// ============================================================================
+
+export const wpWebStorySchema = z.object({
+  id: z.number().optional().catch(undefined),
+  date: z.string().optional().catch(""),
+  modified: z.string().optional().catch(""),
+  slug: z.string().optional().catch("story"),
+  link: z.string().url().optional().catch(""),
+  title: wpRenderedStringSchema.optional().catch({ rendered: "Untitled Story" }),
+  content: wpRenderedStringSchema.optional().catch({ rendered: "" }),
+  
+  // Custom Web Stories Fields
+  poster_image_url: z.string().url().optional().catch(undefined),
+  story_poster: z.object({
+    url: z.string().url().optional().catch(undefined)
+  }).optional().catch(undefined),
+  
+  // Embedded data (For featured image fallback)
+  _embedded: wpEmbeddedSchema.optional().catch(undefined),
+}).passthrough(); // Ensures Zod doesn't reject unexpected fields sent by the plugin
+
+// SAFE PARSING: Ensure an array is returned even if WordPress sends weird data
+export const wpWebStoryArraySchema = z.any().transform((arr) => {
+  if (!Array.isArray(arr)) {
+    console.warn("[Zod] Web Stories API did not return an array:", arr);
+    return [];
+  }
+  return arr.reduce((acc: WpWebStory[], item) => {
+    const parsed = wpWebStorySchema.safeParse(item);
+    if (parsed.success) {
+      acc.push(parsed.data);
+    } else {
+      console.warn("[Zod] Dropped invalid Web Story Item:", parsed.error);
+    }
+    return acc;
+  }, []);
+});
+
 export type WpWebStory = z.infer<typeof wpWebStorySchema>;

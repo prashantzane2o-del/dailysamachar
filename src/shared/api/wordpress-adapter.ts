@@ -39,7 +39,6 @@ type FetchJsonResult<T> = {
   response: Response;
 };
 
-// --- System Constants ---
 const DEFAULT_PAGE_SIZE = 12;
 const MAX_PAGE_SIZE = 100;
 const REQUEST_TIMEOUT_MS = 15_000;
@@ -51,8 +50,6 @@ const UNAVAILABLE_BACKEND_COOLDOWN_MS = 5_000;
 
 export const DEFAULT_WORDPRESS_API_URL = "https://api.dailysamachar.org";
 export const DEFAULT_ARTICLE_IMAGE = "/Logo.png";
-
-// --- AAA Utility Functions ---
 
 function decodeHTMLEntities(text: string | null | undefined): string {
   if (!text) return "";
@@ -147,7 +144,6 @@ class WordPressHttpError extends Error {
   }
 }
 
-// --- AAA-Level Adapter Class ---
 export class WordPressAdapter {
   private readonly baseUrl: string;
   private readonly backendDomain: string;
@@ -314,9 +310,8 @@ export class WordPressAdapter {
         });
 
         if (!response.ok) {
-          // NAYA: 404 (Not Found) errors ko ignore karega bina heavy console error phenke
           if (response.status !== 404) {
-             console.error(`🚨 [WP API Error] HTTP ${response.status} from ${url.toString()}.`);
+            console.error(`[WP API Error] HTTP ${response.status} from ${url.toString()}.`);
           }
           throw new WordPressHttpError(response.status, url);
         }
@@ -326,13 +321,11 @@ export class WordPressAdapter {
         try {
           rawData = textData ? JSON.parse(textData) : {};
         } catch {
-          console.error(`🚨 [WP API Error] Invalid JSON from ${url.toString()}. Snippet:`, textData.slice(0, 200));
           throw new Error(`WP returned invalid JSON.`);
         }
 
         const parsed = schema.safeParse(rawData);
         if (!parsed.success) {
-          console.error(`🚨 [WP API Error] Schema Parse Failed for ${url.toString()}`, parsed.error);
           throw new Error("WordPress returned an invalid schema format");
         }
 
@@ -345,7 +338,6 @@ export class WordPressAdapter {
         }
         if (attempt === retries) {
           this.unavailableUntil = Date.now() + UNAVAILABLE_BACKEND_COOLDOWN_MS;
-          console.error(`🚨 [WP Adapter Final Failure] Could not fetch ${url.pathname}. Reason:`, error);
           throw new Error("WordPress request failed.", { cause: error });
         }
         await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
@@ -357,11 +349,11 @@ export class WordPressAdapter {
   }
 
   private mapArticle(article: WpArticle): Article {
-    const author = article._embedded?.author?.[0] || {};
-    const featuredMedia = article._embedded?.["wp:featuredmedia"]?.[0] || {};
+    const author = article._embedded?.author?.[0];
+    const featuredMedia = article._embedded?.["wp:featuredmedia"]?.[0];
     const termsArray = article._embedded?.["wp:term"] ?? [];
 
-    let categoryObj: { name?: string; description?: string } = {};
+    let categoryObj: { name?: string; description?: string } | undefined;
     let tagsObj: Array<{ name?: string }> = [];
 
     termsArray.forEach((termGroup: Array<{ taxonomy?: string; name?: string }>) => {
@@ -375,41 +367,50 @@ export class WordPressAdapter {
 
     const publishedAt = toIsoDate(article.date);
 
-    let finalImageUrl = featuredMedia.source_url;
-    if (featuredMedia.media_details?.sizes?.large?.source_url) {
-      finalImageUrl = featuredMedia.media_details.sizes.large.source_url;
-    } else if (featuredMedia.media_details?.sizes?.medium_large?.source_url) {
-      finalImageUrl = featuredMedia.media_details.sizes.medium_large.source_url;
+    let finalImageUrl = featuredMedia?.source_url;
+    const sizes = featuredMedia?.media_details?.sizes;
+    if (sizes && typeof sizes === "object") {
+      const largeSize = sizes as Record<string, { source_url?: string }>;
+      if (largeSize.large?.source_url) {
+        finalImageUrl = largeSize.large.source_url;
+      } else if (largeSize.medium_large?.source_url) {
+        finalImageUrl = largeSize.medium_large.source_url;
+      }
     }
 
-    let seoExcerpt = stripCmsExcerpt(article.excerpt);
+    let seoExcerpt = stripCmsExcerpt(article.excerpt?.rendered);
     const seoMetadata = article as WpArticle & {
       yoast_head_json?: { description?: string };
       rank_math_seo?: { description?: string };
     };
+
     if (seoMetadata.yoast_head_json?.description) {
       seoExcerpt = cleanText(seoMetadata.yoast_head_json.description);
     } else if (seoMetadata.rank_math_seo?.description) {
       seoExcerpt = cleanText(seoMetadata.rank_math_seo.description);
     }
 
+    const titleText = cleanText(article.title?.rendered) || "Untitled story";
+    const imageAltText = cleanText(featuredMedia?.alt_text) || titleText;
+    const htmlContent = article.content?.rendered;
+
     return {
       id: String(article.id),
       slug: article.slug,
-      title: cleanText(article.title || "Untitled story"),
-      content: this.cleanHtml(article.content),
+      title: titleText,
+      content: this.cleanHtml(htmlContent),
       excerpt: seoExcerpt,
       publishedAt,
       publishedAtIso: publishedAt,
-      readTime: estimateReadTime(article.content),
-      author: cleanText(author.name || "DailySamachar Desk"),
-      authorSlug: author.slug ?? undefined,
+      readTime: estimateReadTime(htmlContent),
+      author: cleanText(author?.name) || "DailySamachar Desk",
+      authorSlug: author?.slug ?? undefined,
       image: toSafeImageUrl(finalImageUrl),
       imageUrl: toSafeImageUrl(finalImageUrl),
-      imageAlt: cleanText(featuredMedia.alt_text || article.title || "Daily Samachar news"),
-      category: cleanText(categoryObj.name || "News"),
+      imageAlt: imageAltText,
+      category: cleanText(categoryObj?.name) || "News",
       updatedAt: article.modified ? toIsoDate(article.modified) : publishedAt,
-      tags: tagsObj.map((tag) => cleanText(tag.name)),
+      tags: tagsObj.map((tag) => cleanText(tag.name)).filter(Boolean),
     };
   }
 
@@ -418,7 +419,7 @@ export class WordPressAdapter {
     const perPage = Math.min(MAX_PAGE_SIZE, Math.max(1, params.perPage ?? DEFAULT_PAGE_SIZE));
 
     const url = new URL(`${this.baseUrl}/posts`);
-    url.searchParams.set("_embed", "true");
+    url.searchParams.set("_embed", "1");
     url.searchParams.set("page", String(page));
     url.searchParams.set("per_page", String(perPage));
 
@@ -456,7 +457,6 @@ export class WordPressAdapter {
       };
     } catch (error) {
       if (error instanceof WordPressHttpError && error.status === 404) return { data: [], totalPages: 0 };
-      console.error(`🚨 [getPosts API Failed] URL: ${url.toString()}`, error);
       return { data: [], totalPages: 0 };
     }
   }
@@ -464,7 +464,7 @@ export class WordPressAdapter {
   async getPostBySlug(slug: string): Promise<Article | null> {
     const normalizedSlug = slug.trim().slice(0, 180);
     const url = new URL(`${this.baseUrl}/posts`);
-    url.searchParams.set("_embed", "true");
+    url.searchParams.set("_embed", "1");
     url.searchParams.set("slug", normalizedSlug);
 
     try {
@@ -475,7 +475,6 @@ export class WordPressAdapter {
       return article ? this.mapArticle(article) : null;
     } catch (error) {
       if (error instanceof WordPressHttpError && error.status === 404) return null;
-      console.error(`🚨 [getPostBySlug Failed] slug: ${slug}`, error);
       return null;
     }
   }
@@ -492,7 +491,6 @@ export class WordPressAdapter {
       return result.data.map(toDomainCategory);
     } catch (error) {
       if (error instanceof WordPressHttpError && error.status === 404) return [];
-      console.error(`🚨 [getCategories Failed]`, error);
       return [];
     }
   }
@@ -507,7 +505,6 @@ export class WordPressAdapter {
       return category ? toDomainCategory(category) : null;
     } catch (error) {
       if (error instanceof WordPressHttpError && error.status === 404) return null;
-      console.error(`🚨 [getCategoryBySlug Failed] slug: ${slug}`, error);
       return null;
     }
   }
@@ -534,16 +531,18 @@ export class WordPressAdapter {
 
       if (!author) return null;
 
+      const avatarUrl = (author.avatar_urls as Record<string, string>)?.["96"] || "";
+
       return {
         slug: author.slug || slug,
         name: cleanText(author.name || "Unknown Author"),
         bio: author.description ? cleanText(author.description) : undefined,
         expertise: [],
-        avatar: author.avatar_urls?.["96"] || "",
+        avatar: avatarUrl || DEFAULT_ARTICLE_IMAGE,
+        role: "Author",
       };
     } catch (error) {
       if (error instanceof WordPressHttpError && error.status === 404) return null;
-      console.error(`🚨 [getAuthorBySlug Failed] slug: ${slug}`, error);
       return null;
     }
   }
@@ -558,7 +557,6 @@ export class WordPressAdapter {
       return tag ? toDomainTag(tag) : null;
     } catch (error) {
       if (error instanceof WordPressHttpError && error.status === 404) return null;
-      console.error(`🚨 [getTagBySlug Failed] slug: ${slug}`, error);
       return null;
     }
   }
@@ -576,7 +574,7 @@ export class WordPressAdapter {
     if (!normalizedQuery) return { data: [], totalPages: 0 };
 
     const url = new URL(`${this.baseUrl}/posts`);
-    url.searchParams.set("_embed", "true");
+    url.searchParams.set("_embed", "1");
     url.searchParams.set("search", normalizedQuery);
     url.searchParams.set("page", String(Math.max(1, page)));
     url.searchParams.set("per_page", String(Math.min(MAX_PAGE_SIZE, Math.max(1, perPage))));
@@ -597,7 +595,6 @@ export class WordPressAdapter {
       };
     } catch (error) {
       if (error instanceof WordPressHttpError && error.status === 404) return { data: [], totalPages: 0 };
-      console.error(`🚨 [searchPosts Failed] query: ${query}`, error);
       return { data: [], totalPages: 0 };
     }
   }
@@ -633,29 +630,24 @@ export class WordPressAdapter {
       }
 
       return entries;
-    } catch (error) {
-      console.error(`🚨 [getPostSitemapEntries Failed]`, error);
+    } catch {
       return [];
     }
   }
 
-  // ==========================================
-  // WEB STORIES FETCH METHOD
-  // ==========================================
   async getWebStories(limit: number = 8): Promise<WpWebStory[]> {
-    const url = new URL(`${this.baseUrl}/web-story`);
-    url.searchParams.set("_embed", "true");
-    url.searchParams.set("per_page", String(limit));
+    const url = new URL(`${this.backendDomain}/wp-json/web-stories/v1/web-story`);
+    url.searchParams.set("_embed", "1");
+    url.searchParams.set("per_page", String(Math.min(limit, MAX_PAGE_SIZE)));
+    url.searchParams.set("cb", String(Date.now()));
 
     try {
-      const result = await this.fetchJson(url, wpWebStoryArraySchema, ["web-stories"]);
+      const result = await this.fetchJson(url, wpWebStoryArraySchema, ["web-stories-fresh"]);
       return result.data as WpWebStory[];
     } catch (error) {
-      // NAYA: 404 errors will be completely silent now.
       if (error instanceof WordPressHttpError && error.status === 404) {
         return [];
       }
-      console.error(`🚨 [getWebStories Failed] URL: ${url.toString()}`, error);
       return [];
     }
   }
