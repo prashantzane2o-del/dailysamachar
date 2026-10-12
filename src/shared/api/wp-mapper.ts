@@ -1,8 +1,9 @@
+// src/shared/api/wp-mapper.ts
 import { wpArticleSchema } from "@/shared/api/wordpress-schemas";
 import { stripCmsExcerpt } from "@/shared/lib/cms-html";
 
 /**
- * Utility to strip HTML tags and entities from plain text fields
+- Utility to strip HTML tags and entities from plain text fields
  */
 function stripCmsHtml(html: string | undefined | null): string {
   if (!html) return "";
@@ -13,8 +14,8 @@ function stripCmsHtml(html: string | undefined | null): string {
 }
 
 /**
- * Maps a single WordPress post to the CMS application format.
- * Throws an error if the input is completely invalid.
+- Maps a single WordPress post to the CMS application format.
+- Throws an error if the input is completely invalid.
  */
 export function mapWordPressPostToCMS(input: unknown) {
   const wpPost = wpArticleSchema.parse(input);
@@ -32,15 +33,16 @@ export function mapWordPressPostToCMS(input: unknown) {
   return {
     id: String(wpPost.id),
     slug: wpPost.slug,
-    title: stripCmsHtml(wpPost.title) || "Untitled",
-    excerpt: stripCmsExcerpt(wpPost.excerpt),
-    content: wpPost.content || "",
+    // FIXED: Access .rendered to satisfy string requirements
+    title: stripCmsHtml(wpPost.title?.rendered) || "Untitled",
+    excerpt: stripCmsExcerpt(wpPost.excerpt?.rendered),
+    content: wpPost.content?.rendered || "",
     publishedAt: wpPost.date,
     image: imageUrl,
     featuredImage: imageUrl
       ? {
           url: imageUrl,
-          alt: stripCmsHtml(featuredMedia?.alt_text || wpPost.title || "News Image"),
+          alt: stripCmsHtml(featuredMedia?.alt_text || wpPost.title?.rendered || "News Image"),
         }
       : undefined,
     author: stripCmsHtml(authorData?.name) || "DailySamachar Desk",
@@ -50,8 +52,8 @@ export function mapWordPressPostToCMS(input: unknown) {
 }
 
 /**
- * Maps an array of WordPress posts gracefully.
- * If a single post fails validation, it is skipped rather than crashing the whole list.
+- Maps an array of WordPress posts gracefully.
+- If a single post fails validation, it is skipped rather than crashing the whole list.
  */
 export function mapWordPressPosts(inputs: unknown[]) {
   if (!Array.isArray(inputs)) return [];
