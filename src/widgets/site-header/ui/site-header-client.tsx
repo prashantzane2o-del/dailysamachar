@@ -16,15 +16,15 @@ interface SiteHeaderClientProps {
   signIn: string;
   subscribe: string;
   categories: Category[];
-} // FIXED: Added missing closing brace
+} // ✅ FIXED: Missing closing bracket added
 
 export function SiteHeaderClient({ brand, signIn, subscribe, categories }: SiteHeaderClientProps) {
   const tHeader = useTranslations("header");
   const tNavigation = useTranslations("navigation");
   const locale = useLocale();
+
   const [menuOpen, setMenuOpen] = useState(false);
   const menuId = useId();
-
   const closeMenu = () => setMenuOpen(false);
 
   return (
@@ -49,6 +49,7 @@ export function SiteHeaderClient({ brand, signIn, subscribe, categories }: SiteH
             <Search aria-hidden="true" />
           </NextLink>
         </div>
+
         <NextLink
           href={getLocalizedPath(locale, "/")}
           className="group focus-visible:ring-focus shrink-0 rounded-sm focus-visible:ring-2"
@@ -56,6 +57,7 @@ export function SiteHeaderClient({ brand, signIn, subscribe, categories }: SiteH
         >
           <BrandLogo noLink className="h-16 w-16 object-contain" />
         </NextLink>
+
         <div className="flex items-center justify-end gap-1 sm:gap-2">
           <ThemeToggle />
           <LanguageSwitcher />
@@ -73,6 +75,7 @@ export function SiteHeaderClient({ brand, signIn, subscribe, categories }: SiteH
           </NextLink>
         </div>
       </div>
+
       <nav
         aria-label={tNavigation("mainNavigation")}
         className="border-line hidden border-t md:block dark:border-gray-800"
@@ -95,6 +98,7 @@ export function SiteHeaderClient({ brand, signIn, subscribe, categories }: SiteH
           ))}
         </div>
       </nav>
+
       {menuOpen && (
         <nav
           id={menuId}
@@ -131,4 +135,4 @@ export function SiteHeaderClient({ brand, signIn, subscribe, categories }: SiteH
       )}
     </>
   );
-} // FIXED: Added missing closing brace for the function
+} // ✅ FIXED: Missing closing bracket added

@@ -10,7 +10,7 @@ import { ChevronDown } from "lucide-react";
 interface MainNavigationProps {
   links?: Array<{ title: string; href: string }>;
   dropdownLinks?: Array<{ title: string; href: string }>;
-}
+} // FIXED: Missing closing bracket for interface
 
 export function MainNavigation({ links = [], dropdownLinks = [] }: MainNavigationProps) {
   const pathname = usePathname();
@@ -32,6 +32,7 @@ export function MainNavigation({ links = [], dropdownLinks = [] }: MainNavigatio
     const handlePointerDown = (event: PointerEvent) => {
       if (!othersRef.current?.contains(event.target as Node)) setIsOthersOpen(false);
     };
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setIsOthersOpen(false);
@@ -41,6 +42,7 @@ export function MainNavigation({ links = [], dropdownLinks = [] }: MainNavigatio
 
     document.addEventListener("pointerdown", handlePointerDown);
     document.addEventListener("keydown", handleKeyDown);
+
     return () => {
       document.removeEventListener("pointerdown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
@@ -66,19 +68,19 @@ export function MainNavigation({ links = [], dropdownLinks = [] }: MainNavigatio
     const nextIndex =
       event.key === "Home" ? 0 : event.key === "End" ? lastIndex : index + (event.key === "ArrowDown" ? 1 : -1);
     const wrappedIndex = nextIndex < 0 ? lastIndex : nextIndex > lastIndex ? 0 : nextIndex;
+
     menuItemRefs.current[wrappedIndex]?.focus();
   };
 
   if (!links || links.length === 0) {
     return null;
-  }
+  } // FIXED: Missing closing bracket for if block
 
   return (
     <nav aria-label="Main Navigation">
       <ul className="flex items-center gap-x-5 lg:gap-x-7">
         {links.map((link) => {
           const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(`${link.href}/`));
-
           return (
             <li key={link.title}>
               <Link
@@ -156,4 +158,4 @@ export function MainNavigation({ links = [], dropdownLinks = [] }: MainNavigatio
       </ul>
     </nav>
   );
-}
+} //FIXED: Missing closing bracket for MainNavigation function

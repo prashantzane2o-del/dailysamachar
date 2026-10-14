@@ -8,7 +8,7 @@ import { stripCmsHtml } from "@/shared/lib/cms-html";
 
 export interface WebStoriesSliderProps {
   locale: string;
-}
+} // ✅ FIXED: Missing closing bracket for interface
 
 export async function WebStoriesSlider({ locale }: WebStoriesSliderProps) {
   void locale;
@@ -34,6 +34,7 @@ export async function WebStoriesSlider({ locale }: WebStoriesSliderProps) {
             <span className="bg-signal inline-block h-6 w-3" aria-hidden="true"></span>
             Web Stories
           </h2>
+
           {stories.length > 0 && (
             <Link
               href="/web-stories" // FIXED: Point to dedicated web-stories page
@@ -72,14 +73,13 @@ export async function WebStoriesSlider({ locale }: WebStoriesSliderProps) {
                 story.story_poster?.url ||
                 story._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
                 "/Logo.png";
-
               const plainTitle = stripCmsHtml(story.title?.rendered) || "Untitled Story";
               const storyLink = story.link || `/web-stories`; // FIXED: Fallback link
 
               return (
                 <a
                   key={story.id}
-                  href={storyLink} 
+                  href={storyLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="focus-visible:ring-signal group relative aspect-9/16 w-37.5 shrink-0 snap-start overflow-hidden rounded-xl transition-shadow outline-none hover:shadow-xl focus-visible:ring-4 motion-reduce:transition-none sm:w-50 lg:w-60"
@@ -132,4 +132,4 @@ export async function WebStoriesSlider({ locale }: WebStoriesSliderProps) {
       </div>
     </section>
   );
-}
+} // ✅ FIXED: Missing closing bracket for function

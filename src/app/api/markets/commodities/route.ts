@@ -7,6 +7,7 @@ const TROY_OUNCE_IN_GRAMS = 31.1034768;
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+const EMPTY_MARKET_RESPONSE = { "Cache-Control": "private, no-store", "X-Market-Data": "unavailable" };
 
 type MetalPriceResponse = {
   success?: boolean;
@@ -18,7 +19,7 @@ type SpotPrice = { price: number; updatedAt?: string };
 
 async function getMetalPriceRates() {
   const apiKey = process.env.METALPRICE_API_KEY?.trim();
-  if (!apiKey) throw new Error("METALPRICE_API_KEY is not configured");
+  if (!apiKey || apiKey === "replace-with-metalpriceapi-key") return null;
 
   const url = new URL(METALPRICE_API_URL);
   url.searchParams.set("base", "USD");
@@ -27,6 +28,7 @@ async function getMetalPriceRates() {
   const response = await fetch(url, {
     headers: { Accept: "application/json", "X-API-KEY": apiKey },
     cache: "no-store",
+    signal: AbortSignal.timeout(8_000),
   });
   if (!response.ok) throw new Error(`MetalpriceAPI returned status: ${response.status}`);
 
@@ -60,7 +62,12 @@ async function getMetalPriceRates() {
 
 export async function GET(): Promise<NextResponse> {
   try {
-    const { usdInr, goldUsdPerOz, silverUsdPerOz } = await getMetalPriceRates();
+    const rates = await getMetalPriceRates();
+    if (!rates) {
+      return NextResponse.json([], { status: 200, headers: EMPTY_MARKET_RESPONSE });
+    }
+
+    const { usdInr, goldUsdPerOz, silverUsdPerOz } = rates;
 
     const data = [
       goldUsdPerOz && {
@@ -88,9 +95,6 @@ export async function GET(): Promise<NextResponse> {
     });
   } catch (error) {
     console.error("[Commodities API Error]:", error instanceof Error ? error.message : error);
-    return NextResponse.json(
-      { error: "Live gold and silver prices are temporarily unavailable." },
-      { status: 502, headers: { "Cache-Control": "private, no-store" } },
-    );
+    return NextResponse.json([], { status: 200, headers: EMPTY_MARKET_RESPONSE });
   }
 }

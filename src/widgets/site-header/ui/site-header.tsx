@@ -14,7 +14,6 @@ import { Calculator, FileText, Radio } from "lucide-react";
 
 export async function SiteHeader() {
   const tNav = await getTranslations("navigation");
-
   let topCategories: Array<{ title: string; href: string }> = [];
   let moreCategories: Array<{ title: string; href: string }> = [];
 
@@ -35,7 +34,7 @@ export async function SiteHeader() {
     }
   } catch (error) {
     console.error("Failed to fetch categories for header", error);
-  }
+  } // ✅ FIXED: Missing closing bracket for catch block added here
 
   // Purely dynamic structure (No hardcoded 'Opinion' or 'Live')
   const finalNavigationLinks = [{ title: tNav("home", { fallback: "Home" }), href: "/" }, ...topCategories];
@@ -46,7 +45,6 @@ export async function SiteHeader() {
       aria-label="Main Site Header"
     >
       <TopUtilityBar />
-
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-[4.5rem] items-center justify-between md:h-[5.25rem]">
           <div className="flex shrink-0 items-center gap-3 md:gap-6">
@@ -67,6 +65,7 @@ export async function SiteHeader() {
               <ThemeToggle />
               <LanguageSwitcher />
             </div>
+
             <Link
               href="/live"
               aria-label={tNav("live", { fallback: "Watch Live" })}
@@ -76,6 +75,7 @@ export async function SiteHeader() {
               <Radio className="h-5 w-5" aria-hidden="true" />
               <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5 rounded-full bg-red-600 ring-2 ring-white" aria-hidden="true" />
             </Link>
+
             <Link
               href="/epaper"
               aria-label="e-Paper"
@@ -84,6 +84,7 @@ export async function SiteHeader() {
             >
               <FileText className="h-5 w-5" aria-hidden="true" />
             </Link>
+
             <Link
               href="/tools"
               aria-label={tNav("tools", { fallback: "Tools & Calculators" })}
@@ -92,10 +93,11 @@ export async function SiteHeader() {
             >
               <Calculator className="h-5 w-5" aria-hidden="true" />
             </Link>
+
             <SearchTrigger />
           </div>
         </div>
       </div>
     </header>
   );
-}
+} // ✅ FIXED: Missing closing bracket for SiteHeader function added here

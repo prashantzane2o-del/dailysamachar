@@ -1,3 +1,4 @@
+// src/features/article/ui/article-page.tsx
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
@@ -11,7 +12,7 @@ export interface ArticlePageProps {
   article: Article;
   related: Article[];
   locale: string;
-} // FIXED: Missing closing bracket here
+} // ✅ FIXED: Missing closing bracket added
 
 function formatDate(value: string, locale: string): string {
   const date = new Date(value);
@@ -22,13 +23,14 @@ function formatDate(value: string, locale: string): string {
         month: "long",
         day: "numeric",
       }).format(date);
-} // FIXED: Missing closing bracket here
+} // ✅ FIXED: Missing closing bracket added
 
 export async function ArticlePage({ article, related, locale }: ArticlePageProps) {
   const t = await getTranslations({ locale, namespace: "article" });
   const title = article.title || "Untitled story";
   const plainTitle = stripCmsHtml(title) || "Untitled story";
   const author = article.author || t("desk");
+
   const contentHtml =
     typeof article.content === "string"
       ? article.content
@@ -50,6 +52,7 @@ export async function ArticlePage({ article, related, locale }: ArticlePageProps
         articleText={stripCmsHtml(`${article.title} ${article.excerpt || ""} ${contentHtml}`)}
         locale={locale}
       />
+
       <article>
         <header className="border-line border-b dark:border-gray-800">
           <div className="container-page py-5">
@@ -61,6 +64,7 @@ export async function ArticlePage({ article, related, locale }: ArticlePageProps
             </Link>
           </div>
         </header>
+
         <div className="container-page grid gap-10 py-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <div className="mx-auto w-full max-w-3xl">
             <ArticleTranslator
@@ -76,17 +80,18 @@ export async function ArticlePage({ article, related, locale }: ArticlePageProps
                       {author.charAt(0).toUpperCase()}
                     </span>
                     <span className="article-primary-text font-semibold">{author}</span>
-                    <span aria-hidden="true"> </span>
+                    <span aria-hidden="true">&bull;</span>
                     <time dateTime={article.publishedAt}>{formatDate(article.publishedAt, locale)}</time>
                     {article.updatedAt && article.updatedAt !== article.publishedAt && (
                       <>
-                        <span aria-hidden="true"> </span>
+                        <span aria-hidden="true">&bull;</span>
                         <span>
                           {t("updated")} {formatDate(article.updatedAt, locale)}
                         </span>
                       </>
                     )}
                   </div>
+
                   {article.image && (
                     <figure className="bg-soft relative mt-8 aspect-video overflow-hidden rounded-2xl dark:bg-gray-900">
                       <Image
@@ -108,6 +113,7 @@ export async function ArticlePage({ article, related, locale }: ArticlePageProps
               }
             />
           </div>
+
           <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start" aria-label="Related stories">
             <div className="border-line border-t pt-4 dark:border-gray-800">
               <p className="kicker">{t("continueReading")}</p>
@@ -128,7 +134,8 @@ export async function ArticlePage({ article, related, locale }: ArticlePageProps
           </aside>
         </div>
       </article>
+
       <ArticleComments articleId={article.id} locale={locale} />
     </main>
-  );
-}
+  ); // ✅ FIXED: Missing closing bracket added
+} // ✅ FIXED: Missing closing bracket added

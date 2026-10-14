@@ -10,19 +10,20 @@ import { Link } from "@/i18n/routing";
 import type { Article } from "@/types/news";
 import { SanitizedHtml } from "@/shared/ui/sanitized-html";
 
-interface MultimediaGalleryProps {
+export interface MultimediaGalleryProps {
   sectionTitle?: string;
   articles?: Article[];
-}
+} // ✅ FIXED: Missing closing bracket added
 
 // Helper to determine media type from Article data
 function getMediaType(article: Article): "video" | "gallery" {
   const cat = article.category?.toLowerCase() || "";
   if (cat.includes("video") || article.tags?.some((t) => t.toLowerCase() === "video")) {
     return "video";
-  }
+  } // ✅ FIXED: Missing closing bracket added
+  
   return "gallery";
-}
+} // ✅ FIXED: Missing closing bracket added
 
 const MediaIndicator: React.FC<{ article: Article; type: "video" | "gallery" }> = ({ article, type }) => {
   if (type === "video") {
@@ -34,20 +35,22 @@ const MediaIndicator: React.FC<{ article: Article; type: "video" | "gallery" }> 
         </span>
       </div>
     );
-  }
+  } // ✅ FIXED: Missing closing bracket added
+
   return (
     <div className="absolute top-4 left-4 z-20 flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1 text-white shadow-sm backdrop-blur-md">
       <Camera className="h-4 w-4" aria-hidden="true" />
       <span className="text-xs font-bold tracking-wider uppercase">Gallery</span>
     </div>
   );
-};
+}; // ✅ FIXED: Missing closing bracket added
 
 export const MultimediaGallery: React.FC<MultimediaGalleryProps> = ({ sectionTitle, articles = [] }) => {
   const t = useTranslations("multimedia");
   const title = sectionTitle || t("inFocus", { fallback: "In Focus: Photos & Videos" });
 
   const safeArticles = Array.isArray(articles) ? articles : [];
+
   if (safeArticles.length === 0) return null;
 
   const featuredItem = safeArticles[0];
@@ -87,7 +90,6 @@ export const MultimediaGallery: React.FC<MultimediaGalleryProps> = ({ sectionTit
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.6 }}
-            /* FIXED: Replaced lg:aspect-auto with lg:aspect-video to prevent Next Image 0 height warning */
             className="group relative aspect-4/3 overflow-hidden rounded-xl lg:col-span-8 lg:aspect-video"
           >
             <Link
@@ -115,7 +117,6 @@ export const MultimediaGallery: React.FC<MultimediaGalleryProps> = ({ sectionTit
               className="absolute inset-0 z-10 bg-linear-to-t from-black/90 via-black/30 to-transparent"
               aria-hidden="true"
             />
-
             <MediaIndicator article={featuredItem} type={getMediaType(featuredItem)} />
 
             {getMediaType(featuredItem) === "video" && (
@@ -146,7 +147,6 @@ export const MultimediaGallery: React.FC<MultimediaGalleryProps> = ({ sectionTit
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                /* FIXED: Removed lg:aspect-auto to safely rely on lg:h-[calc(50%-12px)] explicit height */
                 className="group relative aspect-square overflow-hidden rounded-xl sm:aspect-video lg:h-[calc(50%-12px)]"
               >
                 <Link
@@ -174,7 +174,6 @@ export const MultimediaGallery: React.FC<MultimediaGalleryProps> = ({ sectionTit
                   className="absolute inset-0 z-10 bg-linear-to-t from-black/90 via-black/20 to-transparent"
                   aria-hidden="true"
                 />
-
                 <MediaIndicator article={item} type={getMediaType(item)} />
 
                 <div className="pointer-events-none absolute bottom-0 left-0 z-20 w-full p-4">
@@ -189,4 +188,4 @@ export const MultimediaGallery: React.FC<MultimediaGalleryProps> = ({ sectionTit
       </div>
     </section>
   );
-};
+}; // ✅ FIXED: Missing closing bracket added

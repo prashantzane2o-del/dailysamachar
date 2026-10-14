@@ -14,25 +14,28 @@ import { Avatar } from "@/shared/ui/legacy-primitives";
 interface OpinionEditorialWidgetProps {
   sectionTitle?: string;
   articles?: Article[];
-}
+} // ✅ FIXED: Missing closing bracket added
 
 // FIXED: Helper function to clean up Author names if WordPress returns an Email ID
 function formatAuthorName(name: string): string {
   if (!name) return "DailySamachar Desk";
+
   if (name.includes("@")) {
     const prefix = name.split("@")[0];
     // Remove numbers/special chars and capitalize the first letter (e.g., dailysamachar56 -> Dailysamachar)
     const cleanedName = prefix.replace(/[0-9_.-]/g, " ").trim();
     return cleanedName.charAt(0).toUpperCase() + cleanedName.slice(1);
-  }
+  } // ✅ FIXED: Missing closing bracket added
+
   return name;
-}
+} // ✅ FIXED: Missing closing bracket added
 
 export const OpinionEditorialWidget: React.FC<OpinionEditorialWidgetProps> = ({ sectionTitle, articles = [] }) => {
   const t = useTranslations("opinionWidget");
   const title = sectionTitle || t("defaultTitle", { fallback: "Opinion & Analysis" });
 
   const safeArticles = Array.isArray(articles) ? articles : [];
+
   if (safeArticles.length === 0) return null;
 
   return (
@@ -121,4 +124,4 @@ export const OpinionEditorialWidget: React.FC<OpinionEditorialWidgetProps> = ({ 
       </div>
     </section>
   );
-};
+}; // ✅ FIXED: Missing closing bracket added

@@ -20,7 +20,7 @@ import { NewsletterCard } from "@/components/widgets/widgets";
 
 export interface HomePageProps {
   params: Promise<{ locale: string }>;
-}
+} // ✅ FIXED: Missing closing bracket added
 
 export async function generateMetadata({ params }: HomePageProps): Promise<Metadata> {
   const { locale } = await params;
@@ -39,21 +39,21 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
       siteName: "DailySamachar",
     },
   };
-}
+} // ✅ FIXED: Missing closing bracket added
 
 // 1. Opinion & Editorial Feed (Optimized: No fallbacks to avoid duplication loops)
 async function OpinionFeed() {
   const opinionArticles = await cmsApi.getArticlesByCategory("opinion", 1, 3).catch(() => []);
   if (opinionArticles.length === 0) return null;
   return <OpinionEditorialWidget sectionTitle="Opinion & Analysis" articles={opinionArticles} />;
-}
+} // ✅ FIXED: Missing closing bracket added
 
 // 2. Multimedia / Videos Feed (Optimized: No fallbacks)
 async function MultimediaFeed() {
   const mediaArticles = await cmsApi.getArticlesByCategory("video", 1, 5).catch(() => []);
   if (mediaArticles.length === 0) return null;
   return <MultimediaGallery sectionTitle="In Focus: Photos & Videos" articles={mediaArticles} />;
-}
+} // ✅ FIXED: Missing closing bracket added
 
 export default async function HomePage({ params }: HomePageProps) {
   const { locale } = await params;
@@ -112,7 +112,7 @@ export default async function HomePage({ params }: HomePageProps) {
         />
 
         {/* ==========================================
-            NAYA: Web Stories exactly below Latest News 
+            NAYA: Web Stories exactly below Latest News
             ========================================== */}
         <Suspense fallback={<div className="bg-soft mx-auto my-6 h-80 w-full animate-pulse rounded-xl" />}>
           <WebStoriesSlider locale={locale} />

@@ -93,4 +93,27 @@ describe("normalizeWordPressApiUrl", () => {
     await expect(adapter.getCategories()).resolves.toEqual([]);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it("preserves WordPress content and only normalizes complete ellipsis entities", async () => {
+    const post = {
+      id: 101,
+      date: "2026-09-18T10:00:00",
+      modified: "2026-09-18T10:00:00",
+      slug: "galaxy-s26-fe",
+      title: { rendered: "Samsung Galaxy S26 FE" },
+      content: {
+        rendered:
+          '<p class="wp-block-paragraph">Samsung Galaxy S26 FE में Dynamic AMOLED 2X डिस्प्ले है&hellip;</p><h2 class="wp-block-heading">लॉन्च की बड़ी खबर</h2>',
+      },
+      excerpt: { rendered: "" },
+    };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify([post]))));
+
+    const article = await new WordPressAdapter().getPostBySlug("galaxy-s26-fe");
+
+    expect(article?.content).toContain('class="wp-block-paragraph"');
+    expect(article?.content).toContain("Samsung Galaxy S26 FE में Dynamic AMOLED 2X डिस्प्ले है...");
+    expect(article?.content).toContain('<h2 class="wp-block-heading">लॉन्च की बड़ी खबर</h2>');
+    expect(article?.content).not.toContain("Ga...axy");
+  });
 });

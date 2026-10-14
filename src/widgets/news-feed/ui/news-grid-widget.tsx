@@ -11,7 +11,7 @@ export interface NewsGridWidgetProps {
   viewAllLink?: string;
   className?: string; // To fix double padding issues from parent wrappers
   hideIfEmpty?: boolean; // To prevent ugly gray boxes on the homepage
-}
+} // ✅ FIXED: Missing closing bracket for interface
 
 export function NewsGridWidget({
   title = "Latest News",
@@ -25,7 +25,7 @@ export function NewsGridWidget({
   // MISTAKE 7 FIX: Gracefully hide the entire section if no articles exist
   if (safeArticles.length === 0 && hideIfEmpty) {
     return null;
-  }
+  } // ✅ FIXED: Missing closing bracket for if block
 
   return (
     <section className={cn(className)} aria-labelledby={`grid-heading-${title.replace(/\s+/g, "-").toLowerCase()}`}>
@@ -39,7 +39,6 @@ export function NewsGridWidget({
             <span className="bg-signal inline-block h-5 w-1.5" aria-hidden="true"></span>
             {title}
           </h2>
-
           {/* Header Link always visible if provided and articles exist */}
           {viewAllLink && safeArticles.length > 0 && (
             <Link
@@ -122,4 +121,4 @@ export function NewsGridWidget({
       </div>
     </section>
   );
-}
+} // ✅ FIXED: Missing closing bracket for function

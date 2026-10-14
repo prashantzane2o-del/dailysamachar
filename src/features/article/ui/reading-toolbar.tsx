@@ -33,35 +33,21 @@ function splitSpeechText(text: string, maxLength = 220) {
 
 // --- Components ---
 
-export const ReadingToolbar: React.FC<ReadingToolbarProps> = ({
-  articleId,
-  articleText = "",
-}) => {
+export const ReadingToolbar: React.FC<ReadingToolbarProps> = ({ articleId, articleText = "" }) => {
   const t = useTranslations("articleToolbar");
 
   const [isVisible, setIsVisible] = useState(false);
-  const [readingProgress, setReadingProgress] = useState(0);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [isAudioPaused, setIsAudioPaused] = useState(false);
   const [audioError, setAudioError] = useState(false);
   const [isLinkCopied, setIsLinkCopied] = useState(false);
   const [currentSpeechText, setCurrentSpeechText] = useState(articleText);
 
-  // Scroll listener for visibility and progress bar
+  // Show the reading controls after the article header without rendering a
+  // scroll-progress indicator in the site header.
   useEffect(() => {
     const handleScroll = () => {
-      // Calculate scroll progress
-      const scrollPosition = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-
-      const totalScrollable = documentHeight - windowHeight;
-      const progress = totalScrollable > 0 ? (scrollPosition / totalScrollable) * 100 : 0;
-
-      setReadingProgress(Math.min(100, Math.max(0, progress)));
-
-      // Show toolbar after scrolling past initial hero section (approx 400px)
-      setIsVisible(scrollPosition > 400);
+      setIsVisible(window.scrollY > 400);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -182,14 +168,6 @@ export const ReadingToolbar: React.FC<ReadingToolbarProps> = ({
           data-article-id={articleId}
           className="fixed top-0 left-0 z-40 w-full border-b border-gray-200 bg-white/90 shadow-sm backdrop-blur-lg dark:border-gray-800 dark:bg-black/90"
         >
-          {/* Progress Bar */}
-          <div className="absolute top-0 left-0 h-1 w-full bg-gray-100 dark:bg-gray-900">
-            <div
-              className="bg-signal h-full transition-all duration-150 ease-out"
-              style={{ width: `${readingProgress}%` }}
-            />
-          </div>
-
           <div className="mx-auto flex h-14 max-w-4xl items-center justify-between px-4 sm:px-6">
             {/* Left: Branding / Context */}
             <div className="flex items-center">

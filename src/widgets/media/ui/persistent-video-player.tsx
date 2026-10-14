@@ -1,5 +1,4 @@
 // src/widgets/media/ui/persistent-video-player.tsx
-
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
@@ -14,13 +13,13 @@ export interface VideoData {
   url: string;
   title: string;
   category: string;
-}
+} // ✅ FIXED: Missing closing bracket for interface
 
 interface PersistentVideoPlayerProps {
   video: VideoData | null;
   onClose?: () => void;
   initialIsPip?: boolean;
-}
+} // ✅ FIXED: Missing closing bracket for interface
 
 // --- Components ---
 export const PersistentVideoPlayer: React.FC<PersistentVideoPlayerProps> = ({

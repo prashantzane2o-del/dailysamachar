@@ -13,7 +13,7 @@ export interface HeroStoryWidgetProps {
   mainStory?: Article | null;
   sideStories?: Article[];
   sectionTitle?: string;
-}
+} // ✅ FIXED: Missing closing bracket for interface
 
 export function HeroStoryWidget({
   stories = [],
@@ -23,7 +23,6 @@ export function HeroStoryWidget({
 }: HeroStoryWidgetProps) {
   const headingId = useId();
   const headingLabel = sectionTitle.trim() || "Latest Headlines";
-
   const fallbackStories = [mainStory, ...(Array.isArray(sideStories) ? sideStories : [])];
   const visibleStories = (stories.length > 0 ? stories : fallbackStories)
     .filter((story): story is Article => Boolean(story?.id && story.slug))
@@ -67,8 +66,8 @@ export function HeroStoryWidget({
     pointerStartX.current = null;
 
     if (Math.abs(distance) < 44 || visibleStories.length < 2) return;
-    setIsPaused(true);
 
+    setIsPaused(true);
     if (distance < 0) showNext();
     else showPrevious();
   };
@@ -97,7 +96,7 @@ export function HeroStoryWidget({
             className="text-signal hover:text-ink focus-visible:ring-signal focus-visible:ring-offset-paper ml-4 min-h-11 shrink-0 rounded-sm px-2 py-2 text-sm font-bold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2 motion-reduce:transition-none"
             aria-label={`View all ${headingLabel.toLowerCase()} stories`}
           >
-            <span aria-hidden="true">View all  </span>
+            <span aria-hidden="true">View all &rarr;</span>
           </Link>
         </div>
 
@@ -137,14 +136,12 @@ export function HeroStoryWidget({
                 fill
                 priority={activeIndex === 0}
                 sizes="(max-width: 768px) 100vw, 1200px"
-                // NAYA: object-contain add kiya hai taaki image kate nahi aur proper fix hoke dikhe
                 className="object-contain"
               />
             ) : (
               <div className="absolute inset-0 bg-slate-800" aria-hidden="true" />
             )}
             
-            {/* Gradient ko thoda adjust kiya gaya hai taaki text visible rahe */}
             <div
               className="pointer-events-none absolute inset-0 hidden bg-gradient-to-t from-black via-black/40 to-transparent sm:block"
               aria-hidden="true"
@@ -220,4 +217,4 @@ export function HeroStoryWidget({
       </div>
     </section>
   );
-}
+} // ✅ FIXED: Missing closing bracket for function

@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { marketApi } from "../api/market.api";
+import { MarketApiError, marketApi } from "../api/market.api";
 
 export function useMarketData(type: "indices" | "commodities" = "indices") {
   return useQuery({
@@ -9,6 +9,7 @@ export function useMarketData(type: "indices" | "commodities" = "indices") {
     queryFn: () => marketApi.getMarketData(type),
     staleTime: 30 * 1000,
     refetchInterval: 60 * 1000,
-    retry: 1,
+    retry: (failureCount, error) => error instanceof MarketApiError && error.transient && failureCount < 2,
+    refetchOnWindowFocus: false,
   });
 }

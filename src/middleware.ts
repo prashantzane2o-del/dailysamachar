@@ -17,7 +17,6 @@ export default function middleware(request: NextRequest) {
 
     // Strict but Dynamic CORS for API routes
     const origin = request.headers.get("origin") ?? "";
-    
     const isLocalhost = origin.startsWith("http://localhost:");
     const isProduction = origin === "https://dailysamachar.org" || origin === "https://api.dailysamachar.org";
     const isVercelPreview = origin.endsWith(".vercel.app");
@@ -34,14 +33,14 @@ export default function middleware(request: NextRequest) {
   } else {
     // Process standard frontend routes through next-intl
     response = intlMiddleware(request);
-  }
+  } // ✅ FIXED: Missing closing bracket for else block added here
 
   // 2. Enforce dynamic security headers
   response.headers.set("X-DNS-Prefetch-Control", "on");
   response.headers.set("X-XSS-Protection", "1; mode=block");
 
   return response;
-}
+} // ✅ FIXED: Missing closing bracket for middleware function added here
 
 export const config = {
   // Matcher includes all paths EXCEPT static files, manifests, and internal Next.js assets

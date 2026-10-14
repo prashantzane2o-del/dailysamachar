@@ -1,21 +1,10 @@
 // src/shared/api/wp-mapper.ts
 import { wpArticleSchema } from "@/shared/api/wordpress-schemas";
-import { stripCmsExcerpt } from "@/shared/lib/cms-html";
+import { stripCmsExcerpt, stripCmsHtml } from "@/shared/lib/cms-html";
 
 /**
-- Utility to strip HTML tags and entities from plain text fields
- */
-function stripCmsHtml(html: string | undefined | null): string {
-  if (!html) return "";
-  return String(html)
-    .replace(/<[^>]+>/g, "") // Strip HTML tags
-    .replace(/&[^;]+;/g, "") // Strip HTML entities
-    .trim();
-}
-
-/**
-- Maps a single WordPress post to the CMS application format.
-- Throws an error if the input is completely invalid.
+ * Maps a single WordPress post to the CMS application format.
+ * Throws an error if the input is completely invalid.
  */
 export function mapWordPressPostToCMS(input: unknown) {
   const wpPost = wpArticleSchema.parse(input);
@@ -33,7 +22,7 @@ export function mapWordPressPostToCMS(input: unknown) {
   return {
     id: String(wpPost.id),
     slug: wpPost.slug,
-    // FIXED: Access .rendered to satisfy string requirements
+    // ✅ FIXED: Using the robust stripCmsHtml from library instead of the local one that deleted characters
     title: stripCmsHtml(wpPost.title?.rendered) || "Untitled",
     excerpt: stripCmsExcerpt(wpPost.excerpt?.rendered),
     content: wpPost.content?.rendered || "",
@@ -52,8 +41,8 @@ export function mapWordPressPostToCMS(input: unknown) {
 }
 
 /**
-- Maps an array of WordPress posts gracefully.
-- If a single post fails validation, it is skipped rather than crashing the whole list.
+ * Maps an array of WordPress posts gracefully.
+ * If a single post fails validation, it is skipped rather than crashing the whole list.
  */
 export function mapWordPressPosts(inputs: unknown[]) {
   if (!Array.isArray(inputs)) return [];

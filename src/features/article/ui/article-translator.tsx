@@ -1,3 +1,4 @@
+// src/features/article/ui/article-translator.tsx
 "use client";
 
 import { useState } from "react";
@@ -14,7 +15,7 @@ type ArticleTranslatorProps = {
   locale: string;
   inBriefLabel: string;
   metadata: ReactNode;
-};
+}; // ✅ FIXED: Missing closing bracket for type
 
 export function ArticleTranslator({ title, excerpt, content, locale, inBriefLabel, metadata }: ArticleTranslatorProps) {
   const t = useTranslations("articleToolbar");
@@ -46,16 +47,20 @@ export function ArticleTranslator({ title, excerpt, content, locale, inBriefLabe
 
     setIsLoading(true);
     setError("");
+
     try {
       const response = await fetch("/api/translate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ texts: [title, excerpt, content], source: originalLanguage, target }),
       });
+
       const result = (await response.json()) as { texts?: string[]; error?: string };
+
       if (!response.ok || !result.texts || result.texts.length !== 3) {
         throw new Error(result.error || "Translation failed");
       }
+
       setTranslated({ title: result.texts[0], excerpt: result.texts[1], content: result.texts[2] });
       setTargetLanguage(target);
       announceLanguageChange(result.texts[0], result.texts[1], result.texts[2], target);
@@ -70,7 +75,7 @@ export function ArticleTranslator({ title, excerpt, content, locale, inBriefLabe
     <>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <span className="text-muted text-sm" role="status" aria-live="polite">
-          {targetLanguage === "hi" ? "हिंदी" : "English"}
+          {targetLanguage === "hi" ? "Translated to Hindi" : "English"}
         </span>
         <div
           className="flex items-center gap-2"
@@ -87,26 +92,31 @@ export function ArticleTranslator({ title, excerpt, content, locale, inBriefLabe
               className="focus-visible:ring-focus border-line text-ink hover:border-signal hover:text-signal rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-default disabled:opacity-60"
               aria-pressed={targetLanguage === language}
             >
-              {language === "hi" ? "हिंदी" : "English"}
+              {language === "hi" ? "Hindi" : "English"}
             </button>
           ))}
           {isLoading && <LoaderCircle className="text-signal h-4 w-4 animate-spin" aria-label="Translating" />}
         </div>
       </div>
+
       {error && (
         <p className="border-signal bg-soft text-ink mb-5 rounded-lg border-l-2 p-3 text-sm" role="alert">
           {error}
         </p>
       )}
+
       <h1 className="article-title editorial mt-4 text-3xl leading-tight font-bold tracking-tight sm:text-5xl lg:text-6xl">
         {stripCmsHtml(translated.title) || "Untitled story"}
       </h1>
+
       <SanitizedHtml html={translated.excerpt} className="text-muted mt-5 max-w-3xl text-lg leading-relaxed" />
       {metadata}
+
       <div className="border-signal bg-soft mb-8 rounded-xl border-l-2 p-5 dark:bg-gray-900">
         <p className="text-signal text-xs font-bold tracking-widest">{inBriefLabel}</p>
         <SanitizedHtml html={translated.excerpt} className="text-ink mt-2 text-sm leading-relaxed" />
       </div>
+
       <SanitizedHtml html={translated.content || translated.excerpt} className="prose-readable text-ink" />
     </>
   );

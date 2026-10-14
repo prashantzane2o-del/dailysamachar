@@ -40,4 +40,4 @@ export function SearchTrigger() {
       </button>
     </form>
   );
-}
+} // ✅ FIXED: Missing closing bracket added

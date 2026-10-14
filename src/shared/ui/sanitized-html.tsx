@@ -165,8 +165,9 @@ const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
   ],
   allowProtocolRelative: false,
   transformTags: {
-    // Article pages already provide the document h1; CMS headings begin at h2.
-    h1: "h2",
+    // Preserve the heading level authored in WordPress. The article title is
+    // rendered separately, but changing CMS headings would silently change
+    // the post's structure and visible hierarchy.
     img: (_tagName, attribs) => ({
       tagName: "img",
       attribs: {

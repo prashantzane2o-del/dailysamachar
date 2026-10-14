@@ -163,8 +163,14 @@ export class WordPressAdapter {
     let processed = html;
 
     processed = processed.replace(/<a[^>]*class="[^"]*more-link[^"]*"[^>]*>.*?<\/a>/gi, "");
-    processed = processed.replace(/<a[^>]*href="[^"]*"[^>]*>\s*[&hellip;]\s*<\/a>/gi, "");
-    processed = processed.replace(/[&hellip;]/g, "...");
+
+    // WordPress may append an ellipsis-only "read more" link. Match complete
+    // entities only: a character class here would corrupt ordinary letters in
+    // both content and HTML attributes (for example, `class` and `Galaxy`).
+    processed = processed.replace(/<a[^>]*href="[^"]*"[^>]*>\s*(?:&hellip;|&#8230;|&#x2026;|…)\s*<\/a>/gi, "");
+
+    // Normalise only complete ellipsis entities, never individual characters.
+    processed = processed.replace(/(?:&hellip;|&#8230;|&#x2026;|…)/gi, "...");
 
     const rawDomain = this.backendDomain.replace(/^https?:\/\//, "");
     const domainRegex = new RegExp(`href=["']https?://${rawDomain}/([^"']*)["']`, "gi");
@@ -193,9 +199,9 @@ export class WordPressAdapter {
 
     processed = processed.replace(
       /<img(?!.*loading=["']lazy["'])([^>]*)>/gi,
-      '<img loading="lazy" decoding="async"$1>',
+      '<img loading="lazy" decoding="async"\$1>',
     );
-    processed = processed.replace(/<iframe(?!.*loading=["']lazy["'])([^>]*)>/gi, '<iframe loading="lazy"$1>');
+    processed = processed.replace(/<iframe(?!.*loading=["']lazy["'])([^>]*)>/gi, '<iframe loading="lazy"\$1>');
 
     return processed;
   }
